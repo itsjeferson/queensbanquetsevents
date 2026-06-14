@@ -1,0 +1,20 @@
+:root {
+  --gold: #D4AF37;
+  --gold-light: #E8C84A;
+  --gold-dark: #B8960C;
+  --gold-pale: #F5EEC8;
+  --white: #FFFFFF;
+  --black: #1A1A1A;
+  --beige: #F5F1E8;
+  --beige-dark: #EDE7D5;
+  --gray: #888888;
+  --gray-light: #F0EEEA;
+  --text-muted: #6B6259;
+  --border: rgba(212, 175, 55, 0.2);
+  --border-soft: rgba(26, 26, 26, 0.08);
+  --shadow: 0 4px 30px rgba(26, 26, 26, 0.06);
+  --shadow-lg: 0 12px 60px rgba(26, 26, 26, 0.12);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --nav-h: 72px;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "velura/queens-banquet-api",
+  "description": "PHP REST API for Queens Banquet Events",
+  "type": "project",
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}

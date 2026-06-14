@@ -1,0 +1,519 @@
+.invitation-page {
+  --inv-primary: var(--gold);
+  --inv-accent: var(--black);
+  font-family: 'Poppins', sans-serif;
+  color: var(--black);
+  background: var(--white);
+  overflow-x: hidden;
+}
+
+.invitation-page h1,
+.invitation-page h2,
+.invitation-page h3 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Cover Screen */
+.inv-cover {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  background: linear-gradient(160deg, var(--beige) 0%, var(--beige-dark) 50%, var(--gold-pale) 100%);
+  overflow: hidden;
+}
+
+.inv-cover-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+}
+
+.inv-cover-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px 24px;
+  animation: invFadeUp 1.2s ease;
+}
+
+.inv-cover-ornament {
+  font-size: 28px;
+  color: var(--inv-primary);
+  margin-bottom: 24px;
+  letter-spacing: 8px;
+}
+
+.inv-cover h1 {
+  font-size: clamp(36px, 8vw, 72px);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.inv-cover .inv-subtitle {
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.inv-cover .inv-tagline {
+  font-size: 16px;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.inv-cover .inv-date {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 4vw, 32px);
+  color: var(--inv-primary);
+  margin-bottom: 40px;
+}
+
+.inv-open-btn {
+  padding: 16px 48px;
+  background: var(--inv-primary);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.inv-open-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.4);
+}
+
+/* Invitation Sections */
+.inv-section {
+  padding: 80px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.inv-section-full {
+  background: var(--beige);
+  padding: 80px 24px;
+}
+
+.inv-section-full .inv-section {
+  padding: 0;
+}
+
+.inv-section-tag {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--inv-primary);
+  margin-bottom: 12px;
+}
+
+.inv-section h2 {
+  font-size: clamp(28px, 5vw, 42px);
+  margin-bottom: 16px;
+}
+
+.inv-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--inv-primary);
+  margin: 0 auto 40px;
+}
+
+/* Countdown */
+.inv-countdown {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.inv-countdown-item {
+  text-align: center;
+  min-width: 80px;
+}
+
+.inv-countdown-item strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 6vw, 56px);
+  color: var(--inv-primary);
+  line-height: 1;
+}
+
+.inv-countdown-item span {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Story */
+.inv-story-block {
+  text-align: left;
+  margin-bottom: 32px;
+  padding: 28px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+}
+
+.inv-story-block h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: var(--inv-primary);
+}
+
+.inv-story-block p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+/* Event Details */
+.inv-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  text-align: left;
+}
+
+.inv-detail-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  border: 1px solid var(--border-soft);
+}
+
+.inv-detail-card h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--inv-primary);
+}
+
+.inv-detail-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.inv-map-btn {
+  display: inline-flex;
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1.5px solid var(--inv-primary);
+  color: var(--inv-primary);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inv-map-btn:hover {
+  background: var(--inv-primary);
+  color: var(--white);
+}
+
+/* Program */
+.inv-program-list {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.inv-program-item {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.inv-program-time {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--inv-primary);
+  min-width: 80px;
+}
+
+/* Entourage */
+.inv-entourage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  text-align: left;
+}
+
+.inv-entourage-group h4 {
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--inv-primary);
+  margin-bottom: 10px;
+}
+
+.inv-entourage-group p,
+.inv-entourage-group li {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.inv-entourage-group ul {
+  list-style: none;
+}
+
+/* Gallery */
+.inv-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.inv-gallery-item {
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--beige-dark), var(--gold-pale));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  overflow: hidden;
+}
+
+/* Video */
+.inv-video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.inv-video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Gift Registry */
+.inv-gift-info {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+  background: var(--white);
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+}
+
+.inv-gift-info p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* RSVP Form */
+.inv-rsvp-form {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.inv-rsvp-form .form-group {
+  margin-bottom: 20px;
+}
+
+.inv-attendance-btns {
+  display: flex;
+  gap: 12px;
+}
+
+.inv-attendance-btn {
+  flex: 1;
+  padding: 12px;
+  border: 1.5px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inv-attendance-btn.active {
+  border-color: var(--inv-primary);
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--inv-primary);
+  font-weight: 500;
+}
+
+/* Guest Book */
+.inv-messages-list {
+  display: grid;
+  gap: 16px;
+  text-align: left;
+}
+
+.inv-message-card {
+  background: var(--white);
+  padding: 20px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-soft);
+}
+
+.inv-message-card strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.inv-message-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Footer */
+.inv-footer {
+  background: var(--black);
+  color: var(--white);
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.inv-footer h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: var(--inv-primary);
+}
+
+.inv-footer p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 24px;
+}
+
+.inv-share-btns {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.inv-share-btn {
+  padding: 10px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--white);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inv-share-btn:hover {
+  border-color: var(--inv-primary);
+  color: var(--inv-primary);
+}
+
+/* QR Code */
+.inv-qr-section {
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.inv-qr-section img {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 16px;
+  border-radius: 8px;
+}
+
+/* Builder */
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.template-card {
+  border: 2px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.template-card:hover,
+.template-card.selected {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.template-preview {
+  height: 120px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--beige-dark), var(--gold-pale));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.template-card h4 {
+  font-size: 14px;
+}
+
+.inv-builder-steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.inv-builder-step {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--beige);
+  color: var(--text-muted);
+}
+
+.inv-builder-step.active {
+  background: var(--gold);
+  color: var(--white);
+}
+
+.inv-builder-step.done {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--gold-dark);
+}
+
+@keyframes invFadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .inv-details-grid { grid-template-columns: 1fr; }
+  .inv-gallery-grid { grid-template-columns: repeat(2, 1fr); }
+}
