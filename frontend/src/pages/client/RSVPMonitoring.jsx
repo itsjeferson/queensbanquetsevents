@@ -13,15 +13,16 @@ const demoRsvps = [
 
 export default function RSVPMonitoring() {
   const { id } = useParams();
+  const eventId = id || '1';
   const [stats, setStats] = useState(demoStats);
   const [rsvps, setRsvps] = useState(demoRsvps);
 
   useEffect(() => {
-    rsvpService.getByEvent(id).then((res) => {
+    rsvpService.getByEvent(eventId).then((res) => {
       if (res.data?.stats) setStats(res.data.stats);
       if (res.data?.rsvps?.length) setRsvps(res.data.rsvps);
     }).catch(() => {});
-  }, [id]);
+  }, [eventId]);
 
   const total = stats.total_responses || (stats.yes + stats.no + stats.maybe);
   const attendingPct = total ? Math.round((stats.yes / total) * 100) : 0;

@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../models/Event.php';
 require_once __DIR__ . '/../models/InvitationPage.php';
-require_once __DIR__ . '/../models/GuestMessage.php';
 require_once __DIR__ . '/../helpers/response.php';
 
 class InvitationController
@@ -23,13 +22,12 @@ class InvitationController
     private function sendPublicInvitation(array $event): void
     {
         $page = InvitationPage::findByEventId((int) $event['id']);
-        $messages = GuestMessage::byEvent((int) $event['id']);
         sendResponse([
             'success' => true,
             'data' => [
                 'event' => $event,
                 'invitation' => $page,
-                'guest_messages' => array_slice($messages, 0, 20),
+                'guest_messages' => [],
             ],
         ]);
     }

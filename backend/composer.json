@@ -1,6 +1,6 @@
 {
-  "name": "velura/queens-banquet-api",
-  "description": "PHP REST API for Queens Banquet Events",
+  "name": "queens-banquet/queens-banquet-api",
+  "description": "PHP REST API for Queen's Banquet Digital Invitation Management System",
   "type": "project",
   "require": {
     "php": ">=8.1"

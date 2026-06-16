@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Velura Events — Luxury Event Management</title>
+<title>Queens Banquet Events — Luxury Event Management</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -204,7 +204,14 @@ footer { background: var(--black); padding: 80px 60px 40px; }
 .auth-form-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 40px; background: var(--white); }
 .auth-form-inner { width: 100%; max-width: 420px; }
 .auth-form-inner h3 { font-size: 30px; margin-bottom: 8px; }
+.auth-brand { margin-bottom: 28px; }
+.auth-brand-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--black); line-height: 1.2; }
+.auth-brand-tagline { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-dark); margin-top: 4px; }
 .auth-form-inner .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 36px; }
+.password-field { position: relative; }
+.password-field input { padding-right: 48px; }
+.password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center; }
+.password-toggle:hover { color: var(--gold-dark); }
 .auth-switch { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-muted); }
 .auth-switch a { color: var(--gold-dark); font-weight: 500; }
 .form-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--text-muted); font-size: 13px; }
@@ -477,7 +484,7 @@ tr:last-child td { border-bottom: none; }
       <div class="testimonials-grid">
         <div class="testimonial-card">
           <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-text">"Velura made our wedding absolutely magical. Every detail was perfect — from the floral arrangements to the lighting. We couldn't have asked for more."</p>
+          <p class="testimonial-text">"Queens Banquet Events made our wedding absolutely magical. Every detail was perfect — from the floral arrangements to the lighting. We couldn't have asked for more."</p>
           <div class="testimonial-author">
             <div class="testimonial-avatar">MR</div>
             <div><div class="testimonial-name">Maria Reyes</div><div class="testimonial-event">Wedding — Oct 2024</div></div>
@@ -493,7 +500,7 @@ tr:last-child td { border-bottom: none; }
         </div>
         <div class="testimonial-card">
           <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-text">"My debut was a dream come true! The entire Velura team was warm, professional, and brought my vision to life beautifully. Thank you!"</p>
+          <p class="testimonial-text">"My debut was a dream come true! The entire Queens Banquet Events team was warm, professional, and brought my vision to life beautifully. Thank you!"</p>
           <div class="testimonial-author">
             <div class="testimonial-avatar">AL</div>
             <div><div class="testimonial-name">Anna Lim</div><div class="testimonial-event">Debut — Aug 2024</div></div>
@@ -536,12 +543,12 @@ tr:last-child td { border-bottom: none; }
           <h4>Contact</h4>
           <a>📍 Metro Manila, PH</a>
           <a>📞 +63 917 000 0000</a>
-          <a>✉️ hello@velura.ph</a>
+          <a>✉️ hello@queensbanquetevents.ph</a>
           <a>🕐 Mon–Sat, 9AM–6PM</a>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2024 Velura Events. All rights reserved.</p>
+        <p>© 2024 Queens Banquet Events. All rights reserved.</p>
         <p>Designed with ♥ for luxury experiences</p>
       </div>
     </div>
@@ -560,7 +567,7 @@ tr:last-child td { border-bottom: none; }
   <div class="section">
     <div class="about-grid">
       <div>
-        <p style="color:var(--text-muted);margin-bottom:24px;font-size:15px">Founded in 2012, Velura Events began with a simple belief: every celebration, no matter the scale, deserves meticulous attention and genuine passion. From a small team of three, we've grown into a premier event management company serving Metro Manila and beyond.</p>
+        <p style="color:var(--text-muted);margin-bottom:24px;font-size:15px">Founded in 2012, Queens Banquet Events began with a simple belief: every celebration, no matter the scale, deserves meticulous attention and genuine passion. From a small team of three, we've grown into a premier event management company serving Metro Manila and beyond.</p>
         <p style="color:var(--text-muted);margin-bottom:32px;font-size:15px">Our philosophy is rooted in personalization. We don't just execute events — we listen, understand, and translate your unique story into an experience your guests will talk about for years.</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
           <div style="background:var(--beige);border-radius:var(--radius);padding:20px">
@@ -612,7 +619,7 @@ tr:last-child td { border-bottom: none; }
     </div>
   </div>
   <!-- Footer reused -->
-  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Velura Events. All rights reserved.</p><p style="color:rgba(255,255,255,0.35)">Crafted with luxury in mind</p></div></div></footer>
+  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Queens Banquet Events. All rights reserved.</p><p style="color:rgba(255,255,255,0.35)">Crafted with luxury in mind</p></div></div></footer>
 </div>
 
 <!-- ============ PAGE: SERVICES ============ -->
@@ -643,7 +650,7 @@ tr:last-child td { border-bottom: none; }
       <button class="btn btn-gold btn-lg" onclick="showPage('contact')">Schedule a Consultation</button>
     </div>
   </div>
-  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Velura Events. All rights reserved.</p></div></div></footer>
+  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Queens Banquet Events. All rights reserved.</p></div></div></footer>
 </div>
 
 <!-- ============ PAGE: PACKAGES ============ -->
@@ -727,7 +734,7 @@ tr:last-child td { border-bottom: none; }
       <button class="btn btn-dark btn-lg" onclick="showPage('contact')">Request Custom Quote</button>
     </div>
   </div>
-  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Velura Events. All rights reserved.</p></div></div></footer>
+  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Queens Banquet Events. All rights reserved.</p></div></div></footer>
 </div>
 
 <!-- ============ PAGE: GALLERY ============ -->
@@ -760,7 +767,7 @@ tr:last-child td { border-bottom: none; }
       <div class="gallery-item" data-cat="birthday"><div class="gallery-placeholder" style="height:200px">🎉</div><div class="gallery-item-overlay">21st Birthday</div></div>
     </div>
   </div>
-  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Velura Events. All rights reserved.</p></div></div></footer>
+  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Queens Banquet Events. All rights reserved.</p></div></div></footer>
 </div>
 
 <!-- ============ PAGE: CONTACT ============ -->
@@ -805,7 +812,7 @@ tr:last-child td { border-bottom: none; }
         </div>
         <div class="contact-detail">
           <div class="contact-icon">✉️</div>
-          <div><strong>Email</strong><span>hello@velura.ph</span></div>
+          <div><strong>Email</strong><span>hello@queensbanquetevents.ph</span></div>
         </div>
         <div class="contact-detail">
           <div class="contact-icon">🕐</div>
@@ -819,7 +826,7 @@ tr:last-child td { border-bottom: none; }
       </div>
     </div>
   </div>
-  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Velura Events. All rights reserved.</p></div></div></footer>
+  <footer><div class="footer-inner"><div class="footer-bottom"><p>© 2024 Queens Banquet Events. All rights reserved.</p></div></div></footer>
 </div>
 
 <!-- ============ PAGE: LOGIN ============ -->
@@ -827,31 +834,44 @@ tr:last-child td { border-bottom: none; }
   <div style="padding-top:var(--nav-h);min-height:100vh;display:flex">
     <div class="auth-visual">
       <div style="position:relative">
-        <div class="section-tag" style="color:var(--gold)">Welcome Back</div>
+        <div class="section-tag" style="color:var(--gold)">Queen's Banquet</div>
         <h2>Sign in to <br>Your Account</h2>
-        <p>Access your bookings, track your events, and communicate with your event team.</p>
+        <p>Create, customize, and share digital invitations with RSVP monitoring.</p>
         <div style="margin-top:48px;display:flex;flex-direction:column;gap:16px">
-          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> View & manage your bookings</div>
-          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Upload payment receipts</div>
-          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Track event progress</div>
-          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Message your event team</div>
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Build and publish invitation pages</div>
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Share links and QR codes with guests</div>
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Monitor RSVPs in real time</div>
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Manage templates and gallery assets</div>
         </div>
       </div>
     </div>
     <div class="auth-form-wrap">
       <div class="auth-form-inner">
+        <div class="auth-brand">
+          <div class="auth-brand-name">Queen's Banquet</div>
+          <div class="auth-brand-tagline">Events Management</div>
+        </div>
         <h3>Sign In</h3>
         <p class="subtitle">Don't have an account? <a onclick="showPage('register')" style="cursor:pointer">Create one</a></p>
-        <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com"></div>
-        <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••"></div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="login-email" placeholder="your@email.com"></div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="password-field">
+            <input type="password" id="login-password" placeholder="••••••••">
+            <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)" aria-label="Show password">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
           <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:400;color:var(--text-muted);cursor:pointer"><input type="checkbox" style="width:auto"> Remember me</label>
           <a style="font-size:13px;color:var(--gold-dark);font-weight:500;cursor:pointer">Forgot password?</a>
         </div>
-        <button class="btn btn-gold" style="width:100%;padding:14px" onclick="loginAs('client')">Sign In as Client</button>
-        <div class="form-divider">or</div>
-        <button class="btn btn-dark" style="width:100%;padding:14px" onclick="loginAs('admin')">Sign In as Admin</button>
-        <div class="auth-switch">New to Velura? <a onclick="showPage('register')" style="cursor:pointer">Create an account</a></div>
+        <button class="btn btn-gold" style="width:100%;padding:14px" onclick="handleLogin()">Sign In</button>
+        <div class="auth-switch">New to Queen's Banquet? <a onclick="showPage('register')" style="cursor:pointer">Create an account</a></div>
       </div>
     </div>
   </div>
@@ -862,7 +882,7 @@ tr:last-child td { border-bottom: none; }
   <div style="padding-top:var(--nav-h);min-height:100vh;display:flex">
     <div class="auth-visual">
       <div style="position:relative">
-        <div class="section-tag" style="color:var(--gold)">Join Velura</div>
+        <div class="section-tag" style="color:var(--gold)">Join Queens Banquet Events</div>
         <h2>Start Planning<br>Your Perfect<br>Event Today</h2>
         <p>Create an account to access exclusive packages, track your bookings, and connect with our team.</p>
       </div>
@@ -1097,7 +1117,7 @@ tr:last-child td { border-bottom: none; }
     <main class="dashboard-main">
       <!-- Admin Overview -->
       <div id="admin-tab-overview">
-        <div class="dash-header"><h1>Admin Dashboard</h1><p>Velura Events Management System — Overview</p></div>
+        <div class="dash-header"><h1>Admin Dashboard</h1><p>Queens Banquet Events Management System — Overview</p></div>
         <div class="stats-grid">
           <div class="stat-card"><div class="label">Total Bookings</div><div class="value">48</div><div class="trend trend-up">↑ 12% this month</div></div>
           <div class="stat-card"><div class="label">Revenue (Nov)</div><div class="value" style="font-size:22px">₱1.2M</div><div class="trend trend-up">↑ 8% vs Oct</div></div>
@@ -1306,7 +1326,7 @@ tr:last-child td { border-bottom: none; }
         <div id="cms-about" class="tab-panel">
           <div class="card-widget">
             <h3>About Page Content</h3>
-            <div class="form-group"><label>Company Description</label><textarea style="min-height:120px">Founded in 2012, Velura Events began with a simple belief...</textarea></div>
+            <div class="form-group"><label>Company Description</label><textarea style="min-height:120px">Founded in 2012, Queens Banquet Events began with a simple belief...</textarea></div>
             <div class="form-group"><label>Years of Experience</label><input value="12+"></div>
             <div class="form-group"><label>Events Completed</label><input value="500+"></div>
             <button class="btn btn-gold">Save Changes</button>
@@ -1318,7 +1338,7 @@ tr:last-child td { border-bottom: none; }
             <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:20px">
               <div style="border:1px solid var(--border-soft);border-radius:10px;padding:16px">
                 <div class="form-row"><div class="form-group"><label>Client Name</label><input value="Maria Reyes"></div><div class="form-group"><label>Event Type</label><input value="Wedding — Oct 2024"></div></div>
-                <div class="form-group"><label>Testimonial</label><textarea style="min-height:80px">Velura made our wedding absolutely magical...</textarea></div>
+                <div class="form-group"><label>Testimonial</label><textarea style="min-height:80px">Queens Banquet Events made our wedding absolutely magical...</textarea></div>
                 <button class="action-btn danger">Remove</button>
               </div>
             </div>
@@ -1351,8 +1371,8 @@ tr:last-child td { border-bottom: none; }
           <div>
             <div class="card-widget" style="margin-bottom:20px">
               <h3>General Settings</h3>
-              <div class="form-group"><label>Company Name</label><input value="Velura Events"></div>
-              <div class="form-group"><label>Contact Email</label><input value="hello@velura.ph"></div>
+              <div class="form-group"><label>Company Name</label><input value="Queens Banquet Events"></div>
+              <div class="form-group"><label>Contact Email</label><input value="hello@queensbanquetevents.ph"></div>
               <div class="form-group"><label>Phone Number</label><input value="+63 917 000 0000"></div>
               <div class="form-group"><label>Address</label><textarea style="min-height:80px">123 Luxury Lane, BGC, Taguig City</textarea></div>
               <button class="btn btn-gold">Save Settings</button>
@@ -1454,6 +1474,33 @@ function setActive(el) {
 function loginAs(role) {
   if (role === 'client') showPage('client-dashboard');
   else showPage('admin-dashboard');
+}
+
+function detectUserRole(email) {
+  const normalized = email.trim().toLowerCase();
+  return normalized.includes('admin') ? 'admin' : 'client';
+}
+
+function handleLogin() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  if (!email.trim() || !password) {
+    alert('Please enter your email and password.');
+    return;
+  }
+
+  loginAs(detectUserRole(email));
+}
+
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  btn.innerHTML = show
+    ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.58 10.58a2 2 0 0 0 2.83 2.83"></path><path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c6.5 0 10 7 10 7a18.45 18.45 0 0 1-2.16 3.19"></path><path d="M6.61 6.61A18.48 18.48 0 0 0 2 12s3.5 7 10 7a10.66 10.66 0 0 0 5.39-1.45"></path></svg>'
+    : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
 }
 
 // Gallery filter

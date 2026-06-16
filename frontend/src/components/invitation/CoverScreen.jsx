@@ -1,18 +1,24 @@
 export default function CoverScreen({ event, invitation, onOpen, labels }) {
   const date = new Date(event.event_date).toLocaleDateString('en-US', {
-    month: 'long', day: 'numeric', year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
   });
 
   return (
     <section className="inv-cover" id="cover">
-      {invitation?.cover_image && (
+      {invitation?.background_video ? (
+        <video className="inv-cover-video" src={invitation.background_video} autoPlay muted loop playsInline />
+      ) : invitation?.cover_image ? (
         <div className="inv-cover-bg" style={{ backgroundImage: `url(${invitation.cover_image})` }} />
+      ) : (
+        <div className="inv-cover-bg inv-cover-bg-fallback" />
       )}
+      <div className="inv-cover-shade" />
       <div className="inv-cover-content">
-        <div className="inv-cover-ornament">✦ ✦ ✦</div>
-        <p className="inv-subtitle">{labels?.together || 'Together With Their Families'}</p>
+        <p className="inv-subtitle">{invitation?.opening_line || 'With great joy, we invite you'}</p>
+        <p className="inv-tagline">{invitation?.hero_caption || labels?.together || 'Together With Their Families'}</p>
         <h1>{event.event_name}</h1>
-        <p className="inv-tagline">{labels?.invite || 'Invite You To Celebrate'}</p>
         <p className="inv-date">{date}</p>
         <button type="button" className="inv-open-btn" onClick={onOpen}>
           Open Invitation

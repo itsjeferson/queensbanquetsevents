@@ -1,5 +1,7 @@
 # Deployment Guide
 
+Deploy Queen's Banquet Digital Invitation Management System as a React static frontend plus PHP REST API and MySQL database.
+
 ## Frontend
 
 1. Set `VITE_API_URL` in `frontend/.env` to production API URL
@@ -14,6 +16,7 @@
    - `JWT_SECRET`
 3. Ensure `uploads/` directories are writable
 4. Import `database/queens_banquet.sql`
+5. If needed, import `database/invitation_system.sql` for invitation-specific extensions
 
 ## Apache
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { rsvpService } from '../../services/invitationService';
 
-export default function RSVPForm({ eventId }) {
+export default function RSVPForm({ eventId, note }) {
   const [form, setForm] = useState({
     name: '', email: '', phone: '', attendance: 'yes', meal_preference: '', guest_count: 1, message: '',
   });
@@ -25,11 +25,10 @@ export default function RSVPForm({ eventId }) {
 
   return (
     <section className="inv-section" id="rsvp">
-      <p className="inv-section-tag">Respond</p>
-      <h2>RSVP</h2>
+      <p className="inv-script-title">Attendance Confirmation</p>
       <div className="inv-divider" />
       <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 32 }}>
-        Please let us know if you can join us
+        {note || 'Please let us know if you can join us.'}
       </p>
 
       {status === 'success' ? (

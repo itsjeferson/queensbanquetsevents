@@ -1,51 +1,32 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import LandingLayout from '../layouts/LandingLayout';
+import AuthLayout from '../layouts/AuthLayout';
 import ClientLayout from '../layouts/ClientLayout';
 import AdminLayout from '../layouts/AdminLayout';
 
-import Home from '../pages/landing/Home';
-import About from '../pages/landing/About';
-import Services from '../pages/landing/Services';
-import Packages from '../pages/landing/Packages';
-import Gallery from '../pages/landing/Gallery';
-import Contact from '../pages/landing/Contact';
-import Login from '../pages/landing/Login';
-import Register from '../pages/landing/Register';
+import Login from '../pages/auth/Login';
+import ForgotPassword from '../pages/auth/ForgotPassword';
 
 import ClientDashboard from '../pages/client/Dashboard';
-import MyBookings from '../pages/client/MyBookings';
-import ClientPayments from '../pages/client/Payments';
-import Messages from '../pages/client/Messages';
-import Notifications from '../pages/client/Notifications';
-import ClientCalendar from '../pages/client/Calendar';
-import EventDetails from '../pages/client/EventDetails';
-import Profile from '../pages/client/Profile';
+import InvitationManage from '../pages/client/InvitationManage';
+import InvitationBuilder from '../pages/client/InvitationBuilder';
+import RSVPMonitoring from '../pages/client/RSVPMonitoring';
+import ClientSettings from '../pages/client/Settings';
 
 import AdminDashboard from '../pages/admin/Dashboard';
-import AdminBookings from '../pages/admin/Bookings';
-import AdminPayments from '../pages/admin/Payments';
-import Clients from '../pages/admin/Clients';
-import AdminPackages from '../pages/admin/Packages';
-import AdminGallery from '../pages/admin/Gallery';
-import AdminCalendar from '../pages/admin/Calendar';
-import ContentManagement from '../pages/admin/ContentManagement';
-import AdminReports from '../pages/admin/Reports';
-import Settings from '../pages/admin/Settings';
-import InvitationTemplates from '../pages/admin/InvitationTemplates';
 import AdminRsvpMonitoring from '../pages/admin/AdminRsvpMonitoring';
+import AdminCalendar from '../pages/admin/Calendar';
+import InvitationTemplates from '../pages/admin/InvitationTemplates';
+import AdminReports from '../pages/admin/Reports';
+import AdminGallery from '../pages/admin/Gallery';
+import AdminSettings from '../pages/admin/Settings';
 
-import InvitationView from '../pages/invitation/InvitationView';
-import MyEvents from '../pages/client/MyEvents';
-import InvitationBuilder from '../pages/client/InvitationBuilder';
-import InvitationManage from '../pages/client/InvitationManage';
-import GuestManagement from '../pages/client/GuestManagement';
-import RSVPMonitoring from '../pages/client/RSVPMonitoring';
+import PublicInvitation from '../pages/invitation/PublicInvitation';
 
 function ProtectedRoute({ children, role }) {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (!user) return <Navigate to="/login" replace />;
   if (role && user.role !== role) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/client'} replace />;
+    return <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard'} replace />;
   }
   return children;
 }
@@ -53,21 +34,13 @@ function ProtectedRoute({ children, role }) {
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route element={<LandingLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/packages" element={<Packages />} />
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="/contact" element={<Contact />} />
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-      {/* Public Invitation Microsites */}
-      <Route path="/invite/:slug" element={<InvitationView mode="slug" />} />
-      <Route path="/event/:code" element={<InvitationView mode="code" />} />
+      <Route path="/invitation/:slug" element={<PublicInvitation />} />
+      <Route path="/invite/:slug" element={<PublicInvitation />} />
 
       <Route
         path="/client"
@@ -77,20 +50,13 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<ClientDashboard />} />
-        <Route path="bookings" element={<MyBookings />} />
-        <Route path="payments" element={<ClientPayments />} />
-        <Route path="messages" element={<Messages />} />
-        <Route path="notifications" element={<Notifications />} />
-        <Route path="calendar" element={<ClientCalendar />} />
-        <Route path="events" element={<MyEvents />} />
-        <Route path="events/:id" element={<EventDetails />} />
-        <Route path="invitations" element={<MyEvents />} />
-        <Route path="invitations/builder" element={<InvitationBuilder />} />
-        <Route path="invitations/:id" element={<InvitationManage />} />
-        <Route path="invitations/:id/guests" element={<GuestManagement />} />
-        <Route path="invitations/:id/rsvp" element={<RSVPMonitoring />} />
-        <Route path="profile" element={<Profile />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<ClientDashboard />} />
+        <Route path="invitation-manage" element={<InvitationManage />} />
+        <Route path="invitation-manage/:id" element={<InvitationManage />} />
+        <Route path="invitation-builder" element={<InvitationBuilder />} />
+        <Route path="rsvp-monitoring" element={<RSVPMonitoring />} />
+        <Route path="settings" element={<ClientSettings />} />
       </Route>
 
       <Route
@@ -101,21 +67,18 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<AdminDashboard />} />
-        <Route path="bookings" element={<AdminBookings />} />
-        <Route path="payments" element={<AdminPayments />} />
-        <Route path="clients" element={<Clients />} />
-        <Route path="packages" element={<AdminPackages />} />
-        <Route path="gallery" element={<AdminGallery />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="rsvp-monitoring" element={<AdminRsvpMonitoring />} />
         <Route path="calendar" element={<AdminCalendar />} />
-        <Route path="content" element={<ContentManagement />} />
+        <Route path="invitation-templates" element={<InvitationTemplates />} />
         <Route path="reports" element={<AdminReports />} />
-        <Route path="invitations" element={<InvitationTemplates />} />
-        <Route path="rsvp" element={<AdminRsvpMonitoring />} />
-        <Route path="settings" element={<Settings />} />
+        <Route path="gallery" element={<AdminGallery />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

@@ -58,9 +58,9 @@ export default function InvitationBuilder() {
         slug: form.slug || form.event_name.toLowerCase().replace(/\s+/g, '-'),
         invitation: { template_id: form.template_id, ...form.invitation },
       });
-      navigate(`/client/invitations/${res.data.id}`);
+      navigate(`/client/invitation-manage/${res.data.id}`);
     } catch {
-      navigate('/client/invitations/1');
+      navigate('/client/invitation-manage/1');
     }
   };
 
@@ -118,7 +118,7 @@ export default function InvitationBuilder() {
               <label>Custom URL Slug</label>
               <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="john-jane" />
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                Your invitation will be at: queensbanquet.com/invite/{form.slug || 'your-slug'}
+                Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
               </p>
             </div>
             <button type="button" className="btn btn-gold" onClick={() => setStep(1)} disabled={!form.event_name || !form.event_date}>
@@ -196,7 +196,7 @@ export default function InvitationBuilder() {
               <p><strong>Event:</strong> {form.event_name}</p>
               <p><strong>Type:</strong> {form.event_type}</p>
               <p><strong>Date:</strong> {form.event_date ? new Date(form.event_date).toLocaleString() : '—'}</p>
-              <p><strong>URL:</strong> /invite/{form.slug || form.event_name.toLowerCase().replace(/\s+/g, '-')}</p>
+              <p><strong>URL:</strong> /#/invite/{form.slug || form.event_name.toLowerCase().replace(/\s+/g, '-')}</p>
             </div>
             <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
               <button type="button" className="btn btn-outline" onClick={() => setStep(2)}>Back</button>

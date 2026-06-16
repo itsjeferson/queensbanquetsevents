@@ -1,61 +1,62 @@
 import { Link } from 'react-router-dom';
 import StatCard from '../../components/common/Cards/StatCard';
-import EventTimeline from '../../components/client/EventTimeline/EventTimeline';
 import DataTable from '../../components/common/Table/DataTable';
 
-const upcomingEvents = [
-  { id: 1, event: 'Wedding', date: 'Dec 28, 2024', package: 'Signature', status: 'Confirmed' },
-  { id: 2, event: 'Post-Wedding', date: 'Jan 5, 2025', package: 'Essential', status: 'Pending' },
-  { id: 3, event: 'Engagement', date: 'Nov 15, 2024', package: 'Essential', status: 'Completed' },
+const invitations = [
+  { id: 1, event: 'Wedding Invitation', date: 'Dec 28, 2026', template: 'Classic Gold', status: 'Published' },
+  { id: 2, event: 'Debut Invitation', date: 'Jan 5, 2027', template: 'Pink Rose', status: 'Draft' },
+  { id: 3, event: 'Birthday Invitation', date: 'Feb 15, 2027', template: 'Kids Theme', status: 'Editing' },
 ];
 
-const timeline = [
-  { title: 'Venue Visit', date: 'Dec 10, 2024 — 2:00 PM' },
-  { title: 'Menu Tasting', date: 'Dec 15, 2024 — 11:00 AM' },
-  { title: 'Final Briefing', date: 'Dec 26, 2024 — 10:00 AM' },
-  { title: 'Wedding Day 🎉', date: 'Dec 28, 2024' },
+const workflow = [
+  { title: 'Create invitation', date: 'Choose event details and URL slug' },
+  { title: 'Customize design', date: 'Upload photos, music, and background video' },
+  { title: 'Share invitation link', date: 'Send public link or QR code to guests' },
+  { title: 'Monitor RSVPs', date: 'Track responses and guest activity' },
 ];
 
 export default function ClientDashboard() {
-  const statusBadge = { Confirmed: 'badge-gold', Pending: 'badge-blue', Completed: 'badge-green' };
+  const statusBadge = { Published: 'badge-green', Draft: 'badge-gray', Editing: 'badge-blue' };
 
   return (
     <>
       <div className="dash-header">
-        <h1>Welcome back, Maria! 👋</h1>
-        <p>Here&apos;s what&apos;s happening with your upcoming events.</p>
+        <h1>Dashboard</h1>
+        <p>Create, customize, share, and monitor your digital invitations.</p>
       </div>
       <div className="stats-grid">
-        <StatCard label="Total Bookings" value="3" trend="📅 All events" />
-        <StatCard label="Upcoming" value="2" trend="↑ Next: Dec 28" trendClass="trend-up" />
-        <StatCard label="Payment Status" value="Partial" trend="₱45,000 due" />
-        <StatCard label="Messages" value="4" trend="2 unread" />
+        <StatCard label="My Invitations" value="3" trend="1 published" />
         <StatCard label="RSVP Responses" value="32" trend="24 attending" trendClass="trend-up" />
+        <StatCard label="Guest Records" value="120" trend="88 confirmed contacts" />
+        <StatCard label="Shared Links" value="2" trend="QR and public URL active" />
       </div>
 
       <div className="card-widget" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <div>
-            <h3>Digital Event Invitation</h3>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Create a personalized event website for your guests</p>
+            <h3>Digital Invitation Workspace</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+              Build an editable invitation page with photos, music, video, RSVP collection, and guest monitoring.
+            </p>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Link to="/client/invitations/builder" className="btn btn-gold">+ Create Invitation</Link>
-            <a href="/invite/john-jane" target="_blank" rel="noreferrer" className="btn btn-outline">Preview Demo</a>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Link to="/client/invitation-builder" className="btn btn-gold">Create Invitation</Link>
+            <a href="/#/invite/john-jane" target="_blank" rel="noreferrer" className="btn btn-outline">Preview Demo</a>
           </div>
         </div>
       </div>
+
       <div className="dash-grid">
         <div className="card-widget">
-          <h3>My Upcoming Events</h3>
+          <h3>My Invitations</h3>
           <DataTable
             columns={[
-              { key: 'event', label: 'Event' },
-              { key: 'date', label: 'Date' },
-              { key: 'package', label: 'Package' },
+              { key: 'event', label: 'Invitation' },
+              { key: 'date', label: 'Event Date' },
+              { key: 'template', label: 'Template' },
               { key: 'status', label: 'Status' },
             ]}
-            data={upcomingEvents}
+            data={invitations}
             renderCell={(key, row) => {
               if (key === 'event') return <strong>{row.event}</strong>;
               if (key === 'status') return <span className={`badge ${statusBadge[row.status]}`}>{row.status}</span>;
@@ -64,8 +65,20 @@ export default function ClientDashboard() {
           />
         </div>
         <div className="card-widget">
-          <h3>Event Timeline</h3>
-          <EventTimeline items={timeline} />
+          <h3>Invitation Workflow</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8 }}>
+            {workflow.map((item, index) => (
+              <div key={item.title} style={{ display: 'flex', gap: 16 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--gold)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, flexShrink: 0 }}>
+                  {index + 1}
+                </div>
+                <div>
+                  <strong style={{ fontSize: 14, display: 'block' }}>{item.title}</strong>
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.date}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>

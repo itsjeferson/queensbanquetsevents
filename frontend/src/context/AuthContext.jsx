@@ -19,20 +19,34 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  const login = useCallback(async (email, password, role = 'client') => {
+  const buildUserFromResponse = (email, data) => {
+    const role = data.role || 'client';
+    const firstName = data.first_name || data.firstName || '';
+    const lastName = data.last_name || data.lastName || '';
+    const name = data.name || `${firstName} ${lastName}`.trim() || email.split('@')[0];
+    const initials = data.initials || `${firstName[0] || ''}${lastName[0] || name[0] || ''}`.toUpperCase();
+    return { ...data, email: data.email || email, role, name, initials };
+  };
+
+  const detectMockRole = (email) => (
+    email.toLowerCase().includes('admin') ? 'admin' : 'client'
+  );
+
+  const login = useCallback(async (email, password) => {
     try {
       const response = await authService.login(email, password);
-      const userData = response.data || { email, role, name: email.split('@')[0] };
+      const userData = buildUserFromResponse(email, response.data || { email });
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));
       if (response.token) localStorage.setItem('token', response.token);
       return userData;
     } catch {
+      const role = detectMockRole(email);
       const mockUser = {
         email,
         role,
-        name: role === 'admin' ? 'Admin' : 'Maria Santos',
-        initials: role === 'admin' ? 'AD' : 'MS',
+        name: role === 'admin' ? 'Admin User' : 'Maria Santos',
+        initials: role === 'admin' ? 'AU' : 'MS',
       };
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));

@@ -1,4 +1,4 @@
--- Digital Event Invitation System Extension
+-- Queen's Banquet Digital Invitation Management System Extension
 -- Run after queens_banquet.sql
 
 USE queens_banquet;

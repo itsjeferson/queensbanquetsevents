@@ -1,61 +1,53 @@
-export default function EventDetailsSection({ venue, dressCode, program }) {
+export default function EventDetailsSection({ event, venue, dressCode, program }) {
+  const date = new Date(event.event_date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
   return (
     <>
-      <section className="inv-section" id="details">
-        <p className="inv-section-tag">Save The Date</p>
-        <h2>Event Details</h2>
-        <div className="inv-divider" />
-        {dressCode && (
-          <p style={{ color: 'var(--text-muted)', marginBottom: 32, fontSize: 14 }}>
-            Dress Code: <strong>{dressCode}</strong>
-          </p>
-        )}
-        {venue && (
-          <div className="inv-details-grid">
-            {venue.ceremony && (
-              <div className="inv-detail-card">
-                <h3>Ceremony</h3>
-                <p><strong>{venue.ceremony.name}</strong></p>
-                <p>{venue.ceremony.address}</p>
-                <p>{venue.ceremony.time}</p>
-                {venue.ceremony.map_url && (
-                  <a href={venue.ceremony.map_url} target="_blank" rel="noreferrer" className="inv-map-btn">
-                    Get Directions
-                  </a>
-                )}
-              </div>
-            )}
-            {venue.reception && (
-              <div className="inv-detail-card">
-                <h3>Reception</h3>
-                <p><strong>{venue.reception.name}</strong></p>
-                <p>{venue.reception.address}</p>
-                <p>{venue.reception.time}</p>
-                {venue.reception.map_url && (
-                  <a href={venue.reception.map_url} target="_blank" rel="noreferrer" className="inv-map-btn">
-                    Get Directions
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+      <section className="inv-details-band" id="details">
+        <div className="inv-details-card">
+          <p className="inv-script-title">Wedding Details</p>
+          <h2>{date}</h2>
+          {dressCode && <p className="inv-muted">Dress Code: <strong>{dressCode}</strong></p>}
+
+          {venue && (
+            <div className="inv-details-grid">
+              {['ceremony', 'reception'].map((type) => {
+                const item = venue[type];
+                if (!item) return null;
+                return (
+                  <div key={type} className="inv-detail-card">
+                    <span>{type}</span>
+                    <h3>{item.name}</h3>
+                    <p>{item.time}</p>
+                    <p>{item.address}</p>
+                    {item.map_url && (
+                      <a href={item.map_url} target="_blank" rel="noreferrer" className="inv-map-btn">
+                        See Location
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </section>
 
       {program?.length > 0 && (
-        <section className="inv-section-full" id="program">
-          <div className="inv-section">
-            <p className="inv-section-tag">Schedule</p>
-            <h2>Program</h2>
-            <div className="inv-divider" />
-            <div className="inv-program-list">
-              {program.map((item, i) => (
-                <div key={i} className="inv-program-item">
-                  <span className="inv-program-time">{item.time}</span>
-                  <span>{item.title}</span>
-                </div>
-              ))}
-            </div>
+        <section className="inv-section inv-timeline-section" id="program">
+          <p className="inv-script-title">Timeline</p>
+          <div className="inv-program-list">
+            {program.map((item, index) => (
+              <div key={index} className="inv-program-item">
+                <strong>{item.time}</strong>
+                <span>{item.title}</span>
+              </div>
+            ))}
           </div>
         </section>
       )}

@@ -1,4 +1,4 @@
--- Queens Banquet Events Database Schema
+-- Queen's Banquet Digital Invitation Management System Database Schema
 CREATE DATABASE IF NOT EXISTS queens_banquet;
 USE queens_banquet;
 
@@ -76,7 +76,7 @@ INSERT INTO packages (name, description, price, max_guests, inclusions, featured
 
 -- Seed admin user (password: admin123)
 INSERT INTO users (first_name, last_name, email, phone, password, role) VALUES
-('Admin', 'User', 'admin@velura.ph', '+63 917 000 0000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+('Admin', 'User', 'admin@queensbanquetevents.ph', '+63 917 000 0000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
 -- Digital Event Invitation System
 CREATE TABLE events (

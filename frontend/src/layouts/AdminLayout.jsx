@@ -1,35 +1,24 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/common/Sidebar/Sidebar';
-import PackageModal from '../components/common/Modal/PackageModal';
 import { useAuth } from '../hooks/useAuth';
-import { useState } from 'react';
 
 const adminNav = [
-  { label: 'Main' },
-  { path: '/admin', title: 'Dashboard', icon: '📊', end: true },
-  { path: '/admin/bookings', title: 'Bookings', icon: '📅' },
-  { path: '/admin/payments', title: 'Payments', icon: '💳' },
-  { path: '/admin/clients', title: 'Clients', icon: '👥' },
-  { label: 'Content' },
-  { path: '/admin/packages', title: 'Packages', icon: '📦' },
-  { path: '/admin/gallery', title: 'Gallery', icon: '🖼️' },
-  { path: '/admin/calendar', title: 'Calendar', icon: '🗓️' },
-  { path: '/admin/content', title: 'CMS', icon: '✏️' },
-  { path: '/admin/invitations', title: 'Invitation Templates', icon: '💌' },
-  { label: 'System' },
-  { path: '/admin/rsvp', title: 'RSVP Monitoring', icon: '📋' },
-  { path: '/admin/reports', title: 'Reports', icon: '📈' },
-  { path: '/admin/settings', title: 'Settings', icon: '⚙️' },
+  { path: '/admin/dashboard', title: 'Dashboard', icon: 'DB', end: true },
+  { path: '/admin/rsvp-monitoring', title: 'RSVP Monitoring', icon: 'RS' },
+  { path: '/admin/calendar', title: 'Calendar', icon: 'CA' },
+  { path: '/admin/invitation-templates', title: 'Invitation Templates', icon: 'TP' },
+  { path: '/admin/gallery', title: 'Gallery', icon: 'GA' },
+  { path: '/admin/reports', title: 'Reports', icon: 'RP' },
+  { path: '/admin/settings', title: 'Settings', icon: 'ST' },
 ];
 
 export default function AdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [packageModalOpen, setPackageModalOpen] = useState(false);
 
   const handleSignOut = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -38,14 +27,13 @@ export default function AdminLayout() {
         items={adminNav}
         footerItem={
           <button type="button" className="sidebar-item" onClick={handleSignOut}>
-            <span className="icon">🚪</span> Sign Out
+            <span className="icon">LO</span> Logout
           </button>
         }
       />
       <main className="dashboard-main">
-        <Outlet context={{ openPackageModal: () => setPackageModalOpen(true) }} />
+        <Outlet />
       </main>
-      <PackageModal isOpen={packageModalOpen} onClose={() => setPackageModalOpen(false)} />
     </div>
   );
 }

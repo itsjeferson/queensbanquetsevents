@@ -176,8 +176,15 @@ footer { background: var(--black); padding: 80px 60px 40px; }
 .auth-visual p { color: rgba(255, 255, 255, 0.6); font-size: 15px; position: relative; max-width: 360px; }
 .auth-form-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 40px; background: var(--white); }
 .auth-form-inner { width: 100%; max-width: 420px; }
+.auth-brand { margin-bottom: 28px; }
+.auth-brand-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--black); line-height: 1.2; }
+.auth-brand-tagline { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-dark); margin-top: 4px; }
 .auth-form-inner h3 { font-size: 30px; margin-bottom: 8px; }
 .auth-form-inner .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 36px; }
+.password-field { position: relative; }
+.password-field input { padding-right: 48px; }
+.password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; display: flex; align-items: center; justify-content: center; }
+.password-toggle:hover { color: var(--gold-dark); }
 .auth-switch { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-muted); }
 .auth-switch a { color: var(--gold-dark); font-weight: 500; }
 .form-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--text-muted); font-size: 13px; }

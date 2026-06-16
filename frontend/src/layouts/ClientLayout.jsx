@@ -1,18 +1,13 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/common/Sidebar/Sidebar';
-import BookingModal from '../components/common/Modal/BookingModal';
 import { useAuth } from '../hooks/useAuth';
 
 const clientNav = [
-  { path: '/client', title: 'Dashboard', icon: '📊', end: true },
-  { path: '/client/bookings', title: 'My Bookings', icon: '📅' },
-  { path: '/client/events', title: 'My Events', icon: '🎉' },
-  { path: '/client/invitations', title: 'Event Invitations', icon: '💌' },
-  { path: '/client/payments', title: 'Payments', icon: '💳' },
-  { path: '/client/messages', title: 'Messages', icon: '💬' },
-  { path: '/client/notifications', title: 'Notifications', icon: '🔔' },
-  { path: '/client/calendar', title: 'Calendar', icon: '🗓️' },
-  { path: '/client/profile', title: 'Profile', icon: '👤' },
+  { path: '/client/dashboard', title: 'Dashboard', icon: 'DB', end: true },
+  { path: '/client/invitation-manage', title: 'Invitation Manager', icon: 'IN' },
+  { path: '/client/invitation-builder', title: 'Invitation Builder', icon: 'CR' },
+  { path: '/client/rsvp-monitoring', title: 'RSVP Monitoring', icon: 'RS' },
+  { path: '/client/settings', title: 'Settings', icon: 'ST' },
 ];
 
 export default function ClientLayout() {
@@ -21,7 +16,7 @@ export default function ClientLayout() {
 
   const handleSignOut = () => {
     logout();
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -30,14 +25,13 @@ export default function ClientLayout() {
         items={clientNav}
         footerItem={
           <button type="button" className="sidebar-item" onClick={handleSignOut}>
-            <span className="icon">🚪</span> Sign Out
+            <span className="icon">LO</span> Logout
           </button>
         }
       />
       <main className="dashboard-main">
         <Outlet />
       </main>
-      <BookingModal />
     </div>
   );
 }
