@@ -17,6 +17,7 @@ $routes = [
     'templates' => 'routes/templates.php',
     'events' => 'routes/events.php',
     'guests' => 'routes/guests.php',
+    'clients' => 'routes/clients.php',
 ];
 
 if (isset($routes[$resource])) {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Queens Banquet Events — Luxury Event Management</title>
+<title>Queen's Banquet — Events Management</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -369,7 +369,7 @@ tr:last-child td { border-bottom: none; }
 
 <!-- ============ NAVBAR ============ -->
 <nav id="navbar">
-  <a class="nav-logo" onclick="showPage('home')" style="cursor:pointer">VE<span>L</span>URA</a>
+  <a class="nav-logo" onclick="showPage('login')" style="cursor:pointer">Queen<span>'</span>s Banquet</a>
   <div class="nav-links" id="navLinks">
     <a onclick="showPage('home');setActive(this)" class="active">Home</a>
     <a onclick="showPage('about');setActive(this)">About</a>
@@ -385,7 +385,7 @@ tr:last-child td { border-bottom: none; }
 </nav>
 
 <!-- ============ PAGE: HOME ============ -->
-<div class="page active" id="page-home">
+<div class="page" id="page-home">
   <!-- Hero -->
   <section class="hero">
     <div class="hero-grid"></div>
@@ -522,8 +522,8 @@ tr:last-child td { border-bottom: none; }
     <div class="footer-inner">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="nav-logo">VE<span style="color:var(--gold)">L</span>URA</div>
-          <p>Premium event management crafting unforgettable moments since 2012. Your vision, our expertise.</p>
+          <div class="nav-logo">Queen<span>'</span>s Banquet</div>
+          <p>Digital invitation management for unforgettable celebrations. Create, share, and monitor RSVPs with ease.</p>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
@@ -830,7 +830,7 @@ tr:last-child td { border-bottom: none; }
 </div>
 
 <!-- ============ PAGE: LOGIN ============ -->
-<div class="page" id="page-login">
+<div class="page active" id="page-login">
   <div style="padding-top:var(--nav-h);min-height:100vh;display:flex">
     <div class="auth-visual">
       <div style="position:relative">
@@ -882,13 +882,22 @@ tr:last-child td { border-bottom: none; }
   <div style="padding-top:var(--nav-h);min-height:100vh;display:flex">
     <div class="auth-visual">
       <div style="position:relative">
-        <div class="section-tag" style="color:var(--gold)">Join Queens Banquet Events</div>
-        <h2>Start Planning<br>Your Perfect<br>Event Today</h2>
-        <p>Create an account to access exclusive packages, track your bookings, and connect with our team.</p>
+        <div class="section-tag" style="color:var(--gold)">Queen's Banquet</div>
+        <h2>Create Your<br>Account</h2>
+        <p>Join Queen's Banquet to build digital invitations, share guest links, and track RSVPs in one place.</p>
+        <div style="margin-top:48px;display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Free client account setup</div>
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Custom invitation builder</div>
+          <div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.6);font-size:14px"><span style="color:var(--gold)">✓</span> Real-time RSVP dashboard</div>
+        </div>
       </div>
     </div>
     <div class="auth-form-wrap">
       <div class="auth-form-inner">
+        <div class="auth-brand">
+          <div class="auth-brand-name">Queen's Banquet</div>
+          <div class="auth-brand-tagline">Events Management</div>
+        </div>
         <h3>Create Account</h3>
         <p class="subtitle">Already have one? <a onclick="showPage('login')" style="cursor:pointer">Sign in</a></p>
         <div class="form-row">
@@ -897,8 +906,30 @@ tr:last-child td { border-bottom: none; }
         </div>
         <div class="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com"></div>
         <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+63 917 000 0000"></div>
-        <div class="form-group"><label>Password</label><input type="password" placeholder="••••••••"></div>
-        <div class="form-group"><label>Confirm Password</label><input type="password" placeholder="••••••••"></div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="password-field">
+            <input type="password" id="register-password" placeholder="••••••••">
+            <button type="button" class="password-toggle" onclick="togglePassword('register-password', this)" aria-label="Show password">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="password-field">
+            <input type="password" id="register-confirm-password" placeholder="••••••••">
+            <button type="button" class="password-toggle" onclick="togglePassword('register-confirm-password', this)" aria-label="Show password">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
         <button class="btn btn-gold" style="width:100%;padding:14px;margin-top:8px" onclick="loginAs('client')">Create Account</button>
         <div class="auth-switch" style="font-size:12px;margin-top:16px">By registering, you agree to our <a style="color:var(--gold-dark)">Terms of Service</a> and <a style="color:var(--gold-dark)">Privacy Policy</a></div>
       </div>
@@ -1460,6 +1491,8 @@ function showPage(id) {
   document.getElementById('navLinks').style.display = (isDash || isAuth) ? 'none' : '';
   document.getElementById('navCta').style.display = (isDash || isAuth) ? 'none' : '';
 }
+
+showPage('login');
 
 function setNavForPublic() {
   document.getElementById('navLinks').style.display = '';

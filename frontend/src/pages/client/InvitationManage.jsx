@@ -72,7 +72,7 @@ function InvitationManagerList() {
     <>
       <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1>Invitation Manager</h1>
+          <h1>Invitation Management</h1>
           <p>Manage your event invitations and guest lists.</p>
         </div>
         <Link to="/client/invitation-builder" className="btn btn-gold">+ Create Invitation</Link>

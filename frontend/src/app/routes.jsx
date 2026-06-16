@@ -10,6 +10,7 @@ import ClientDashboard from '../pages/client/Dashboard';
 import InvitationManage from '../pages/client/InvitationManage';
 import InvitationBuilder from '../pages/client/InvitationBuilder';
 import RSVPMonitoring from '../pages/client/RSVPMonitoring';
+import ClientNotifications from '../pages/client/Notifications';
 import ClientSettings from '../pages/client/Settings';
 
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -19,6 +20,7 @@ import InvitationTemplates from '../pages/admin/InvitationTemplates';
 import AdminReports from '../pages/admin/Reports';
 import AdminGallery from '../pages/admin/Gallery';
 import AdminSettings from '../pages/admin/Settings';
+import ClientManagement from '../pages/admin/ClientManagement';
 
 import PublicInvitation from '../pages/invitation/PublicInvitation';
 
@@ -56,6 +58,7 @@ export default function AppRoutes() {
         <Route path="invitation-manage/:id" element={<InvitationManage />} />
         <Route path="invitation-builder" element={<InvitationBuilder />} />
         <Route path="rsvp-monitoring" element={<RSVPMonitoring />} />
+        <Route path="notifications" element={<ClientNotifications />} />
         <Route path="settings" element={<ClientSettings />} />
       </Route>
 
@@ -69,6 +72,7 @@ export default function AppRoutes() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="client-management" element={<ClientManagement />} />
         <Route path="rsvp-monitoring" element={<AdminRsvpMonitoring />} />
         <Route path="calendar" element={<AdminCalendar />} />
         <Route path="invitation-templates" element={<InvitationTemplates />} />

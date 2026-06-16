@@ -24,6 +24,41 @@ nav {
 .nav-links a { font-size: 13px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); transition: color 0.2s; }
 .nav-links a:hover, .nav-links a.active { color: var(--gold-dark); }
 .nav-cta { display: flex; gap: 12px; align-items: center; }
+
+/* PANEL NAVBAR */
+.panel-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--nav-h);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+}
+.panel-navbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.panel-navbar-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--black);
+  letter-spacing: 0.5px;
+}
+.panel-navbar-tagline {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; border-radius: 6px; font-size: 13px; font-weight: 500; letter-spacing: 0.5px; border: none; transition: all 0.25s; }
 .btn-outline { border: 1.5px solid var(--gold); color: var(--gold-dark); background: transparent; }
 .btn-outline:hover { background: var(--gold); color: var(--white); }
@@ -199,6 +234,15 @@ footer { background: var(--black); padding: 80px 60px 40px; }
 .sidebar-item:hover { background: var(--beige); color: var(--black); }
 .sidebar-item.active { background: rgba(212, 175, 55, 0.1); color: var(--gold-dark); font-weight: 500; }
 .sidebar-item .icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-item .sidebar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+.sidebar-item:hover .sidebar-icon,
+.sidebar-item.active .sidebar-icon { color: var(--gold-dark); }
 .dashboard-main { flex: 1; margin-left: 260px; padding: 40px 48px; background: var(--gray-light); min-height: 100vh; }
 .dash-header { margin-bottom: 36px; }
 .dash-header h1 { font-size: 30px; margin-bottom: 6px; }

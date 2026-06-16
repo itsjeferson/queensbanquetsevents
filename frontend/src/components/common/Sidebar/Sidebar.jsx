@@ -27,7 +27,7 @@ export default function Sidebar({ items, footerItem }) {
           </div>
         </div>
       </div>
-      <div className="sidebar-section">
+      <div className="sidebar-section" style={{ paddingBottom: footerItem ? 72 : 0 }}>
         {items.map((item) => (
           item.label ? (
             <div key={item.label} className="sidebar-label">{item.label}</div>
@@ -38,7 +38,11 @@ export default function Sidebar({ items, footerItem }) {
               className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
               end={item.end}
             >
-              <span className="icon">{item.icon}</span>
+              {item.icon && (
+                <span className="icon sidebar-icon">
+                  <item.icon />
+                </span>
+              )}
               {item.title}
             </NavLink>
           )

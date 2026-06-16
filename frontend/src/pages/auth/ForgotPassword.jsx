@@ -6,13 +6,17 @@ export default function ForgotPassword() {
     <div className="auth-page">
       <div className="auth-visual">
         <div style={{ position: 'relative' }}>
-          <div className="section-tag" style={{ color: 'var(--gold)' }}>Account Recovery</div>
+          <div className="section-tag" style={{ color: 'var(--gold)' }}>Queen&apos;s Banquet</div>
           <h2>Reset Your <br />Password</h2>
           <p>Enter your email and we will send you a link to reset your password.</p>
         </div>
       </div>
       <div className="auth-form-wrap">
         <div className="auth-form-inner">
+          <div className="auth-brand">
+            <div className="auth-brand-name">Queen&apos;s Banquet</div>
+            <div className="auth-brand-tagline">Events Management</div>
+          </div>
           <h3>Forgot Password</h3>
           <p className="subtitle">Remember your password? <Link to="/login">Back to sign in</Link></p>
           <div className="form-group"><label>Email Address</label><input type="email" placeholder="your@email.com" /></div>

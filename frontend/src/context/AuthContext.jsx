@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
+import { findLocalClientByEmail } from '../services/clientService';
 
 export const AuthContext = createContext(null);
 
@@ -28,10 +29,6 @@ export function AuthProvider({ children }) {
     return { ...data, email: data.email || email, role, name, initials };
   };
 
-  const detectMockRole = (email) => (
-    email.toLowerCase().includes('admin') ? 'admin' : 'client'
-  );
-
   const login = useCallback(async (email, password) => {
     try {
       const response = await authService.login(email, password);
@@ -41,16 +38,27 @@ export function AuthProvider({ children }) {
       if (response.token) localStorage.setItem('token', response.token);
       return userData;
     } catch {
-      const role = detectMockRole(email);
-      const mockUser = {
-        email,
-        role,
-        name: role === 'admin' ? 'Admin User' : 'Maria Santos',
-        initials: role === 'admin' ? 'AU' : 'MS',
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      return mockUser;
+      const normalizedEmail = email.trim().toLowerCase();
+      if (normalizedEmail.includes('admin')) {
+        const mockAdmin = {
+          email,
+          role: 'admin',
+          name: 'Admin User',
+          initials: 'AU',
+        };
+        setUser(mockAdmin);
+        localStorage.setItem('user', JSON.stringify(mockAdmin));
+        return mockAdmin;
+      }
+
+      const clientUser = findLocalClientByEmail(email, password);
+      if (clientUser) {
+        setUser(clientUser);
+        localStorage.setItem('user', JSON.stringify(clientUser));
+        return clientUser;
+      }
+
+      throw new Error('Invalid email or password');
     }
   }, []);
 

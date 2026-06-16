@@ -27,12 +27,17 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    const user = await login(email || 'user@email.com', password);
-    navigate(user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard');
+    try {
+      const user = await login(email.trim(), password);
+      navigate(user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard');
+    } catch {
+      setLoginError('Invalid email or password.');
+    }
   };
 
   return (
@@ -89,6 +94,7 @@ export default function Login() {
             </label>
             <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--gold-dark)', fontWeight: 500 }}>Forgot password?</Link>
           </div>
+          {loginError && <p style={{ color: '#DC3545', fontSize: 13, marginBottom: 16 }}>{loginError}</p>}
           <Button variant="gold" style={{ width: '100%', padding: 14 }} onClick={handleLogin}>Sign In</Button>
         </div>
       </div>
