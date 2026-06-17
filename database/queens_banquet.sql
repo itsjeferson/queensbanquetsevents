@@ -9,7 +9,7 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
-    role ENUM('client', 'admin') DEFAULT 'client',
+    role ENUM('client', 'admin', 'super_admin') DEFAULT 'client',
     status ENUM('active', 'disabled') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -74,9 +74,10 @@ INSERT INTO packages (name, description, price, max_guests, inclusions, featured
 ('Signature', 'Our most popular choice', 95000, 150, '["Full-day coordination (12 hrs)","Premium venue styling & décor","Elaborate floral arrangements","Premium sound, lighting & LED walls","8-hour catering with open bar","Photo + video (8 hrs)","Host / Emcee service","Cake from partner baker"]', 1),
 ('Grand', 'The ultimate luxury experience', 185000, 300, '["Dedicated 2-day event team","Luxury venue transformation","Couture floral installations","Pro audio-visual production","Full-day dining & premium bar","Cinematic photo + film team","Live band or celebrity host","Luxury transport (2 vehicles)","Concierge guest services"]', 0);
 
--- Seed admin user (password: admin123)
+-- Seed default accounts (passwords in database/seed_default_users.sql comments)
 INSERT INTO users (first_name, last_name, email, phone, password, role) VALUES
-('Admin', 'User', 'admin@queensbanquetevents.ph', '+63 917 000 0000', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+('Marou', 'Madrid', 'queensbanquet@gmail.com', '+63 917 100 0001', '$2y$10$Q7LC1mgFKLDXHPIzou2/l.sS63IcgTHWAh209ikq35naiyWBgkgUq', 'super_admin'),
+('Sophia', 'Reyes', 'client@queensbanquetevents.ph', '+63 917 200 0002', '$2y$10$6BhzY8BfrLfxu2IAuQATq.Yo2/on1CVttopH4rXeoTiuhwnvwPSg2', 'client');
 
 -- Digital Event Invitation System
 CREATE TABLE events (

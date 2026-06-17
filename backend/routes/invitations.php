@@ -14,6 +14,8 @@ $param = $parts[2] ?? null;
 
 if ($action === 'slug' && $param) {
     $controller->bySlug($param);
+} elseif ($action === 'preview' && $param) {
+    $controller->preview($param);
 } elseif ($action === 'code' && $param) {
     $controller->byCode($param);
 } else {

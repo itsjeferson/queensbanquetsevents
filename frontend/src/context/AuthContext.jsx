@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
-import { findLocalClientByEmail } from '../services/clientService';
+import { authStorage } from '../utils/authStorage';
+import { isAdminRole } from '../utils/roles';
 
 export const AuthContext = createContext(null);
 
@@ -9,14 +10,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('user');
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch {
-        localStorage.removeItem('user');
-      }
-    }
+    authStorage.clearLegacyStorage();
+    setUser(authStorage.getUser());
     setLoading(false);
   }, []);
 
@@ -26,71 +21,38 @@ export function AuthProvider({ children }) {
     const lastName = data.last_name || data.lastName || '';
     const name = data.name || `${firstName} ${lastName}`.trim() || email.split('@')[0];
     const initials = data.initials || `${firstName[0] || ''}${lastName[0] || name[0] || ''}`.toUpperCase();
-    return { ...data, email: data.email || email, role, name, initials };
+    return { ...data, id: data.id, email: data.email || email, role, name, initials };
   };
 
   const login = useCallback(async (email, password) => {
-    try {
-      const response = await authService.login(email, password);
-      const userData = buildUserFromResponse(email, response.data || { email });
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      if (response.token) localStorage.setItem('token', response.token);
-      return userData;
-    } catch {
-      const normalizedEmail = email.trim().toLowerCase();
-      if (normalizedEmail.includes('admin')) {
-        const mockAdmin = {
-          email,
-          role: 'admin',
-          name: 'Admin User',
-          initials: 'AU',
-        };
-        setUser(mockAdmin);
-        localStorage.setItem('user', JSON.stringify(mockAdmin));
-        return mockAdmin;
-      }
-
-      const clientUser = findLocalClientByEmail(email, password);
-      if (clientUser) {
-        setUser(clientUser);
-        localStorage.setItem('user', JSON.stringify(clientUser));
-        return clientUser;
-      }
-
-      throw new Error('Invalid email or password');
-    }
+    const response = await authService.login(email, password);
+    const userData = buildUserFromResponse(email, response.data || { email });
+    setUser(userData);
+    authStorage.setUser(userData);
+    if (response.token) authStorage.setToken(response.token);
+    return userData;
   }, []);
 
   const register = useCallback(async (data) => {
-    try {
-      const response = await authService.register(data);
-      const userData = response.data || { ...data, role: 'client', initials: `${data.firstName?.[0] || ''}${data.lastName?.[0] || ''}` };
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      if (response.token) localStorage.setItem('token', response.token);
-      return userData;
-    } catch {
-      const mockUser = {
-        ...data,
-        role: 'client',
-        name: `${data.firstName} ${data.lastName}`,
-        initials: `${data.firstName?.[0] || ''}${data.lastName?.[0] || ''}`,
-      };
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      return mockUser;
-    }
+    const response = await authService.register(data);
+    const userData = buildUserFromResponse(data.email, response.data || {
+      ...data,
+      role: 'client',
+      initials: `${data.firstName?.[0] || ''}${data.lastName?.[0] || ''}`,
+    });
+    setUser(userData);
+    authStorage.setUser(userData);
+    if (response.token) authStorage.setToken(response.token);
+    return userData;
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    authStorage.clear();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAdmin: user?.role === 'admin' }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, isAdmin: isAdminRole(user?.role) }}>
       {children}
     </AuthContext.Provider>
   );

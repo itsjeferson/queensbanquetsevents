@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../models/Gallery.php';
 require_once __DIR__ . '/../helpers/response.php';
 require_once __DIR__ . '/../helpers/upload.php';
+require_once __DIR__ . '/../middleware/adminMiddleware.php';
 
 class GalleryController
 {
@@ -13,6 +14,7 @@ class GalleryController
 
     public function upload(): void
     {
+        requireAdmin();
         if (empty($_FILES['image'])) sendError('Image file required', 422);
         $path = handleUpload($_FILES['image'], 'gallery');
         if (!$path) sendError('Upload failed', 500);
@@ -27,6 +29,7 @@ class GalleryController
 
     public function destroy(int $id): void
     {
+        requireAdmin();
         Gallery::delete($id);
         sendResponse(['success' => true, 'message' => 'Image deleted']);
     }

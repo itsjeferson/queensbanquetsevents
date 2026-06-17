@@ -3,13 +3,8 @@ import StatCard from '../../components/common/Cards/StatCard';
 import DataTable from '../../components/common/Table/DataTable';
 import { eventService, rsvpService } from '../../services/invitationService';
 
-const demoEvents = [
-  { id: 1, event_name: 'John & Jane Wedding', event_type: 'wedding', first_name: 'Maria', last_name: 'Santos', status: 'published' },
-  { id: 2, event_name: 'Maria at 18', event_type: 'debut', first_name: 'Roberto', last_name: 'Cruz', status: 'published' },
-];
-
 export default function AdminRsvpMonitoring() {
-  const [events, setEvents] = useState(demoEvents);
+  const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [stats, setStats] = useState(null);
   const [rsvps, setRsvps] = useState([]);
@@ -27,7 +22,7 @@ export default function AdminRsvpMonitoring() {
       setStats(res.data.stats);
       setRsvps(res.data.rsvps);
     } catch {
-      setStats({ yes: 24, no: 5, maybe: 3, total_responses: 32, total_attending: 38 });
+      setStats(null);
       setRsvps([]);
     }
   };

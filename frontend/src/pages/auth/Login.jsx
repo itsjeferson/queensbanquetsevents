@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button/Button';
 import { useAuth } from '../../hooks/useAuth';
+import { isAdminRole } from '../../utils/roles';
 
 function EyeIcon() {
   return (
@@ -34,7 +35,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const user = await login(email.trim(), password);
-      navigate(user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard');
+      navigate(isAdminRole(user.role) ? '/admin/dashboard' : '/client/dashboard');
     } catch {
       setLoginError('Invalid email or password.');
     }

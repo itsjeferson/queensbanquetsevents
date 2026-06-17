@@ -2,15 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
-import { demoWeddingInvitation, demoDebutInvitation, demoBirthdayInvitation } from '../../data/demoInvitation';
 import { buildInvitationPreviewData, getLocalInvitationDraft } from '../../utils/invitationPreview';
 import '../../styles/invitation.css';
-
-const DEMO_MAP = {
-  'john-jane': demoWeddingInvitation,
-  'maria-at-18': demoDebutInvitation,
-  'josh-7th-birthday': demoBirthdayInvitation,
-};
 
 export default function PublicInvitation() {
   const { slug } = useParams();
@@ -27,11 +20,15 @@ export default function PublicInvitation() {
       }
 
       try {
-        const res = await invitationService.getBySlug(slug);
+        const res = await invitationService.getPreviewBySlug(slug);
         setData(buildInvitationPreviewData(res.data));
       } catch {
-        const demo = DEMO_MAP[slug];
-        setData(demo || null);
+        try {
+          const res = await invitationService.getBySlug(slug);
+          setData(buildInvitationPreviewData(res.data));
+        } catch {
+          setData(null);
+        }
       } finally {
         setLoading(false);
       }

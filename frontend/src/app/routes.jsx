@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import ClientLayout from '../layouts/ClientLayout';
 import AdminLayout from '../layouts/AdminLayout';
+import { useAuth } from '../hooks/useAuth';
+import { isAdminRole } from '../utils/roles';
 
 import Login from '../pages/auth/Login';
 import ForgotPassword from '../pages/auth/ForgotPassword';
@@ -24,10 +26,21 @@ import ClientManagement from '../pages/admin/ClientManagement';
 import PublicInvitation from '../pages/invitation/PublicInvitation';
 
 function ProtectedRoute({ children, role }) {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <p style={{ padding: 32, color: 'var(--text-muted)' }}>Loading session...</p>;
+  }
   if (!user) return <Navigate to="/login" replace />;
-  if (role && user.role !== role) {
-    return <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard'} replace />;
+  const userIsAdmin = isAdminRole(user.role);
+  if (role === 'admin' && !userIsAdmin) {
+    return <Navigate to="/client/dashboard" replace />;
+  }
+  if (role === 'client' && userIsAdmin) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  if (role && role !== 'admin' && role !== 'client' && user.role !== role) {
+    return <Navigate to={userIsAdmin ? '/admin/dashboard' : '/client/dashboard'} replace />;
   }
   return children;
 }
@@ -57,6 +70,7 @@ export default function AppRoutes() {
         <Route path="invitation-manage/:id" element={<InvitationManage />} />
         <Route path="invitation-builder" element={<InvitationBuilder />} />
         <Route path="rsvp-monitoring" element={<RSVPMonitoring />} />
+        <Route path="rsvp-monitoring/:eventId" element={<RSVPMonitoring />} />
         <Route path="notifications" element={<ClientNotifications />} />
         <Route path="settings" element={<ClientSettings />} />
       </Route>

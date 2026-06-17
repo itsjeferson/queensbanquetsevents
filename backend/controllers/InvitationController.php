@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/Event.php';
 require_once __DIR__ . '/../models/InvitationPage.php';
+require_once __DIR__ . '/../models/GuestMessage.php';
 require_once __DIR__ . '/../helpers/response.php';
 
 class InvitationController
@@ -8,6 +9,13 @@ class InvitationController
     public function bySlug(string $slug): void
     {
         $event = Event::findBySlug($slug);
+        if (!$event) sendError('Invitation not found', 404);
+        $this->sendPublicInvitation($event);
+    }
+
+    public function preview(string $slug): void
+    {
+        $event = Event::findBySlugAny($slug);
         if (!$event) sendError('Invitation not found', 404);
         $this->sendPublicInvitation($event);
     }
@@ -27,7 +35,7 @@ class InvitationController
             'data' => [
                 'event' => $event,
                 'invitation' => $page,
-                'guest_messages' => [],
+                'guest_messages' => GuestMessage::byEvent((int) $event['id']),
             ],
         ]);
     }

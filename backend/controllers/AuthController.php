@@ -17,7 +17,12 @@ class AuthController
         }
 
         unset($user['password']);
-        sendResponse(['success' => true, 'data' => $user, 'token' => 'mock-jwt-token']);
+        $token = base64_encode(json_encode([
+            'id' => (int) $user['id'],
+            'role' => $user['role'],
+            'email' => $user['email'],
+        ]));
+        sendResponse(['success' => true, 'data' => $user, 'token' => $token]);
     }
 
     public function register(array $data): void

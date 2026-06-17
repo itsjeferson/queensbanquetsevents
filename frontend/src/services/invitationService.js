@@ -1,8 +1,9 @@
 import { api } from './api';
 
 export const invitationService = {
-  getBySlug: (slug) => api.get(`/invitations/slug/${slug}`),
-  getByCode: (code) => api.get(`/invitations/code/${code}`),
+  getBySlug: (slug) => api.get(`/invitations/slug/${encodeURIComponent(slug)}`),
+  getPreviewBySlug: (slug) => api.get(`/invitations/preview/${encodeURIComponent(slug)}`),
+  getByCode: (code) => api.get(`/invitations/code/${encodeURIComponent(code)}`),
 };
 
 export const eventService = {
@@ -23,6 +24,7 @@ export const guestService = {
 
 export const rsvpService = {
   getByEvent: (eventId) => api.get(`/rsvp/event/${eventId}`),
+  getByClient: (clientId) => api.get(`/rsvp/client/${clientId}`),
   submit: (data) => api.post('/rsvp', data),
 };
 

@@ -16,8 +16,39 @@ class Rsvp
         $pdo = getConnection();
         $stmt = $pdo->prepare('SELECT attendance, COUNT(*) as count, SUM(guest_count) as total_guests FROM rsvps WHERE event_id = ? GROUP BY attendance');
         $stmt->execute([$eventId]);
-        $rows = $stmt->fetchAll();
+        return self::aggregateStats($stmt->fetchAll());
+    }
 
+    public static function byClient(int $clientId): array
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare(
+            'SELECT r.*, e.event_name
+             FROM rsvps r
+             JOIN events e ON r.event_id = e.id
+             WHERE e.client_id = ?
+             ORDER BY r.submitted_at DESC'
+        );
+        $stmt->execute([$clientId]);
+        return $stmt->fetchAll();
+    }
+
+    public static function statsByClient(int $clientId): array
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare(
+            'SELECT r.attendance, COUNT(*) as count, SUM(r.guest_count) as total_guests
+             FROM rsvps r
+             JOIN events e ON r.event_id = e.id
+             WHERE e.client_id = ?
+             GROUP BY r.attendance'
+        );
+        $stmt->execute([$clientId]);
+        return self::aggregateStats($stmt->fetchAll());
+    }
+
+    private static function aggregateStats(array $rows): array
+    {
         $stats = ['yes' => 0, 'no' => 0, 'maybe' => 0, 'total_responses' => 0, 'total_attending' => 0];
         foreach ($rows as $row) {
             $stats[$row['attendance']] = (int) $row['count'];

@@ -32,6 +32,14 @@ class Event
         return $stmt->fetch() ?: null;
     }
 
+    public static function findBySlugAny(string $slug): ?array
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE slug = ? AND status != 'archived'");
+        $stmt->execute([$slug]);
+        return $stmt->fetch() ?: null;
+    }
+
     public static function findByCode(string $code): ?array
     {
         $pdo = getConnection();

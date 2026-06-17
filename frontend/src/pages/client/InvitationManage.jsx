@@ -5,7 +5,6 @@ import { eventService } from '../../services/invitationService';
 import { useAuth } from '../../hooks/useAuth';
 import QRShare from '../../components/invitation/QRShare';
 import InvitationPreviewModal from '../../components/invitation/InvitationPreviewModal';
-import { demoWeddingInvitation } from '../../data/demoInvitation';
 import {
   getPreviewPath,
   saveClientPreviewSlug,
@@ -14,39 +13,33 @@ import {
 
 const INVITATION_ENTRY = '/#';
 
-const baseInvitation = {
-  ...demoWeddingInvitation.invitation,
-  opening_line: 'With great joy, we invite you',
-  hero_caption: 'In the union of',
-  quote: 'So they are no longer two, but one flesh. Therefore what God has joined together, let no one separate.',
-  quote_source: 'Matthew 19:6',
-  rsvp_note: 'You are special to us. Kindly confirm your attendance below.',
-  coordinator: 'Queens Banquet Events',
-  coordinator_phone: '+63 917 000 0000',
-  attire: {
-    primary: 'Formal in champagne, gold, cream, and warm neutrals.',
-    guests: 'Ladies: long dress or pantsuit. Gentlemen: long sleeves or polo with slacks.',
-    reminders: 'Although we love your little ones, this is an adult-only celebration.',
-  },
-  faqs: [
-    { question: 'Can I bring a plus one?', answer: 'Please refer to the name listed on your invitation.' },
-    { question: 'Will transportation be provided?', answer: 'Kindly coordinate with the event team for shuttle details.' },
-  ],
-  gallery: demoWeddingInvitation.invitation.gallery,
-  videos: demoWeddingInvitation.invitation.videos,
-  music_url: '',
+const emptyInvitation = {
+  opening_line: '',
+  hero_caption: '',
+  quote: '',
+  quote_source: '',
+  rsvp_note: '',
+  coordinator: '',
+  coordinator_phone: '',
+  cover_image: '',
   background_video: '',
+  music_url: '',
+  dress_code: '',
+  story: { title: '', sections: [{ heading: '', content: '' }] },
+  venue: {
+    ceremony: { name: '', address: '', time: '', map_url: '' },
+    reception: { name: '', address: '', time: '', map_url: '' },
+  },
+  program: [],
+  gallery: [],
+  videos: [],
+  gift_registry: { preferences: '' },
+  attire: { guests: '' },
+  faqs: [],
+  entourage: null,
+  qr_enabled: 1,
 };
 
-function mergeDraft(base, draft) {
-  return {
-    ...base,
-    ...draft,
-    event: { ...(base.event || {}), ...(draft?.event || {}) },
-    invitation: { ...(base.invitation || {}), ...(draft?.invitation || {}) },
-    guest_messages: draft?.guest_messages || base.guest_messages || [],
-  };
-}
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -57,10 +50,11 @@ function readFileAsDataUrl(file) {
   });
 }
 
-const demoEvents = [
-  { id: 1, event_name: 'John & Jane Wedding', event_type: 'wedding', event_date: '2027-07-25', slug: 'john-jane', status: 'published' },
-  { id: 2, event_name: 'Maria at 18', event_type: 'debut', event_date: '2027-03-15', slug: 'maria-at-18', status: 'draft' },
-];
+const demoEvents = [];
+
+function mapInvitationFromApi(invitation) {
+  return { ...emptyInvitation, ...(invitation || {}) };
+}
 
 const MANAGE_CONFIG = {
   client: {
@@ -141,38 +135,19 @@ export default function InvitationManage({ variant = 'client' }) {
   const config = MANAGE_CONFIG[variant];
   if (!id) return <InvitationManagerList variant={variant} />;
   const [event, setEvent] = useState(null);
-  const [invitation, setInvitation] = useState(baseInvitation);
+  const [invitation, setInvitation] = useState(emptyInvitation);
   const [saved, setSaved] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    const fallback = {
-      event: {
-        ...demoWeddingInvitation.event,
-        id,
-        event_name: 'Kevin & Andy',
-        slug: 'john-jane',
-        invite_code: 'DEMO2027',
-      },
-      invitation: baseInvitation,
-      guest_messages: demoWeddingInvitation.guest_messages,
-    };
-
     eventService.getById(id).then((res) => {
-      const apiData = {
-        event: res.data.event,
-        invitation: { ...baseInvitation, ...(res.data.invitation || {}) },
-        guest_messages: res.data.guest_messages || demoWeddingInvitation.guest_messages,
-      };
-      const local = localStorage.getItem(`invitation-draft-${id}`);
-      const data = local ? mergeDraft(apiData, JSON.parse(local)) : apiData;
-      setEvent(data.event);
-      setInvitation(data.invitation);
+      setEvent(res.data.event);
+      setInvitation(mapInvitationFromApi(res.data.invitation));
+      setLoadError(false);
     }).catch(() => {
-      const local = localStorage.getItem(`invitation-draft-${id}`);
-      const data = local ? mergeDraft(fallback, JSON.parse(local)) : fallback;
-      setEvent(data.event);
-      setInvitation(data.invitation);
+      setEvent(null);
+      setLoadError(true);
     });
   }, [id]);
 
@@ -230,7 +205,7 @@ export default function InvitationManage({ variant = 'client' }) {
     const data = {
       event,
       invitation,
-      guest_messages: demoWeddingInvitation.guest_messages,
+      guest_messages: [],
     };
     saveInvitationDraft(data);
     if (variant === 'client') saveClientPreviewSlug(user?.id, event?.slug);
@@ -248,7 +223,8 @@ export default function InvitationManage({ variant = 'client' }) {
     }
   };
 
-  if (!event) return <p>Loading...</p>;
+  if (loadError) return <p>Invitation not found.</p>;
+  if (!event) return <p>Loading invitation...</p>;
 
   const gallery = invitation.gallery?.length ? invitation.gallery : [{ caption: '', image: '' }];
   const firstStory = invitation.story?.sections?.[0] || {};
@@ -434,7 +410,7 @@ export default function InvitationManage({ variant = 'client' }) {
         data={{
           event,
           invitation,
-          guest_messages: demoWeddingInvitation.guest_messages,
+          guest_messages: [],
         }}
       />
     </>

@@ -24,6 +24,7 @@ function statusBadgeClass(status) {
 
 export default function ClientManagement() {
   const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [addOpen, setAddOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [credentialsOpen, setCredentialsOpen] = useState(false);
@@ -33,7 +34,17 @@ export default function ClientManagement() {
   const [error, setError] = useState('');
 
   const loadClients = () => {
-    clientService.getAll().then((res) => setClients(res.data || []));
+    setLoading(true);
+    clientService.getAll()
+      .then((res) => {
+        setClients(res.data || []);
+        setError('');
+      })
+      .catch(() => {
+        setClients([]);
+        setError('Could not load clients from the database.');
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -137,6 +148,11 @@ export default function ClientManagement() {
 
       <div className="card-widget">
         <h3>List of Clients</h3>
+        {loading ? (
+          <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>Loading clients...</p>
+        ) : clients.length === 0 ? (
+          <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>No clients found in the database yet.</p>
+        ) : (
         <DataTable
           columns={[
             { key: 'name', label: 'Name' },
@@ -160,6 +176,7 @@ export default function ClientManagement() {
             return row[key] || '—';
           }}
         />
+        )}
       </div>
 
       <Modal

@@ -10,8 +10,10 @@ switch ($method) {
     case 'GET':
         if ($action === 'event' && isset($parts[2])) {
             $controller->byEvent((int) $parts[2]);
+        } elseif ($action === 'client' && isset($parts[2])) {
+            $controller->byClient((int) $parts[2]);
         } else {
-            sendError('Use /rsvp/event/{eventId}', 400);
+            sendError('Use /rsvp/event/{eventId} or /rsvp/client/{clientId}', 400);
         }
         break;
     case 'POST':

@@ -5,7 +5,7 @@ require_once __DIR__ . '/../helpers/response.php';
 function requireAdmin(): array
 {
     $user = requireAuth();
-    if ($user['role'] !== 'admin') {
+    if (!in_array($user['role'], ['admin', 'super_admin'], true)) {
         sendError('Forbidden', 403);
     }
     return $user;

@@ -1,4 +1,5 @@
 import { API_URL } from '../utils/constants';
+import { authStorage } from '../utils/authStorage';
 
 class ApiError extends Error {
   constructor(message, status, data) {
@@ -9,7 +10,7 @@ class ApiError extends Error {
 }
 
 async function request(endpoint, options = {}) {
-  const token = localStorage.getItem('token');
+  const token = authStorage.getToken();
   const headers = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -36,7 +37,7 @@ export const api = {
   put: (endpoint, body) => request(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
   delete: (endpoint) => request(endpoint, { method: 'DELETE' }),
   upload: async (endpoint, formData) => {
-    const token = localStorage.getItem('token');
+    const token = authStorage.getToken();
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
       headers: token ? { Authorization: `Bearer ${token}` } : {},

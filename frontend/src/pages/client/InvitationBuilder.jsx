@@ -52,18 +52,11 @@ const defaultInvitation = {
   program: [{ time: '', title: '' }],
 };
 
-const DEMO_TEMPLATES = [
-  { id: 1, template_name: 'Classic Gold', category: 'wedding' },
-  { id: 2, template_name: 'Modern Minimalist', category: 'wedding' },
-  { id: 3, template_name: 'Pink Rose', category: 'debut' },
-  { id: 4, template_name: 'Kids Theme', category: 'birthday' },
-];
-
 export default function InvitationBuilder() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [templates, setTemplates] = useState(DEMO_TEMPLATES);
+  const [templates, setTemplates] = useState([]);
   const [form, setForm] = useState({
     event_name: '',
     event_type: 'wedding',

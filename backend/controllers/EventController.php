@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/Event.php';
 require_once __DIR__ . '/../models/InvitationPage.php';
+require_once __DIR__ . '/../models/GuestMessage.php';
 require_once __DIR__ . '/../helpers/response.php';
 
 class EventController
@@ -16,7 +17,11 @@ class EventController
         $event = Event::find($id);
         if (!$event) sendError('Event not found', 404);
         $page = InvitationPage::findByEventId($id);
-        sendResponse(['success' => true, 'data' => ['event' => $event, 'invitation' => $page]]);
+        sendResponse(['success' => true, 'data' => [
+            'event' => $event,
+            'invitation' => $page,
+            'guest_messages' => GuestMessage::byEvent($id),
+        ]]);
     }
 
     public function store(array $data): void

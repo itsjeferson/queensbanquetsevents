@@ -1,8 +1,10 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
+import { adminRoleLabel, isAdminRole } from '../../../utils/roles';
 
 export default function Sidebar({ items, footerItem }) {
   const { user } = useAuth();
+  const userIsAdmin = isAdminRole(user?.role);
 
   return (
     <aside className="sidebar">
@@ -14,15 +16,15 @@ export default function Sidebar({ items, footerItem }) {
               width: 44,
               height: 44,
               fontSize: 18,
-              background: user?.role === 'admin' ? 'var(--black)' : undefined,
+              background: userIsAdmin ? 'var(--black)' : undefined,
             }}
           >
-            {user?.initials || 'U'}
+            {user?.role === 'super_admin' ? '★' : (user?.initials || 'U')}
           </div>
           <div>
             <strong style={{ fontSize: 14, display: 'block' }}>{user?.name || 'User'}</strong>
-            <span style={{ fontSize: 12, color: user?.role === 'admin' ? 'var(--gold-dark)' : 'var(--text-muted)' }}>
-              {user?.role === 'admin' ? 'Administrator' : 'Client Account'}
+            <span style={{ fontSize: 12, color: userIsAdmin ? 'var(--gold-dark)' : 'var(--text-muted)' }}>
+              {adminRoleLabel(user?.role)}
             </span>
           </div>
         </div>

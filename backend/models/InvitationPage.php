@@ -9,28 +9,29 @@ class InvitationPage
         $stmt = $pdo->prepare('SELECT ip.*, it.template_name, it.category, it.theme_config FROM invitation_pages ip LEFT JOIN invitation_templates it ON ip.template_id = it.id WHERE ip.event_id = ?');
         $stmt->execute([$eventId]);
         $row = $stmt->fetch();
-        return $row ? self::decodeJsonFields($row) : null;
+        return $row ? self::formatForApi(self::decodeJsonFields($row)) : null;
     }
 
     public static function create(int $eventId, array $data = []): int
     {
         $pdo = getConnection();
+        $normalized = self::normalizeInput($data);
         $stmt = $pdo->prepare('INSERT INTO invitation_pages (event_id, template_id, cover_image, background_music, primary_color, font_family, story, entourage, venue, dress_code, program, gallery, videos, gift_registry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $stmt->execute([
             $eventId,
-            $data['template_id'] ?? null,
-            $data['cover_image'] ?? null,
-            $data['background_music'] ?? null,
-            $data['primary_color'] ?? '#D4AF37',
-            $data['font_family'] ?? 'Playfair Display',
-            json_encode($data['story'] ?? []),
-            json_encode($data['entourage'] ?? []),
-            json_encode($data['venue'] ?? []),
-            $data['dress_code'] ?? '',
-            json_encode($data['program'] ?? []),
-            json_encode($data['gallery'] ?? []),
-            json_encode($data['videos'] ?? []),
-            json_encode($data['gift_registry'] ?? []),
+            $normalized['template_id'],
+            $normalized['cover_image'],
+            $normalized['background_music'],
+            $normalized['primary_color'],
+            $normalized['font_family'],
+            json_encode($normalized['story']),
+            json_encode($normalized['entourage']),
+            json_encode($normalized['venue']),
+            $normalized['dress_code'],
+            json_encode($normalized['program']),
+            json_encode($normalized['gallery']),
+            json_encode($normalized['videos']),
+            json_encode($normalized['gift_registry']),
         ]);
         return (int) $pdo->lastInsertId();
     }
@@ -38,22 +39,23 @@ class InvitationPage
     public static function update(int $eventId, array $data): void
     {
         $pdo = getConnection();
+        $normalized = self::normalizeInput($data);
         $stmt = $pdo->prepare('UPDATE invitation_pages SET template_id = ?, cover_image = ?, background_music = ?, primary_color = ?, font_family = ?, story = ?, entourage = ?, venue = ?, dress_code = ?, program = ?, gallery = ?, videos = ?, gift_registry = ?, qr_enabled = ? WHERE event_id = ?');
         $stmt->execute([
-            $data['template_id'] ?? null,
-            $data['cover_image'] ?? null,
-            $data['background_music'] ?? null,
-            $data['primary_color'] ?? '#D4AF37',
-            $data['font_family'] ?? 'Playfair Display',
-            json_encode($data['story'] ?? []),
-            json_encode($data['entourage'] ?? []),
-            json_encode($data['venue'] ?? []),
-            $data['dress_code'] ?? '',
-            json_encode($data['program'] ?? []),
-            json_encode($data['gallery'] ?? []),
-            json_encode($data['videos'] ?? []),
-            json_encode($data['gift_registry'] ?? []),
-            $data['qr_enabled'] ?? 1,
+            $normalized['template_id'],
+            $normalized['cover_image'],
+            $normalized['background_music'],
+            $normalized['primary_color'],
+            $normalized['font_family'],
+            json_encode($normalized['story']),
+            json_encode($normalized['entourage']),
+            json_encode($normalized['venue']),
+            $normalized['dress_code'],
+            json_encode($normalized['program']),
+            json_encode($normalized['gallery']),
+            json_encode($normalized['videos']),
+            json_encode($normalized['gift_registry']),
+            $normalized['qr_enabled'],
             $eventId,
         ]);
     }
@@ -63,6 +65,84 @@ class InvitationPage
         $pdo = getConnection();
         $stmt = $pdo->prepare('UPDATE invitation_pages SET published_at = NOW() WHERE event_id = ?');
         $stmt->execute([$eventId]);
+    }
+
+    public static function formatForApi(array $row): array
+    {
+        $story = is_array($row['story'] ?? null) ? $row['story'] : [];
+
+        return [
+            'template_id' => $row['template_id'] ?? null,
+            'template_name' => $row['template_name'] ?? null,
+            'category' => $row['category'] ?? null,
+            'cover_image' => $row['cover_image'] ?? '',
+            'music_url' => $row['background_music'] ?? '',
+            'background_video' => $story['background_video'] ?? '',
+            'primary_color' => $row['primary_color'] ?? '#D4AF37',
+            'secondary_color' => $story['secondary_color'] ?? '#F4EEE7',
+            'font_family' => $row['font_family'] ?? 'Playfair Display',
+            'opening_line' => $story['opening_line'] ?? '',
+            'hero_caption' => $story['hero_caption'] ?? '',
+            'quote' => $story['quote'] ?? '',
+            'quote_source' => $story['quote_source'] ?? '',
+            'rsvp_note' => $story['rsvp_note'] ?? '',
+            'coordinator' => $story['coordinator'] ?? '',
+            'coordinator_phone' => $story['coordinator_phone'] ?? '',
+            'story' => [
+                'title' => $story['title'] ?? '',
+                'sections' => $story['sections'] ?? [],
+            ],
+            'venue' => $row['venue'] ?? [],
+            'dress_code' => $row['dress_code'] ?? '',
+            'program' => $row['program'] ?? [],
+            'gallery' => $row['gallery'] ?? [],
+            'videos' => $row['videos'] ?? [],
+            'gift_registry' => $row['gift_registry'] ?? [],
+            'attire' => $story['attire'] ?? [],
+            'faqs' => $story['faqs'] ?? [],
+            'entourage' => $row['entourage'] ?? [],
+            'qr_enabled' => (int) ($row['qr_enabled'] ?? 1),
+            'published_at' => $row['published_at'] ?? null,
+        ];
+    }
+
+    public static function normalizeInput(array $data): array
+    {
+        $story = $data['story'] ?? [];
+        if (!is_array($story)) {
+            $story = [];
+        }
+
+        $story['title'] = $story['title'] ?? '';
+        $story['sections'] = $story['sections'] ?? [];
+        $story['opening_line'] = $data['opening_line'] ?? ($story['opening_line'] ?? '');
+        $story['hero_caption'] = $data['hero_caption'] ?? ($story['hero_caption'] ?? '');
+        $story['quote'] = $data['quote'] ?? ($story['quote'] ?? '');
+        $story['quote_source'] = $data['quote_source'] ?? ($story['quote_source'] ?? '');
+        $story['rsvp_note'] = $data['rsvp_note'] ?? ($story['rsvp_note'] ?? '');
+        $story['coordinator'] = $data['coordinator'] ?? ($story['coordinator'] ?? '');
+        $story['coordinator_phone'] = $data['coordinator_phone'] ?? ($story['coordinator_phone'] ?? '');
+        $story['background_video'] = $data['background_video'] ?? ($story['background_video'] ?? '');
+        $story['secondary_color'] = $data['secondary_color'] ?? ($story['secondary_color'] ?? '#F4EEE7');
+        $story['attire'] = $data['attire'] ?? ($story['attire'] ?? []);
+        $story['faqs'] = $data['faqs'] ?? ($story['faqs'] ?? []);
+
+        return [
+            'template_id' => $data['template_id'] ?? null,
+            'cover_image' => $data['cover_image'] ?? null,
+            'background_music' => $data['music_url'] ?? ($data['background_music'] ?? null),
+            'primary_color' => $data['primary_color'] ?? '#D4AF37',
+            'font_family' => $data['font_family'] ?? 'Playfair Display',
+            'story' => $story,
+            'entourage' => $data['entourage'] ?? [],
+            'venue' => $data['venue'] ?? [],
+            'dress_code' => $data['dress_code'] ?? '',
+            'program' => $data['program'] ?? [],
+            'gallery' => $data['gallery'] ?? [],
+            'videos' => $data['videos'] ?? [],
+            'gift_registry' => $data['gift_registry'] ?? [],
+            'qr_enabled' => $data['qr_enabled'] ?? 1,
+        ];
     }
 
     private static function decodeJsonFields(array $row): array

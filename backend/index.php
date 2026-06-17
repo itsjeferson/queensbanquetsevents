@@ -17,6 +17,7 @@ $routes = [
     'templates' => 'routes/templates.php',
     'events' => 'routes/events.php',
     'guests' => 'routes/guests.php',
+    'guest-messages' => 'routes/guest-messages.php',
     'clients' => 'routes/clients.php',
 ];
 

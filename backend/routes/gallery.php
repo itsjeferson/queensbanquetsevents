@@ -7,17 +7,12 @@ $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($parts[1]) && is_numeric($parts[1]) ? (int) $parts[1] : null;
 $action = $parts[1] ?? '';
 
-switch ("$method:$action") {
-    case 'GET:':
-    case 'GET':
-        $controller->index();
-        break;
-    case 'POST:upload':
-        $controller->upload();
-        break;
-    case 'DELETE:':
-        $id ? $controller->destroy($id) : sendError('ID required', 400);
-        break;
-    default:
-        sendError('Route not found', 404);
+if ($method === 'GET' && ($action === '' || $action === 'gallery')) {
+    $controller->index();
+} elseif ($method === 'POST' && $action === 'upload') {
+    $controller->upload();
+} elseif ($method === 'DELETE' && $id) {
+    $controller->destroy($id);
+} else {
+    sendError('Route not found', 404);
 }
