@@ -1,13 +1,16 @@
 export default function OurStory({ story, gallery = [] }) {
-  if (!story?.sections?.length) return null;
+  const sections = (story?.sections || []).filter(
+    (section) => section.heading?.trim() || section.content?.trim(),
+  );
+  if (!sections.length && !story?.title?.trim()) return null;
   const portraits = gallery.filter((item) => item.image).slice(0, 2);
 
   return (
     <section className="inv-story-section" id="story">
       <div className="inv-section">
-        <p className="inv-script-title">{story.title || 'Our Story'}</p>
-        <div className="inv-divider" />
-        <p className="inv-story-lead">{story.sections[0]?.content}</p>
+        {story?.title && <p className="inv-script-title">{story.title}</p>}
+        {story?.title && <div className="inv-divider" />}
+        {sections[0]?.content && <p className="inv-story-lead">{sections[0].content}</p>}
 
         {portraits.length > 0 && (
           <div className="inv-portrait-grid">
@@ -20,10 +23,10 @@ export default function OurStory({ story, gallery = [] }) {
           </div>
         )}
 
-        {story.sections.slice(1).map((section, index) => (
+        {sections.slice(1).map((section, index) => (
           <div key={index} className="inv-story-block">
-            <h3>{section.heading}</h3>
-            <p>{section.content}</p>
+            {section.heading && <h3>{section.heading}</h3>}
+            {section.content && <p>{section.content}</p>}
           </div>
         ))}
       </div>

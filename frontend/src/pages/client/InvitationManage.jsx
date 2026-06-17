@@ -4,9 +4,14 @@ import DataTable from '../../components/common/Table/DataTable';
 import { eventService } from '../../services/invitationService';
 import { useAuth } from '../../hooks/useAuth';
 import QRShare from '../../components/invitation/QRShare';
+import InvitationPreviewModal from '../../components/invitation/InvitationPreviewModal';
 import { demoWeddingInvitation } from '../../data/demoInvitation';
+import {
+  getPreviewPath,
+  saveClientPreviewSlug,
+  saveInvitationDraft,
+} from '../../utils/invitationPreview';
 
-const STORAGE_PREFIX = 'invitation-draft';
 const INVITATION_ENTRY = '/#';
 
 const baseInvitation = {
@@ -57,25 +62,47 @@ const demoEvents = [
   { id: 2, event_name: 'Maria at 18', event_type: 'debut', event_date: '2027-03-15', slug: 'maria-at-18', status: 'draft' },
 ];
 
-function InvitationManagerList() {
+const MANAGE_CONFIG = {
+  client: {
+    title: 'Invitation Management',
+    subtitle: 'Manage your event invitations and guest lists.',
+    basePath: '/client/invitation-manage',
+    builderPath: '/client/invitation-builder',
+    rsvpPath: '/client/rsvp-monitoring',
+    showCreateButton: true,
+  },
+  admin: {
+    title: 'Invitation Manager',
+    subtitle: 'Review and manage all client event invitations.',
+    basePath: '/admin/invitation-manager',
+    rsvpPath: '/admin/rsvp-monitoring',
+    showCreateButton: false,
+  },
+};
+
+function InvitationManagerList({ variant = 'client' }) {
   const { user } = useAuth();
+  const config = MANAGE_CONFIG[variant];
   const [events, setEvents] = useState(demoEvents);
   const statusBadge = { published: 'badge-green', draft: 'badge-gray', archived: 'badge-red' };
 
   useEffect(() => {
-    eventService.getAll(user?.id).then((res) => {
+    const clientId = variant === 'admin' ? undefined : user?.id;
+    eventService.getAll(clientId).then((res) => {
       if (res.data?.length) setEvents(res.data);
     }).catch(() => {});
-  }, [user?.id]);
+  }, [user?.id, variant]);
 
   return (
     <>
       <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h1>Invitation Management</h1>
-          <p>Manage your event invitations and guest lists.</p>
+          <h1>{config.title}</h1>
+          <p>{config.subtitle}</p>
         </div>
-        <Link to="/client/invitation-builder" className="btn btn-gold">+ Create Invitation</Link>
+        {config.showCreateButton && (
+          <Link to={config.builderPath} className="btn btn-gold">+ Create Invitation</Link>
+        )}
       </div>
       <div className="card-widget">
         <DataTable
@@ -94,7 +121,7 @@ function InvitationManagerList() {
             if (key === 'status') return <span className={`badge ${statusBadge[row.status] || 'badge-gray'}`}>{row.status}</span>;
             if (key === 'actions') return (
               <span>
-                <Link to={`/client/invitation-manage/${row.id}`} className="action-btn">Manage</Link>
+                <Link to={`${config.basePath}/${row.id}`} className="action-btn">Manage</Link>
                 {row.status === 'published' && row.slug && (
                   <a href={`${INVITATION_ENTRY}/invite/${row.slug}`} target="_blank" rel="noreferrer" className="action-btn">View</a>
                 )}
@@ -108,12 +135,15 @@ function InvitationManagerList() {
   );
 }
 
-export default function InvitationManage() {
+export default function InvitationManage({ variant = 'client' }) {
   const { id } = useParams();
-  if (!id) return <InvitationManagerList />;
+  const { user } = useAuth();
+  const config = MANAGE_CONFIG[variant];
+  if (!id) return <InvitationManagerList variant={variant} />;
   const [event, setEvent] = useState(null);
   const [invitation, setInvitation] = useState(baseInvitation);
   const [saved, setSaved] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
     const fallback = {
@@ -134,12 +164,12 @@ export default function InvitationManage() {
         invitation: { ...baseInvitation, ...(res.data.invitation || {}) },
         guest_messages: res.data.guest_messages || demoWeddingInvitation.guest_messages,
       };
-      const local = localStorage.getItem(`${STORAGE_PREFIX}-${id}`);
+      const local = localStorage.getItem(`invitation-draft-${id}`);
       const data = local ? mergeDraft(apiData, JSON.parse(local)) : apiData;
       setEvent(data.event);
       setInvitation(data.invitation);
     }).catch(() => {
-      const local = localStorage.getItem(`${STORAGE_PREFIX}-${id}`);
+      const local = localStorage.getItem(`invitation-draft-${id}`);
       const data = local ? mergeDraft(fallback, JSON.parse(local)) : fallback;
       setEvent(data.event);
       setInvitation(data.invitation);
@@ -202,9 +232,8 @@ export default function InvitationManage() {
       invitation,
       guest_messages: demoWeddingInvitation.guest_messages,
     };
-    localStorage.setItem(`${STORAGE_PREFIX}-${id}`, JSON.stringify(data));
-    if (event?.slug) localStorage.setItem(`${STORAGE_PREFIX}-slug-${event.slug}`, JSON.stringify(data));
-    if (event?.invite_code) localStorage.setItem(`${STORAGE_PREFIX}-code-${event.invite_code}`, JSON.stringify(data));
+    saveInvitationDraft(data);
+    if (variant === 'client') saveClientPreviewSlug(user?.id, event?.slug);
     setSaved(true);
 
     try {
@@ -233,7 +262,12 @@ export default function InvitationManage() {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button type="button" className="btn btn-gold" onClick={handlePublish}>Save & Publish</button>
-          {event.slug && <a href={`${INVITATION_ENTRY}/invite/${event.slug}`} target="_blank" rel="noreferrer" className="btn btn-outline">Preview</a>}
+          {variant === 'admin' && (
+            <button type="button" className="btn btn-outline" onClick={() => setPreviewOpen(true)}>Preview Invitation</button>
+          )}
+          {event.slug && variant === 'client' && (
+            <a href={getPreviewPath(event.slug)} target="_blank" rel="noreferrer" className="btn btn-outline">Preview Invitation</a>
+          )}
         </div>
       </div>
 
@@ -391,9 +425,18 @@ export default function InvitationManage() {
             <label>Coordinator</label>
             <input value={invitation.coordinator || ''} onChange={(e) => updateInvitation({ coordinator: e.target.value })} />
           </div>
-          <Link to="/client/rsvp-monitoring" className="btn btn-outline">RSVP Monitoring</Link>
+          <Link to={config.rsvpPath} className="btn btn-outline">RSVP Monitoring</Link>
         </div>
       </div>
+      <InvitationPreviewModal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        data={{
+          event,
+          invitation,
+          guest_messages: demoWeddingInvitation.guest_messages,
+        }}
+      />
     </>
   );
 }

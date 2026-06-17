@@ -18,7 +18,7 @@ export default function EventDetailsSection({ event, venue, dressCode, program }
             <div className="inv-details-grid">
               {['ceremony', 'reception'].map((type) => {
                 const item = venue[type];
-                if (!item) return null;
+                if (!item?.name?.trim() && !item?.address?.trim() && !item?.time?.trim()) return null;
                 return (
                   <div key={type} className="inv-detail-card">
                     <span>{type}</span>

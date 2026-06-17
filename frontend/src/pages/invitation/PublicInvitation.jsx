@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
 import { demoWeddingInvitation, demoDebutInvitation, demoBirthdayInvitation } from '../../data/demoInvitation';
+import { buildInvitationPreviewData, getLocalInvitationDraft } from '../../utils/invitationPreview';
 import '../../styles/invitation.css';
 
 const DEMO_MAP = {
@@ -11,33 +12,6 @@ const DEMO_MAP = {
   'josh-7th-birthday': demoBirthdayInvitation,
 };
 
-function getLocalInvitation(identifier, baseData) {
-  if (typeof window === 'undefined') return baseData;
-  const keys = [
-    `invitation-draft-slug-${identifier}`,
-    `invitation-draft-code-${identifier}`,
-  ];
-  if (baseData?.event?.id) keys.unshift(`invitation-draft-${baseData.event.id}`);
-
-  for (const key of keys) {
-    const raw = localStorage.getItem(key);
-    if (!raw) continue;
-    try {
-      const draft = JSON.parse(raw);
-      return {
-        ...baseData,
-        ...draft,
-        event: { ...(baseData?.event || {}), ...(draft.event || {}) },
-        invitation: { ...(baseData?.invitation || {}), ...(draft.invitation || {}) },
-        guest_messages: draft.guest_messages || baseData?.guest_messages || [],
-      };
-    } catch {
-      localStorage.removeItem(key);
-    }
-  }
-  return baseData;
-}
-
 export default function PublicInvitation() {
   const { slug } = useParams();
   const [data, setData] = useState(null);
@@ -45,12 +19,19 @@ export default function PublicInvitation() {
 
   useEffect(() => {
     async function load() {
+      const draft = getLocalInvitationDraft(slug);
+      if (draft) {
+        setData(buildInvitationPreviewData(draft));
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await invitationService.getBySlug(slug);
-        setData(getLocalInvitation(slug, res.data));
+        setData(buildInvitationPreviewData(res.data));
       } catch {
-        const demo = DEMO_MAP[slug] || demoWeddingInvitation;
-        setData(getLocalInvitation(slug, demo));
+        const demo = DEMO_MAP[slug];
+        setData(demo || null);
       } finally {
         setLoading(false);
       }

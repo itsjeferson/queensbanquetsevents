@@ -1,6 +1,10 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatCard from '../../components/common/Cards/StatCard';
 import DataTable from '../../components/common/Table/DataTable';
+import { useAuth } from '../../hooks/useAuth';
+import { eventService } from '../../services/invitationService';
+import { getClientPreviewSlug, getPreviewPath } from '../../utils/invitationPreview';
 
 const invitations = [
   { id: 1, event: 'Wedding Invitation', date: 'Dec 28, 2026', template: 'Classic Gold', status: 'Published' },
@@ -16,7 +20,22 @@ const workflow = [
 ];
 
 export default function ClientDashboard() {
+  const { user } = useAuth();
+  const [previewSlug, setPreviewSlug] = useState(null);
   const statusBadge = { Published: 'badge-green', Draft: 'badge-gray', Editing: 'badge-blue' };
+
+  useEffect(() => {
+    const storedSlug = getClientPreviewSlug(user?.id);
+    if (storedSlug) {
+      setPreviewSlug(storedSlug);
+      return;
+    }
+
+    eventService.getAll(user?.id).then((res) => {
+      const latest = [...(res.data || [])].reverse().find((event) => event.slug);
+      if (latest?.slug) setPreviewSlug(latest.slug);
+    }).catch(() => {});
+  }, [user?.id]);
 
   return (
     <>
@@ -41,7 +60,15 @@ export default function ClientDashboard() {
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <Link to="/client/invitation-builder" className="btn btn-gold">Create Invitation</Link>
-            <a href="/#/invite/john-jane" target="_blank" rel="noreferrer" className="btn btn-outline">Preview Demo</a>
+            {previewSlug ? (
+              <a href={getPreviewPath(previewSlug)} target="_blank" rel="noreferrer" className="btn btn-outline">
+                Preview Invitation
+              </a>
+            ) : (
+              <button type="button" className="btn btn-outline" disabled title="Create an invitation first">
+                Preview Invitation
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -90,10 +90,12 @@ export default function InvitationRenderer({ data }) {
             </div>
           </section>
 
-          <section className="inv-quote-band">
-            <p>{invitation.quote || 'A celebration of love, family, and forever.'}</p>
-            {invitation.quote_source && <strong>{invitation.quote_source}</strong>}
-          </section>
+          {(invitation.quote || invitation.quote_source) && (
+            <section className="inv-quote-band">
+              {invitation.quote && <p>{invitation.quote}</p>}
+              {invitation.quote_source && <strong>{invitation.quote_source}</strong>}
+            </section>
+          )}
 
           <OurStory story={invitation.story} gallery={invitation.gallery} />
           <EventDetailsSection event={event} venue={invitation.venue} dressCode={invitation.dress_code} program={invitation.program} />
@@ -112,14 +114,14 @@ export default function InvitationRenderer({ data }) {
           <VideoSection videos={invitation.videos} />
           <GiftRegistry registry={invitation.gift_registry} />
 
-          {invitation.attire && (
+          {invitation.attire && (invitation.attire.primary || invitation.attire.guests || invitation.attire.reminders) && (
             <section className="inv-section inv-attire-section">
               <p className="inv-script-title">What to wear?</p>
               <h2>Dress Guide</h2>
               <div className="inv-divider" />
-              <p>{invitation.attire.primary || invitation.dress_code}</p>
-              <p>{invitation.attire.guests}</p>
-              <p>{invitation.attire.reminders}</p>
+              {invitation.attire.primary && <p>{invitation.attire.primary}</p>}
+              {invitation.attire.guests && <p>{invitation.attire.guests}</p>}
+              {invitation.attire.reminders && <p>{invitation.attire.reminders}</p>}
             </section>
           )}
 

@@ -1,0 +1,192 @@
+import {
+  demoWeddingInvitation,
+  demoDebutInvitation,
+  demoBirthdayInvitation,
+} from '../data/demoInvitation';
+
+export const STORAGE_PREFIX = 'invitation-draft';
+export const CLIENT_PREVIEW_KEY = 'client-latest-preview-slug';
+
+const TYPE_DEMOS = {
+  wedding: demoWeddingInvitation,
+  debut: demoDebutInvitation,
+  birthday: demoBirthdayInvitation,
+  anniversary: demoWeddingInvitation,
+  corporate: demoWeddingInvitation,
+};
+
+function pickText(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function normalizeEventDate(dateValue, fallback) {
+  if (!dateValue) return fallback;
+  return dateValue.includes('T') ? dateValue : `${dateValue}T16:00:00`;
+}
+
+function cleanStory(story) {
+  const sections = (story?.sections || []).filter(
+    (section) => pickText(section.heading) || pickText(section.content),
+  );
+  return {
+    title: pickText(story?.title),
+    sections,
+  };
+}
+
+function cleanGallery(gallery) {
+  return (gallery || []).filter((item) => pickText(item?.image));
+}
+
+function cleanVenue(venue) {
+  const empty = { name: '', address: '', time: '', map_url: '' };
+  return ['ceremony', 'reception'].reduce((result, type) => {
+    const item = venue?.[type] || {};
+    result[type] = {
+      name: pickText(item.name),
+      address: pickText(item.address),
+      time: pickText(item.time),
+      map_url: pickText(item.map_url),
+    };
+    return result;
+  }, { ceremony: { ...empty }, reception: { ...empty } });
+}
+
+function hasVenueDetails(venue) {
+  return ['ceremony', 'reception'].some((type) => {
+    const item = venue?.[type];
+    return pickText(item?.name) || pickText(item?.address) || pickText(item?.time);
+  });
+}
+
+function hasAttireDetails(attire, dressCode) {
+  return Boolean(
+    pickText(dressCode)
+    || pickText(attire?.primary)
+    || pickText(attire?.guests)
+    || pickText(attire?.reminders),
+  );
+}
+
+export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_messages } = {}) {
+  const eventType = event.event_type || 'wedding';
+  const template = TYPE_DEMOS[eventType] || demoWeddingInvitation;
+  const templateInv = template.invitation;
+  const story = cleanStory(invitation.story);
+  const venue = cleanVenue(invitation.venue);
+  const gallery = cleanGallery(invitation.gallery);
+  const program = (invitation.program || []).filter(
+    (item) => pickText(item?.time) || pickText(item?.title),
+  );
+  const giftPreferences = pickText(invitation.gift_registry?.preferences);
+
+  return {
+    event: {
+      ...template.event,
+      id: event.id ?? template.event.id,
+      event_name: pickText(event.event_name) || 'Your Event',
+      event_type: eventType,
+      event_date: normalizeEventDate(event.event_date, template.event.event_date),
+      slug: pickText(event.slug) || template.event.slug,
+      invite_code: pickText(event.invite_code) || template.event.invite_code,
+      status: event.status || template.event.status || 'draft',
+    },
+    invitation: {
+      primary_color: templateInv.primary_color,
+      secondary_color: templateInv.secondary_color,
+      font_family: templateInv.font_family,
+      qr_enabled: templateInv.qr_enabled,
+      opening_line: pickText(invitation.opening_line),
+      hero_caption: pickText(invitation.hero_caption),
+      quote: pickText(invitation.quote),
+      quote_source: pickText(invitation.quote_source),
+      cover_image: pickText(invitation.cover_image),
+      background_video: pickText(invitation.background_video),
+      music_url: pickText(invitation.music_url),
+      dress_code: pickText(invitation.dress_code),
+      coordinator: pickText(invitation.coordinator),
+      coordinator_phone: pickText(invitation.coordinator_phone),
+      rsvp_note: pickText(invitation.rsvp_note) || templateInv.rsvp_note,
+      story,
+      venue: hasVenueDetails(venue) ? venue : null,
+      gallery,
+      program,
+      videos: (invitation.videos || []).filter((item) => pickText(item?.url)),
+      entourage: null,
+      faqs: (invitation.faqs || []).filter((item) => pickText(item?.question)),
+      gift_registry: giftPreferences
+        ? { ...templateInv.gift_registry, ...invitation.gift_registry, preferences: giftPreferences }
+        : null,
+      attire: hasAttireDetails(invitation.attire, invitation.dress_code)
+        ? {
+          primary: pickText(invitation.attire?.primary),
+          guests: pickText(invitation.attire?.guests),
+          reminders: pickText(invitation.attire?.reminders),
+        }
+        : pickText(invitation.dress_code)
+          ? { primary: '', guests: pickText(invitation.dress_code), reminders: '' }
+          : null,
+    },
+    guest_messages: guest_messages || [],
+  };
+}
+
+export function getLocalInvitationDraft(identifier) {
+  if (typeof window === 'undefined' || !identifier) return null;
+
+  const keys = [
+    `${STORAGE_PREFIX}-slug-${identifier}`,
+    `${STORAGE_PREFIX}-code-${identifier}`,
+    `${STORAGE_PREFIX}-${identifier}`,
+  ];
+
+  for (const key of keys) {
+    const raw = localStorage.getItem(key);
+    if (!raw) continue;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      localStorage.removeItem(key);
+    }
+  }
+
+  return null;
+}
+
+export function saveInvitationDraft({ event, invitation, guest_messages }) {
+  if (typeof window === 'undefined' || !event) return;
+
+  const data = { event, invitation, guest_messages: guest_messages || [] };
+  const payload = JSON.stringify(data);
+
+  if (event.id != null) {
+    localStorage.setItem(`${STORAGE_PREFIX}-${event.id}`, payload);
+  }
+  if (event.slug) {
+    localStorage.setItem(`${STORAGE_PREFIX}-slug-${event.slug}`, payload);
+  }
+  if (event.invite_code) {
+    localStorage.setItem(`${STORAGE_PREFIX}-code-${event.invite_code}`, payload);
+  }
+}
+
+export function saveClientPreviewSlug(clientId, slug) {
+  if (typeof window === 'undefined' || !slug) return;
+  localStorage.setItem(CLIENT_PREVIEW_KEY, slug);
+  if (clientId != null) {
+    localStorage.setItem(`${CLIENT_PREVIEW_KEY}-${clientId}`, slug);
+  }
+}
+
+export function getClientPreviewSlug(clientId) {
+  if (typeof window === 'undefined') return null;
+  if (clientId != null) {
+    const scoped = localStorage.getItem(`${CLIENT_PREVIEW_KEY}-${clientId}`);
+    if (scoped) return scoped;
+  }
+  return localStorage.getItem(CLIENT_PREVIEW_KEY);
+}
+
+export function getPreviewPath(slug) {
+  return `/#/invite/${encodeURIComponent(slug)}`;
+}

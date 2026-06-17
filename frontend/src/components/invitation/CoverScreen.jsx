@@ -16,8 +16,9 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
       )}
       <div className="inv-cover-shade" />
       <div className="inv-cover-content">
-        <p className="inv-subtitle">{invitation?.opening_line || 'With great joy, we invite you'}</p>
-        <p className="inv-tagline">{invitation?.hero_caption || labels?.together || 'Together With Their Families'}</p>
+        {invitation?.opening_line && <p className="inv-subtitle">{invitation.opening_line}</p>}
+        {!invitation?.opening_line && labels?.together && <p className="inv-tagline">{labels.together}</p>}
+        {invitation?.hero_caption && <p className="inv-tagline">{invitation.hero_caption}</p>}
         <h1>{event.event_name}</h1>
         <p className="inv-date">{date}</p>
         <button type="button" className="inv-open-btn" onClick={onOpen}>

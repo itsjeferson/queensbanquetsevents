@@ -17,7 +17,6 @@ import AdminDashboard from '../pages/admin/Dashboard';
 import AdminRsvpMonitoring from '../pages/admin/AdminRsvpMonitoring';
 import AdminCalendar from '../pages/admin/Calendar';
 import InvitationTemplates from '../pages/admin/InvitationTemplates';
-import AdminReports from '../pages/admin/Reports';
 import AdminGallery from '../pages/admin/Gallery';
 import AdminSettings from '../pages/admin/Settings';
 import ClientManagement from '../pages/admin/ClientManagement';
@@ -73,10 +72,12 @@ export default function AppRoutes() {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="client-management" element={<ClientManagement />} />
+        <Route path="invitation-manager" element={<InvitationManage variant="admin" />} />
+        <Route path="invitation-manager/:id" element={<InvitationManage variant="admin" />} />
         <Route path="rsvp-monitoring" element={<AdminRsvpMonitoring />} />
         <Route path="calendar" element={<AdminCalendar />} />
         <Route path="invitation-templates" element={<InvitationTemplates />} />
-        <Route path="reports" element={<AdminReports />} />
+        <Route path="reports" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="gallery" element={<AdminGallery />} />
         <Route path="settings" element={<AdminSettings />} />
       </Route>

@@ -279,6 +279,13 @@ tr:last-child td { border-bottom: none; }
 .modal-close { position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--beige); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
 .modal h2 { font-size: 26px; margin-bottom: 8px; }
 .modal-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 32px; }
+.modal-preview { max-width: 980px; width: 96%; padding: 0; overflow: hidden; }
+.modal-preview-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 24px 28px 16px; border-bottom: 1px solid var(--border-soft); }
+.modal-preview-header h2 { margin-bottom: 4px; font-size: 22px; }
+.modal-preview-header .modal-sub { margin-bottom: 0; }
+.modal-preview .modal-close { position: static; flex-shrink: 0; }
+.invitation-preview-frame { max-height: calc(85vh - 88px); overflow: auto; background: var(--beige); }
+.invitation-preview-frame .invitation-page { min-height: auto; }
 
 /* ABOUT */
 .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
