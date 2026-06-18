@@ -3,6 +3,9 @@
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "installCommand": "npm install --prefix frontend",
+  "redirects": [
+    { "source": "/queens-banquet-events.html", "destination": "/", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

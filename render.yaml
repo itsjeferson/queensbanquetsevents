@@ -1,9 +1,12 @@
 # Render Blueprint — Queen's Banquet API + PostgreSQL
 # Deploy: Render Dashboard → New → Blueprint → connect this repo
 
+# IMPORTANT: the web service and database MUST share the same region,
+# otherwise the internal DATABASE_URL hostname will not resolve.
 databases:
   - name: queens-banquet-db
     plan: free
+    region: oregon
     databaseName: queens_banquet
     user: queens_banquet
 
@@ -12,7 +15,7 @@ services:
     name: queens-banquet-api
     runtime: docker
     plan: free
-    region: singapore
+    region: oregon
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /

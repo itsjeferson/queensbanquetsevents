@@ -26,10 +26,20 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (email, password) => {
     const response = await authService.login(email, password);
-    const userData = buildUserFromResponse(email, response.data || { email });
+    if (response.token) authStorage.setToken(response.token);
+
+    // Always load role from the API after login (avoids stale sessionStorage roles).
+    let profileData = response.data;
+    try {
+      const profile = await authService.getProfile();
+      profileData = profile.data || profileData;
+    } catch {
+      // Fall back to login payload if /auth/me is unavailable.
+    }
+
+    const userData = buildUserFromResponse(email, profileData || { email });
     setUser(userData);
     authStorage.setUser(userData);
-    if (response.token) authStorage.setToken(response.token);
     return userData;
   }, []);
 
