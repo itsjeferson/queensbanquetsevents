@@ -1,6 +1,6 @@
 # Queen's Banquet Digital Invitation Management System
 
-Queen's Banquet Digital Invitation Management System is a React, PHP, and MySQL application for creating, customizing, sharing, and monitoring digital event invitations.
+Queen's Banquet Digital Invitation Management System is a React, PHP, and PostgreSQL application for creating, customizing, sharing, and monitoring digital event invitations.
 
 ## Main Users
 
@@ -28,7 +28,7 @@ Admins can manage invitation templates, monitor RSVPs across all events, manage 
            │
            ▼
 ┌─────────────────────┐
-│      MySQL DB       │
+│    PostgreSQL DB    │
 └─────────────────────┘
 ```
 

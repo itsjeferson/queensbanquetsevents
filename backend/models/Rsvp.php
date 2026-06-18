@@ -75,6 +75,6 @@ class Rsvp
             $data['guest_count'] ?? 1,
             $data['message'] ?? null,
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'rsvps');
     }
 }

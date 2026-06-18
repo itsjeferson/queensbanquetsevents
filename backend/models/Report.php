@@ -10,7 +10,7 @@ class Report
         $totalInvitations = (int) $pdo->query("SELECT COUNT(*) FROM events WHERE status != 'archived'")->fetchColumn();
         $publishedInvitations = (int) $pdo->query("SELECT COUNT(*) FROM events WHERE status = 'published'")->fetchColumn();
         $publishedThisMonth = (int) $pdo->query(
-            "SELECT COUNT(*) FROM events WHERE status = 'published' AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())"
+            "SELECT COUNT(*) FROM events WHERE status = 'published' AND EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(YEAR FROM created_at) = EXTRACT(YEAR FROM CURRENT_DATE)"
         )->fetchColumn();
         $totalRsvps = (int) $pdo->query('SELECT COUNT(*) FROM rsvps')->fetchColumn();
         $attendingRsvps = (int) $pdo->query("SELECT COUNT(*) FROM rsvps WHERE attendance = 'yes'")->fetchColumn();
@@ -225,8 +225,8 @@ class Report
              LEFT JOIN invitation_pages ip ON ip.event_id = e.id
              LEFT JOIN invitation_templates it ON ip.template_id = it.id
              WHERE e.status != 'archived'
-               AND YEAR(e.event_date) = ?
-               AND MONTH(e.event_date) = ?
+               AND EXTRACT(YEAR FROM e.event_date) = ?
+               AND EXTRACT(MONTH FROM e.event_date) = ?
              ORDER BY e.event_date ASC"
         );
         $stmt->execute([$year, $month]);

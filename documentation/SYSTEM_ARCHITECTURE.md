@@ -17,7 +17,7 @@ Queen's Banquet Digital Invitation Management System uses a decoupled frontend/b
            │
            ▼
 ┌─────────────────────┐
-│      MySQL DB       │
+│    PostgreSQL DB    │
 └─────────────────────┘
 ```
 
@@ -54,7 +54,7 @@ The frontend currently sends requests through `frontend/src/services/api.js`, wh
 2. Frontend service calls the PHP REST API.
 3. Route dispatches to the correct controller.
 4. Controller validates input and calls a model.
-5. Model reads or writes MySQL tables.
+5. Model reads or writes PostgreSQL tables.
 6. JSON response returns to the frontend.
 
 ## Primary Modules

@@ -33,7 +33,7 @@ class Guest
             $data['plus_one'] ?? 0,
             $token,
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'guests');
     }
 
     public static function bulkCreate(int $eventId, array $guests): int

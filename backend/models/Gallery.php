@@ -19,7 +19,7 @@ class Gallery
         $pdo = getConnection();
         $stmt = $pdo->prepare('INSERT INTO gallery (category, caption, image_path) VALUES (?, ?, ?)');
         $stmt->execute([$data['category'], $data['caption'], $data['image_path']]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'gallery');
     }
 
     public static function delete(int $id): void

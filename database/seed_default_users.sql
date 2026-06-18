@@ -1,9 +1,5 @@
--- Run this in phpMyAdmin if you already created the database from an older schema.
+-- Run in PostgreSQL if you need to reset default accounts.
 -- Passwords: Super Admin = QueensAdmin2026! | Client = ClientDemo2026!
-
-USE queens_banquet;
-
-ALTER TABLE users MODIFY role ENUM('client', 'admin', 'super_admin') DEFAULT 'client';
 
 INSERT INTO users (first_name, last_name, email, phone, password, role) VALUES
 (
@@ -22,10 +18,10 @@ INSERT INTO users (first_name, last_name, email, phone, password, role) VALUES
   '$2y$10$6BhzY8BfrLfxu2IAuQATq.Yo2/on1CVttopH4rXeoTiuhwnvwPSg2',
   'client'
 )
-ON DUPLICATE KEY UPDATE
-  first_name = VALUES(first_name),
-  last_name = VALUES(last_name),
-  phone = VALUES(phone),
-  password = VALUES(password),
-  role = VALUES(role),
+ON CONFLICT (email) DO UPDATE SET
+  first_name = EXCLUDED.first_name,
+  last_name = EXCLUDED.last_name,
+  phone = EXCLUDED.phone,
+  password = EXCLUDED.password,
+  role = EXCLUDED.role,
   status = 'active';

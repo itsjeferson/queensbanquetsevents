@@ -1,0 +1,26 @@
+# Render Blueprint — Queen's Banquet API + PostgreSQL
+# Deploy: Render Dashboard → New → Blueprint → connect this repo
+
+databases:
+  - name: queens-banquet-db
+    plan: free
+    databaseName: queens_banquet
+    user: queens_banquet
+
+services:
+  - type: web
+    name: queens-banquet-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: queens-banquet-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true

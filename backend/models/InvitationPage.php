@@ -33,7 +33,7 @@ class InvitationPage
             json_encode($normalized['videos']),
             json_encode($normalized['gift_registry']),
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'invitation_pages');
     }
 
     public static function update(int $eventId, array $data): void

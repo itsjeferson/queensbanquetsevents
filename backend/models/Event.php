@@ -65,7 +65,7 @@ class Event
             $code,
             $data['status'] ?? 'draft',
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'events');
     }
 
     public static function update(int $id, array $data): void

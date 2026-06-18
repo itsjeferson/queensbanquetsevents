@@ -26,18 +26,17 @@ $users = [
 
 try {
     $pdo = getConnection();
-    $pdo->exec("ALTER TABLE users MODIFY role ENUM('client', 'admin', 'super_admin') DEFAULT 'client'");
 
     $stmt = $pdo->prepare(
         'INSERT INTO users (first_name, last_name, email, phone, password, role)
          VALUES (?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE
-           first_name = VALUES(first_name),
-           last_name = VALUES(last_name),
-           phone = VALUES(phone),
-           password = VALUES(password),
-           role = VALUES(role),
-           status = "active"'
+         ON CONFLICT (email) DO UPDATE SET
+           first_name = EXCLUDED.first_name,
+           last_name = EXCLUDED.last_name,
+           phone = EXCLUDED.phone,
+           password = EXCLUDED.password,
+           role = EXCLUDED.role,
+           status = \'active\''
     );
 
     foreach ($users as $user) {

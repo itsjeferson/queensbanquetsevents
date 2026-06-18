@@ -20,6 +20,6 @@ class GuestMessage
             $data['guest_name'],
             $data['message'],
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'guest_messages');
     }
 }

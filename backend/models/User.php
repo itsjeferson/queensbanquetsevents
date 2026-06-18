@@ -31,7 +31,7 @@ class User
             password_hash($data['password'], PASSWORD_DEFAULT),
             'client',
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'users');
     }
 
     public static function allClients(): array

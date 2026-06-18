@@ -39,7 +39,7 @@ class InvitationTemplate
             json_encode($data['theme_config'] ?? []),
             $data['status'] ?? 'active',
         ]);
-        return (int) $pdo->lastInsertId();
+        return dbLastInsertId($pdo, 'invitation_templates');
     }
 
     public static function update(int $id, array $data): void

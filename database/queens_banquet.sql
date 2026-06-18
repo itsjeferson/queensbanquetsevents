@@ -1,168 +1,151 @@
--- Queen's Banquet Digital Invitation Management System Database Schema
-CREATE DATABASE IF NOT EXISTS queens_banquet;
-USE queens_banquet;
+-- Queen's Banquet Digital Invitation Management System (PostgreSQL)
+-- Run against your PostgreSQL database (Render, local, etc.)
 
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
-    role ENUM('client', 'admin', 'super_admin') DEFAULT 'client',
-    status ENUM('active', 'disabled') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    role VARCHAR(20) NOT NULL DEFAULT 'client' CHECK (role IN ('client', 'admin', 'super_admin')),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'disabled')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE packages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     price DECIMAL(12,2) NOT NULL,
     max_guests INT DEFAULT 50,
-    inclusions JSON,
-    featured TINYINT(1) DEFAULT 0,
-    status ENUM('active', 'inactive') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    inclusions JSONB,
+    featured BOOLEAN DEFAULT FALSE,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE bookings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id),
     event_type VARCHAR(50) NOT NULL,
     event_date DATE NOT NULL,
     guest_count INT DEFAULT 0,
-    package_id INT,
-    status ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+    package_id INT REFERENCES packages(id),
+    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
     notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (package_id) REFERENCES packages(id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE payments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    booking_id INT NOT NULL REFERENCES bookings(id),
     amount DECIMAL(12,2) NOT NULL,
     receipt_path VARCHAR(255),
-    status ENUM('pending', 'verified', 'rejected') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (booking_id) REFERENCES bookings(id)
+    status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified', 'rejected')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE gallery (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     category VARCHAR(50) NOT NULL,
     caption VARCHAR(255),
     image_path VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_id INT NOT NULL,
-    sender_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    booking_id INT NOT NULL REFERENCES bookings(id),
+    sender_id INT NOT NULL REFERENCES users(id),
     message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (booking_id) REFERENCES bookings(id),
-    FOREIGN KEY (sender_id) REFERENCES users(id)
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed packages
 INSERT INTO packages (name, description, price, max_guests, inclusions, featured) VALUES
-('Essential', 'Perfect for intimate gatherings', 45000, 50, '["Event coordination (8 hrs)","Basic table & chair setup","Floral centerpieces (5 tables)","Sound system & basic lighting","4-hour catering service","Photo coverage (4 hrs)"]', 0),
-('Signature', 'Our most popular choice', 95000, 150, '["Full-day coordination (12 hrs)","Premium venue styling & décor","Elaborate floral arrangements","Premium sound, lighting & LED walls","8-hour catering with open bar","Photo + video (8 hrs)","Host / Emcee service","Cake from partner baker"]', 1),
-('Grand', 'The ultimate luxury experience', 185000, 300, '["Dedicated 2-day event team","Luxury venue transformation","Couture floral installations","Pro audio-visual production","Full-day dining & premium bar","Cinematic photo + film team","Live band or celebrity host","Luxury transport (2 vehicles)","Concierge guest services"]', 0);
+('Essential', 'Perfect for intimate gatherings', 45000, 50, '["Event coordination (8 hrs)","Basic table & chair setup","Floral centerpieces (5 tables)","Sound system & basic lighting","4-hour catering service","Photo coverage (4 hrs)"]', FALSE),
+('Signature', 'Our most popular choice', 95000, 150, '["Full-day coordination (12 hrs)","Premium venue styling & décor","Elaborate floral arrangements","Premium sound, lighting & LED walls","8-hour catering with open bar","Photo + video (8 hrs)","Host / Emcee service","Cake from partner baker"]', TRUE),
+('Grand', 'The ultimate luxury experience', 185000, 300, '["Dedicated 2-day event team","Luxury venue transformation","Couture floral installations","Pro audio-visual production","Full-day dining & premium bar","Cinematic photo + film team","Live band or celebrity host","Luxury transport (2 vehicles)","Concierge guest services"]', FALSE);
 
--- Seed default accounts (passwords in database/seed_default_users.sql comments)
 INSERT INTO users (first_name, last_name, email, phone, password, role) VALUES
 ('Marou', 'Madrid', 'queensbanquet@gmail.com', '+63 917 100 0001', '$2y$10$Q7LC1mgFKLDXHPIzou2/l.sS63IcgTHWAh209ikq35naiyWBgkgUq', 'super_admin'),
 ('Sophia', 'Reyes', 'client@queensbanquetevents.ph', '+63 917 200 0002', '$2y$10$6BhzY8BfrLfxu2IAuQATq.Yo2/on1CVttopH4rXeoTiuhwnvwPSg2', 'client');
 
--- Digital Event Invitation System
 CREATE TABLE events (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    client_id INT NOT NULL,
-    booking_id INT,
+    id SERIAL PRIMARY KEY,
+    client_id INT NOT NULL REFERENCES users(id),
+    booking_id INT REFERENCES bookings(id) ON DELETE SET NULL,
     event_name VARCHAR(255) NOT NULL,
-    event_type ENUM('wedding', 'debut', 'birthday', 'anniversary', 'corporate') NOT NULL,
-    event_date DATETIME NOT NULL,
+    event_type VARCHAR(20) NOT NULL CHECK (event_type IN ('wedding', 'debut', 'birthday', 'anniversary', 'corporate')),
+    event_date TIMESTAMP NOT NULL,
     slug VARCHAR(100) UNIQUE,
     invite_code VARCHAR(10) UNIQUE,
-    status ENUM('draft', 'published', 'archived') DEFAULT 'draft',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (client_id) REFERENCES users(id),
-    FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+    status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE invitation_templates (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     template_name VARCHAR(100) NOT NULL,
-    category ENUM('wedding', 'debut', 'birthday', 'anniversary', 'corporate') NOT NULL,
+    category VARCHAR(20) NOT NULL CHECK (category IN ('wedding', 'debut', 'birthday', 'anniversary', 'corporate')),
     preview_image VARCHAR(255),
-    theme_config JSON,
-    status ENUM('active', 'inactive') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    theme_config JSONB,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE invitation_pages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    event_id INT NOT NULL UNIQUE,
+    id SERIAL PRIMARY KEY,
+    event_id INT NOT NULL UNIQUE REFERENCES events(id) ON DELETE CASCADE,
     theme_id INT,
-    template_id INT,
+    template_id INT REFERENCES invitation_templates(id) ON DELETE SET NULL,
     cover_image VARCHAR(255),
     background_music VARCHAR(255),
     primary_color VARCHAR(20) DEFAULT '#D4AF37',
     font_family VARCHAR(50) DEFAULT 'Playfair Display',
-    story JSON,
-    entourage JSON,
-    venue JSON,
+    story JSONB,
+    entourage JSONB,
+    venue JSONB,
     dress_code VARCHAR(100),
-    program JSON,
-    gallery JSON,
-    videos JSON,
-    gift_registry JSON,
-    qr_enabled TINYINT(1) DEFAULT 1,
-    published_at TIMESTAMP NULL,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-    FOREIGN KEY (template_id) REFERENCES invitation_templates(id) ON DELETE SET NULL
+    program JSONB,
+    gallery JSONB,
+    videos JSONB,
+    gift_registry JSONB,
+    qr_enabled BOOLEAN DEFAULT TRUE,
+    published_at TIMESTAMP
 );
 
 CREATE TABLE guests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    event_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(255),
     phone VARCHAR(20),
-    plus_one TINYINT(1) DEFAULT 0,
+    plus_one BOOLEAN DEFAULT FALSE,
     invite_token VARCHAR(64) UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE rsvps (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    guest_id INT,
-    event_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    guest_id INT REFERENCES guests(id) ON DELETE SET NULL,
+    event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
     name VARCHAR(150) NOT NULL,
     email VARCHAR(255),
     phone VARCHAR(20),
-    attendance ENUM('yes', 'no', 'maybe') DEFAULT 'yes',
+    attendance VARCHAR(10) NOT NULL DEFAULT 'yes' CHECK (attendance IN ('yes', 'no', 'maybe')),
     meal_preference VARCHAR(100),
     guest_count INT DEFAULT 1,
     message TEXT,
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE SET NULL,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+    submitted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE guest_messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    event_id INT NOT NULL,
+    id SERIAL PRIMARY KEY,
+    event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
     guest_name VARCHAR(150) NOT NULL,
     message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 INSERT INTO invitation_templates (template_name, category, preview_image, theme_config, status) VALUES

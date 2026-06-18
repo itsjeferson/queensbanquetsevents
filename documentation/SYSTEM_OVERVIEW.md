@@ -30,7 +30,7 @@ The system lets admins manage invitation templates, gallery assets, event schedu
            │
            ▼
 ┌─────────────────────┐
-│      MySQL DB       │
+│    PostgreSQL DB    │
 └─────────────────────┘
 ```
 
