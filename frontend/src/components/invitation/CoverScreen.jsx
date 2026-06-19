@@ -1,4 +1,5 @@
 import { parseEventDate } from '../../utils/eventDate';
+import { getCoupleDisplayName } from '../../utils/invitationContent';
 
 export default function CoverScreen({ event, invitation, onOpen, labels }) {
   const parsed = parseEventDate(event.event_date);
@@ -9,6 +10,7 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
       year: 'numeric',
     })
     : '';
+  const coupleName = getCoupleDisplayName(event, invitation);
 
   return (
     <section className="inv-cover" id="cover">
@@ -21,11 +23,19 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
       )}
       <div className="inv-cover-shade" />
       <div className="inv-cover-content">
-        {invitation?.opening_line && <p className="inv-subtitle">{invitation.opening_line}</p>}
-        {!invitation?.opening_line && labels?.together && <p className="inv-tagline">{labels.together}</p>}
-        {invitation?.hero_caption && <p className="inv-tagline">{invitation.hero_caption}</p>}
-        <h1>{event.event_name}</h1>
-        <p className="inv-date">{date}</p>
+        {invitation?.opening_line && (
+          <p className="inv-subtitle inv-cover-opening">{invitation.opening_line}</p>
+        )}
+        {!invitation?.opening_line && labels?.together && (
+          <p className="inv-subtitle inv-cover-opening">{labels.together}</p>
+        )}
+
+        {invitation?.hero_caption && (
+          <p className="inv-tagline inv-cover-caption">{invitation.hero_caption}</p>
+        )}
+
+        <h1 className="inv-cover-couple">{coupleName}</h1>
+        {date && <p className="inv-date">{date}</p>}
         <button type="button" className="inv-open-btn" onClick={onOpen}>
           Open Invitation
         </button>

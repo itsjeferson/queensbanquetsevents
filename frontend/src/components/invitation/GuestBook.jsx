@@ -27,20 +27,19 @@ export default function GuestBook({ eventId, messages: initialMessages = [] }) {
         <p className="inv-section-tag">Wishes</p>
         <h2>Guest Book</h2>
         <div className="inv-divider" />
+        <p className="inv-muted" style={{ marginBottom: 24 }}>Leave your message here.</p>
 
         <form className="inv-rsvp-form" onSubmit={handleSubmit} style={{ marginBottom: 40 }}>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Your Name</label>
-              <input required value={form.guest_name} onChange={(e) => setForm({ ...form, guest_name: e.target.value })} />
-            </div>
-          </div>
           <div className="form-group">
-            <label>Leave a Message</label>
+            <label>Leave your message here</label>
             <textarea required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Share your blessings..." />
           </div>
-          <button type="submit" className="btn btn-outline" disabled={loading}>
-            {loading ? 'Posting...' : 'Leave a Message'}
+          <div className="form-group">
+            <label>Name</label>
+            <input required value={form.guest_name} onChange={(e) => setForm({ ...form, guest_name: e.target.value })} />
+          </div>
+          <button type="submit" className="btn btn-gold" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit'}
           </button>
         </form>
 

@@ -102,6 +102,15 @@ class InvitationPage
             'gift_registry' => $row['gift_registry'] ?? [],
             'attire' => $story['attire'] ?? [],
             'faqs' => $story['faqs'] ?? [],
+            'opening_hero_image' => $story['opening_hero_image'] ?? '',
+            'couple_initials' => $story['couple_initials'] ?? '',
+            'couple_display_name' => $story['couple_display_name'] ?? '',
+            'secondary_quote' => $story['secondary_quote'] ?? '',
+            'story_image' => $story['image'] ?? '',
+            'invitation_message' => $story['invitation_message'] ?? '',
+            'acceptance_message' => $story['acceptance_message'] ?? '',
+            'groom_profile' => $story['groom_profile'] ?? [],
+            'bride_profile' => $story['bride_profile'] ?? [],
             'entourage' => $row['entourage'] ?? [],
             'qr_enabled' => (int) ($row['qr_enabled'] ?? 1),
             'published_at' => $row['published_at'] ?? null,
@@ -128,6 +137,15 @@ class InvitationPage
         $story['secondary_color'] = $data['secondary_color'] ?? ($story['secondary_color'] ?? '#F4EEE7');
         $story['attire'] = $data['attire'] ?? ($story['attire'] ?? []);
         $story['faqs'] = $data['faqs'] ?? ($story['faqs'] ?? []);
+        $story['opening_hero_image'] = $data['opening_hero_image'] ?? ($story['opening_hero_image'] ?? '');
+        $story['couple_initials'] = $data['couple_initials'] ?? ($story['couple_initials'] ?? '');
+        $story['couple_display_name'] = $data['couple_display_name'] ?? ($story['couple_display_name'] ?? '');
+        $story['secondary_quote'] = $data['secondary_quote'] ?? ($story['secondary_quote'] ?? '');
+        $story['image'] = $data['story_image'] ?? ($story['image'] ?? '');
+        $story['invitation_message'] = $data['invitation_message'] ?? ($story['invitation_message'] ?? '');
+        $story['acceptance_message'] = $data['acceptance_message'] ?? ($story['acceptance_message'] ?? '');
+        $story['groom_profile'] = $data['groom_profile'] ?? ($story['groom_profile'] ?? []);
+        $story['bride_profile'] = $data['bride_profile'] ?? ($story['bride_profile'] ?? []);
 
         return [
             'template_id' => $data['template_id'] ?? null,

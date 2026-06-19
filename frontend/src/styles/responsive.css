@@ -24,6 +24,7 @@
   .footer-grid { grid-template-columns: 1fr; }
 
   .dash-grid { grid-template-columns: 1fr; }
+  .wedding-media-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
 
   /* Auth — stack form below visual */

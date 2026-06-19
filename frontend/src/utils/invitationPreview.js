@@ -5,6 +5,7 @@ import {
 } from '../data/demoInvitation';
 import { stripLargeDataUrls } from './mediaUpload';
 import { normalizeEventDate } from './eventDate';
+import { normalizeInvitationContent } from './invitationContent';
 
 export const STORAGE_PREFIX = 'invitation-draft';
 export const CLIENT_PREVIEW_KEY = 'client-latest-preview-slug';
@@ -31,6 +32,9 @@ function cleanStory(story) {
   );
   return {
     title: pickText(story?.title),
+    image: pickText(story?.image),
+    invitation_message: pickText(story?.invitation_message),
+    acceptance_message: pickText(story?.acceptance_message),
     sections,
   };
 }
@@ -40,7 +44,7 @@ function cleanGallery(gallery) {
 }
 
 function cleanVenue(venue) {
-  const empty = { name: '', address: '', time: '', map_url: '' };
+  const empty = { name: '', address: '', time: '', map_url: '', image: '' };
   return ['ceremony', 'reception'].reduce((result, type) => {
     const item = venue?.[type] || {};
     result[type] = {
@@ -48,6 +52,7 @@ function cleanVenue(venue) {
       address: pickText(item.address),
       time: pickText(item.time),
       map_url: pickText(item.map_url),
+      image: pickText(item.image),
     };
     return result;
   }, { ceremony: { ...empty }, reception: { ...empty } });
@@ -60,12 +65,26 @@ function hasVenueDetails(venue) {
   });
 }
 
+function cleanProfile(profile) {
+  if (!profile) return null;
+  const cleaned = {
+    name: pickText(profile.name),
+    photo: pickText(profile.photo),
+    parents: pickText(profile.parents),
+  };
+  return cleaned.name || cleaned.photo || cleaned.parents ? cleaned : null;
+}
+
 function hasAttireDetails(attire, dressCode) {
   return Boolean(
     pickText(dressCode)
+    || pickText(attire?.female_primary_sponsors)
+    || pickText(attire?.male_primary_sponsors)
+    || pickText(attire?.ladies)
+    || pickText(attire?.gentlemen)
+    || pickText(attire?.reminders)
     || pickText(attire?.primary)
-    || pickText(attire?.guests)
-    || pickText(attire?.reminders),
+    || pickText(attire?.guests),
   );
 }
 
@@ -80,6 +99,18 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
     (item) => pickText(item?.time) || pickText(item?.title),
   );
   const giftPreferences = pickText(invitation.gift_registry?.preferences);
+  const paymentDetails = pickText(invitation.gift_registry?.payment_details);
+  const groomProfile = cleanProfile(invitation.groom_profile);
+  const brideProfile = cleanProfile(invitation.bride_profile);
+  const normalized = normalizeInvitationContent({
+    ...invitation,
+    story,
+    venue,
+    gallery,
+    program,
+    groom_profile: groomProfile || invitation.groom_profile,
+    bride_profile: brideProfile || invitation.bride_profile,
+  });
 
   return {
     event: {
@@ -96,37 +127,42 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       primary_color: templateInv.primary_color,
       secondary_color: templateInv.secondary_color,
       font_family: templateInv.font_family,
-      qr_enabled: templateInv.qr_enabled,
-      opening_line: pickText(invitation.opening_line),
-      hero_caption: pickText(invitation.hero_caption),
-      quote: pickText(invitation.quote),
-      quote_source: pickText(invitation.quote_source),
-      cover_image: pickText(invitation.cover_image),
+      qr_enabled: invitation.qr_enabled ?? templateInv.qr_enabled,
+      opening_line: pickText(invitation.opening_line) || templateInv.opening_line,
+      hero_caption: pickText(invitation.hero_caption) || templateInv.hero_caption,
+      couple_display_name: pickText(invitation.couple_display_name),
+      couple_initials: pickText(invitation.couple_initials),
+      opening_hero_image: pickText(invitation.opening_hero_image),
+      secondary_quote: pickText(invitation.secondary_quote),
+      quote: pickText(invitation.quote) || templateInv.quote,
+      quote_source: pickText(invitation.quote_source) || templateInv.quote_source,
+      cover_image: pickText(invitation.cover_image) || templateInv.cover_image,
       background_video: pickText(invitation.background_video),
       music_url: pickText(invitation.music_url),
-      dress_code: pickText(invitation.dress_code),
-      coordinator: pickText(invitation.coordinator),
+      dress_code: pickText(invitation.dress_code) || templateInv.dress_code,
+      coordinator: pickText(invitation.coordinator) || templateInv.coordinator,
       coordinator_phone: pickText(invitation.coordinator_phone),
       rsvp_note: pickText(invitation.rsvp_note) || templateInv.rsvp_note,
       story,
-      venue: hasVenueDetails(venue) ? venue : null,
-      gallery,
-      program,
+      groom_profile: groomProfile,
+      bride_profile: brideProfile,
+      venue: hasVenueDetails(venue) ? venue : normalized.venue,
+      gallery: gallery.length ? gallery : templateInv.gallery,
+      program: program.length ? program : normalized.program,
       videos: (invitation.videos || []).filter((item) => pickText(item?.url)),
-      entourage: null,
+      entourage: invitation.entourage || templateInv.entourage,
       faqs: (invitation.faqs || []).filter((item) => pickText(item?.question)),
-      gift_registry: giftPreferences
-        ? { ...templateInv.gift_registry, ...invitation.gift_registry, preferences: giftPreferences }
-        : null,
-      attire: hasAttireDetails(invitation.attire, invitation.dress_code)
+      gift_registry: giftPreferences || paymentDetails
         ? {
-          primary: pickText(invitation.attire?.primary),
-          guests: pickText(invitation.attire?.guests),
-          reminders: pickText(invitation.attire?.reminders),
+          ...templateInv.gift_registry,
+          ...invitation.gift_registry,
+          preferences: giftPreferences || templateInv.gift_registry?.preferences,
+          payment_details: paymentDetails,
         }
-        : pickText(invitation.dress_code)
-          ? { primary: '', guests: pickText(invitation.dress_code), reminders: '' }
-          : null,
+        : templateInv.gift_registry,
+      attire: hasAttireDetails(invitation.attire, invitation.dress_code)
+        ? normalized.attire
+        : templateInv.attire,
     },
     guest_messages: guest_messages || [],
   };

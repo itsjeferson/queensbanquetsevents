@@ -313,6 +313,51 @@ footer { background: var(--black); padding: 80px 60px 40px; }
 .card-widget { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border-soft); padding: 28px; margin-bottom: 24px; }
 .card-widget h3 { font-size: 18px; margin-bottom: 20px; }
 .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+.wedding-media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.wedding-media-grid .card-widget {
+  margin-bottom: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.wedding-media-grid .card-widget h3 {
+  margin-bottom: 0;
+}
+.card-form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+  flex: 1;
+}
+.card-form-stack .form-group {
+  margin-bottom: 0;
+}
+.card-form-stack .form-help {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+.card-form-stack .gallery-photo-item {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.card-form-stack .gallery-photo-item:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.card-form-stack .btn-outline {
+  align-self: flex-start;
+}
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
 th { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-soft); }

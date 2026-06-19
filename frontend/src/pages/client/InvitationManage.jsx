@@ -14,46 +14,14 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
-import MediaField from '../../components/common/MediaField/MediaField';
-import { getMediaFieldDisplay, isDataUrl, readFileAsDataUrl, MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
+import { normalizeInvitationContent } from '../../utils/invitationContent';
+import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 
 const INVITATION_ENTRY = '/#';
 const AUTO_SAVE_DELAY_MS = 600;
 
-const emptyInvitation = {
-  opening_line: '',
-  hero_caption: '',
-  quote: '',
-  quote_source: '',
-  rsvp_note: '',
-  coordinator: '',
-  coordinator_phone: '',
-  cover_image: '',
-  background_video: '',
-  music_url: '',
-  dress_code: '',
-  story: { title: '', sections: [{ heading: '', content: '' }] },
-  venue: {
-    ceremony: { name: '', address: '', time: '', map_url: '' },
-    reception: { name: '', address: '', time: '', map_url: '' },
-  },
-  program: [],
-  gallery: [],
-  videos: [],
-  gift_registry: { preferences: '' },
-  attire: { guests: '' },
-  faqs: [],
-  entourage: null,
-  qr_enabled: 1,
-};
-
-
-const demoEvents = [];
-
 function mapInvitationFromApi(invitation) {
-  const merged = { ...emptyInvitation, ...(invitation || {}) };
-  merged.gallery = Array.isArray(merged.gallery) ? merged.gallery : [];
-  return merged;
+  return normalizeInvitationContent(invitation || {});
 }
 
 const MANAGE_CONFIG = {
@@ -77,7 +45,7 @@ const MANAGE_CONFIG = {
 function InvitationManagerList({ variant = 'client' }) {
   const { user } = useAuth();
   const config = MANAGE_CONFIG[variant];
-  const [events, setEvents] = useState(demoEvents);
+  const [events, setEvents] = useState([]);
   const statusBadge = { published: 'badge-green', draft: 'badge-gray', archived: 'badge-red' };
 
   useEffect(() => {
@@ -135,7 +103,7 @@ export default function InvitationManage({ variant = 'client' }) {
   const config = MANAGE_CONFIG[variant];
   if (!id) return <InvitationManagerList variant={variant} />;
   const [event, setEvent] = useState(null);
-  const [invitation, setInvitation] = useState(emptyInvitation);
+  const [invitation, setInvitation] = useState(() => normalizeInvitationContent());
   const [saveStatus, setSaveStatus] = useState('idle');
   const [dirty, setDirty] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -214,12 +182,39 @@ export default function InvitationManage({ variant = 'client' }) {
     }));
   };
 
-  const updateStorySection = (index, field, value) => {
+  const updateStory = (story) => {
+    markDirty();
+    setInvitation((current) => ({ ...current, story }));
+  };
+
+  const updateEntourage = (entourage) => {
+    markDirty();
+    setInvitation((current) => ({ ...current, entourage }));
+  };
+
+  const updateAttire = (field, value) => {
+    markDirty();
+    setInvitation((current) => ({
+      ...current,
+      attire: { ...(current.attire || {}), [field]: value },
+    }));
+  };
+
+  const updateProgram = (index, field, value) => {
     markDirty();
     setInvitation((current) => {
-      const sections = [...(current.story?.sections || [])];
-      sections[index] = { ...(sections[index] || {}), [field]: value };
-      return { ...current, story: { ...(current.story || {}), sections } };
+      const program = [...(current.program || [])];
+      program[index] = { ...(program[index] || {}), [field]: value };
+      return { ...current, program };
+    });
+  };
+
+  const updateFaq = (index, field, value) => {
+    markDirty();
+    setInvitation((current) => {
+      const faqs = [...(current.faqs || [])];
+      faqs[index] = { ...(faqs[index] || {}), [field]: value };
+      return { ...current, faqs };
     });
   };
 
@@ -230,17 +225,6 @@ export default function InvitationManage({ variant = 'client' }) {
       gallery[index] = { ...(gallery[index] || {}), ...patch };
       return { ...current, gallery };
     });
-  };
-
-  const handleFile = async (file, onValue) => {
-    if (!file) return;
-    try {
-      const dataUrl = await readFileAsDataUrl(file, MAX_IMAGE_SIZE_MB);
-      onValue(dataUrl);
-      setFileError('');
-    } catch (err) {
-      setFileError(err.message || 'Could not upload file.');
-    }
   };
 
   const persistLocalDraft = useCallback(() => {
@@ -373,9 +357,6 @@ export default function InvitationManage({ variant = 'client' }) {
   }
   if (!event) return <p>Loading invitation...</p>;
 
-  const gallery = invitation.gallery?.length ? invitation.gallery : [{ caption: '', image: '' }];
-  const firstStory = invitation.story?.sections?.[0] || {};
-
   return (
     <>
       <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
@@ -455,7 +436,7 @@ export default function InvitationManage({ variant = 'client' }) {
 
       <div className="dash-grid">
         <div className="card-widget">
-          <h3>Invitation Details</h3>
+          <h3>Event Settings</h3>
           <div className="form-row">
             <div className="form-group">
               <label>Event Name</label>
@@ -465,20 +446,6 @@ export default function InvitationManage({ variant = 'client' }) {
               <label>Event Date</label>
               <input type="datetime-local" value={toDatetimeLocalValue(event.event_date)} onChange={(e) => updateEvent({ event_date: e.target.value })} />
             </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Opening Line</label>
-              <input value={invitation.opening_line || ''} onChange={(e) => updateInvitation({ opening_line: e.target.value })} />
-            </div>
-            <div className="form-group">
-              <label>Hero Caption</label>
-              <input value={invitation.hero_caption || ''} onChange={(e) => updateInvitation({ hero_caption: e.target.value })} />
-            </div>
-          </div>
-          <div className="form-group">
-            <label>Quote</label>
-            <textarea value={invitation.quote || ''} onChange={(e) => updateInvitation({ quote: e.target.value })} />
           </div>
         </div>
 
@@ -500,127 +467,24 @@ export default function InvitationManage({ variant = 'client' }) {
           </div>
           <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Invite Code: <strong>{event.invite_code}</strong></p>
           {invitation?.qr_enabled && <QRShare url={shareUrl} enabled />}
+          <Link to={config.rsvpPath} className="btn btn-outline" style={{ marginTop: 12 }}>RSVP Monitoring</Link>
         </div>
       </div>
 
-      <div className="dash-grid">
-        <div className="card-widget">
-          <h3>Photos, Music & Video</h3>
-          <MediaField
-            label="Cover Photo URL"
-            value={invitation.cover_image || ''}
-            onChange={(value) => updateInvitation({ cover_image: value })}
-            placeholder="https://..."
-            accept="image/*"
-            maxSizeMb={MAX_IMAGE_SIZE_MB}
-            onError={setFileError}
-          />
-          <MediaField
-            label="Background Video URL"
-            value={invitation.background_video || ''}
-            onChange={(value) => updateInvitation({ background_video: value })}
-            placeholder="https://...mp4"
-            accept="video/*"
-            maxSizeMb={MAX_VIDEO_SIZE_MB}
-            onError={setFileError}
-          />
-          <MediaField
-            label="Music URL"
-            value={invitation.music_url || ''}
-            onChange={(value) => updateInvitation({ music_url: value })}
-            placeholder="https://...mp3"
-            accept="audio/*"
-            maxSizeMb={MAX_AUDIO_SIZE_MB}
-            onError={setFileError}
-          />
-        </div>
+      <WeddingContentFields
+        invitation={invitation}
+        event={event}
+        onInvitationChange={updateInvitation}
+        onVenueChange={updateVenue}
+        onStoryChange={updateStory}
+        onGalleryChange={updateGallery}
+        onEntourageChange={updateEntourage}
+        onAttireChange={updateAttire}
+        onProgramChange={updateProgram}
+        onFaqChange={updateFaq}
+        onFileError={setFileError}
+      />
 
-        <div className="card-widget">
-          <h3>Gallery Photos</h3>
-          {gallery.slice(0, 4).map((item, index) => (
-            <div key={index} className="form-group">
-              <label>Photo {index + 1}</label>
-              <input value={item.caption || ''} onChange={(e) => updateGallery(index, { caption: e.target.value })} placeholder="Caption" />
-              <input
-                value={isDataUrl(item.image) ? getMediaFieldDisplay(item.image) : (item.image || '')}
-                readOnly={isDataUrl(item.image)}
-                onChange={(e) => updateGallery(index, { image: e.target.value })}
-                placeholder="Image URL"
-              />
-              <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateGallery(index, { image: value }))} />
-            </div>
-          ))}
-          <button type="button" className="btn btn-outline" onClick={() => updateInvitation({ gallery: [...gallery, { caption: '', image: '' }] })}>Add Photo Slot</button>
-        </div>
-      </div>
-
-      <div className="card-widget">
-        <h3>Story & Invitation Message</h3>
-        <div className="form-row">
-          <div className="form-group">
-            <label>Story Title</label>
-            <input value={invitation.story?.title || ''} onChange={(e) => updateInvitation({ story: { ...(invitation.story || {}), title: e.target.value } })} />
-          </div>
-          <div className="form-group">
-            <label>Story Heading</label>
-            <input value={firstStory.heading || ''} onChange={(e) => updateStorySection(0, 'heading', e.target.value)} />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Story Text</label>
-          <textarea value={firstStory.content || ''} onChange={(e) => updateStorySection(0, 'content', e.target.value)} />
-        </div>
-      </div>
-
-      <div className="dash-grid">
-        <div className="card-widget">
-          <h3>Venue & Schedule</h3>
-          {['ceremony', 'reception'].map((type) => (
-            <div key={type} style={{ marginBottom: 20 }}>
-              <h4 style={{ textTransform: 'capitalize', marginBottom: 12 }}>{type}</h4>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Name</label>
-                  <input value={invitation.venue?.[type]?.name || ''} onChange={(e) => updateVenue(type, 'name', e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label>Time</label>
-                  <input value={invitation.venue?.[type]?.time || ''} onChange={(e) => updateVenue(type, 'time', e.target.value)} />
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Address</label>
-                <input value={invitation.venue?.[type]?.address || ''} onChange={(e) => updateVenue(type, 'address', e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label>Map URL</label>
-                <input value={invitation.venue?.[type]?.map_url || ''} onChange={(e) => updateVenue(type, 'map_url', e.target.value)} />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="card-widget">
-          <h3>Attire, Gifts & FAQs</h3>
-          <div className="form-group">
-            <label>Dress Code</label>
-            <input value={invitation.dress_code || ''} onChange={(e) => updateInvitation({ dress_code: e.target.value })} />
-          </div>
-          <div className="form-group">
-            <label>Guest Attire Notes</label>
-            <textarea value={invitation.attire?.guests || ''} onChange={(e) => updateInvitation({ attire: { ...(invitation.attire || {}), guests: e.target.value } })} />
-          </div>
-          <div className="form-group">
-            <label>Gift Note</label>
-            <textarea value={invitation.gift_registry?.preferences || ''} onChange={(e) => updateInvitation({ gift_registry: { ...(invitation.gift_registry || {}), preferences: e.target.value } })} />
-          </div>
-          <div className="form-group">
-            <label>Coordinator</label>
-            <input value={invitation.coordinator || ''} onChange={(e) => updateInvitation({ coordinator: e.target.value })} />
-          </div>
-          <Link to={config.rsvpPath} className="btn btn-outline">RSVP Monitoring</Link>
-        </div>
-      </div>
       <InvitationPreviewModal
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}

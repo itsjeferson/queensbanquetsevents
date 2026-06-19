@@ -8,8 +8,8 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { slugFromEventName } from '../../utils/slug';
-import MediaField from '../../components/common/MediaField/MediaField';
-import { getMediaFieldDisplay, isDataUrl, readFileAsDataUrl, MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
+import { defaultWeddingInvitationContent, normalizeInvitationContent } from '../../utils/invitationContent';
+import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import '../../styles/invitation.css';
 
 const EVENT_TYPES = [
@@ -21,26 +21,6 @@ const EVENT_TYPES = [
 ];
 
 const STEPS = ['Event Info', 'Content', 'Publish'];
-
-const defaultInvitation = {
-  opening_line: '',
-  hero_caption: '',
-  quote: '',
-  cover_image: '',
-  background_video: '',
-  music_url: '',
-  gallery: [{ caption: '', image: '' }],
-  story: { title: 'Our Story', sections: [{ heading: '', content: '' }] },
-  venue: {
-    ceremony: { name: '', address: '', time: '', map_url: '' },
-    reception: { name: '', address: '', time: '', map_url: '' },
-  },
-  dress_code: '',
-  attire: { guests: '' },
-  gift_registry: { preferences: '' },
-  coordinator: '',
-  program: [{ time: '', title: '' }],
-};
 
 export default function InvitationBuilder() {
   const { user } = useAuth();
@@ -55,7 +35,7 @@ export default function InvitationBuilder() {
     event_date: '',
     slug: '',
     template_id: null,
-    invitation: { ...defaultInvitation },
+    invitation: normalizeInvitationContent(defaultWeddingInvitationContent),
   });
 
   const updateInvitation = (patch) => {
@@ -78,18 +58,11 @@ export default function InvitationBuilder() {
     }));
   };
 
-  const updateStorySection = (index, field, value) => {
-    setForm((current) => {
-      const sections = [...(current.invitation.story?.sections || [])];
-      sections[index] = { ...(sections[index] || {}), [field]: value };
-      return {
-        ...current,
-        invitation: {
-          ...current.invitation,
-          story: { ...(current.invitation.story || {}), sections },
-        },
-      };
-    });
+  const updateStory = (story) => {
+    setForm((current) => ({
+      ...current,
+      invitation: { ...current.invitation, story },
+    }));
   };
 
   const updateGallery = (index, patch) => {
@@ -100,22 +73,48 @@ export default function InvitationBuilder() {
     });
   };
 
-  const handleFile = async (file, onValue, maxSizeMb = MAX_IMAGE_SIZE_MB) => {
-    if (!file) return;
-    try {
-      const dataUrl = await readFileAsDataUrl(file, maxSizeMb);
-      onValue(dataUrl);
-      setFileError('');
-    } catch (err) {
-      setFileError(err.message || 'Could not upload file.');
-    }
+  const updateEntourage = (entourage) => {
+    setForm((current) => ({
+      ...current,
+      invitation: { ...current.invitation, entourage },
+    }));
   };
 
-  const gallery = form.invitation.gallery?.length ? form.invitation.gallery : [{ caption: '', image: '' }];
-  const firstStory = form.invitation.story?.sections?.[0] || {};
+  const updateAttire = (field, value) => {
+    setForm((current) => ({
+      ...current,
+      invitation: {
+        ...current.invitation,
+        attire: { ...(current.invitation.attire || {}), [field]: value },
+      },
+    }));
+  };
+
+  const updateProgram = (index, field, value) => {
+    setForm((current) => {
+      const program = [...(current.invitation.program || [])];
+      program[index] = { ...(program[index] || {}), [field]: value };
+      return { ...current, invitation: { ...current.invitation, program } };
+    });
+  };
+
+  const updateFaq = (index, field, value) => {
+    setForm((current) => {
+      const faqs = [...(current.invitation.faqs || [])];
+      faqs[index] = { ...(faqs[index] || {}), [field]: value };
+      return { ...current, invitation: { ...current.invitation, faqs } };
+    });
+  };
 
   const hasEventName = form.event_name.trim().length > 0;
   const hasEventDate = Boolean(form.event_date);
+
+  const builderEvent = {
+    event_name: form.event_name,
+    event_type: form.event_type,
+    event_date: form.event_date,
+    slug: form.slug || slugFromEventName(form.event_name),
+  };
 
   const persistInvitationPreview = (eventId, slug) => {
     const previewData = buildInvitationPreviewData({
@@ -188,6 +187,12 @@ export default function InvitationBuilder() {
         ))}
       </div>
 
+      {fileError && (
+        <div className="card-widget" style={{ borderColor: 'rgba(220,53,69,0.35)', background: 'rgba(220,53,69,0.06)' }}>
+          {fileError}
+        </div>
+      )}
+
       {step !== 1 ? (
       <div className="card-widget">
         {step === 0 && (
@@ -217,9 +222,17 @@ export default function InvitationBuilder() {
                   value={form.event_name}
                   onChange={(e) => {
                     const event_name = e.target.value;
-                    setForm({ ...form, event_name, slug: slugFromEventName(event_name) });
+                    setForm({
+                      ...form,
+                      event_name,
+                      slug: slugFromEventName(event_name),
+                      invitation: {
+                        ...form.invitation,
+                        couple_display_name: event_name,
+                      },
+                    });
                   }}
-                  placeholder="John & Mae"
+                  placeholder="Mark & She"
                 />
               </div>
               <div className="form-group">
@@ -233,7 +246,7 @@ export default function InvitationBuilder() {
             </div>
             <div className="form-group">
               <label>Custom URL Slug</label>
-              <input value={form.slug} readOnly placeholder="John-Mae" />
+              <input value={form.slug} readOnly placeholder="Mark-She" />
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
                 Auto-generated from event name. Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
               </p>
@@ -284,146 +297,19 @@ export default function InvitationBuilder() {
       </div>
       ) : (
         <>
-          <div className="card-widget">
-            <h3>Invitation Details</h3>
-            <div className="form-row" style={{ marginTop: 20 }}>
-              <div className="form-group">
-                <label>Opening Line</label>
-                <input value={form.invitation.opening_line || ''} onChange={(e) => updateInvitation({ opening_line: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>Hero Caption</label>
-                <input value={form.invitation.hero_caption || ''} onChange={(e) => updateInvitation({ hero_caption: e.target.value })} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Quote</label>
-              <textarea value={form.invitation.quote || ''} onChange={(e) => updateInvitation({ quote: e.target.value })} />
-            </div>
-          </div>
-
-          <div className="dash-grid">
-            <div className="card-widget">
-              <h3>Photos, Music & Video</h3>
-              {fileError && (
-                <p style={{ color: '#DC3545', fontSize: 13, marginTop: 20 }}>{fileError}</p>
-              )}
-              <div style={{ marginTop: fileError ? 12 : 20 }}>
-                <MediaField
-                  label="Cover Photo URL"
-                  value={form.invitation.cover_image || ''}
-                  onChange={(value) => updateInvitation({ cover_image: value })}
-                  placeholder="https://..."
-                  accept="image/*"
-                  maxSizeMb={MAX_IMAGE_SIZE_MB}
-                  onError={setFileError}
-                />
-                <MediaField
-                  label="Background Video URL"
-                  value={form.invitation.background_video || ''}
-                  onChange={(value) => updateInvitation({ background_video: value })}
-                  placeholder="https://...mp4"
-                  accept="video/*"
-                  maxSizeMb={MAX_VIDEO_SIZE_MB}
-                  onError={setFileError}
-                />
-                <MediaField
-                  label="Music URL"
-                  value={form.invitation.music_url || ''}
-                  onChange={(value) => updateInvitation({ music_url: value })}
-                  placeholder="https://...mp3"
-                  accept="audio/*"
-                  maxSizeMb={MAX_AUDIO_SIZE_MB}
-                  onError={setFileError}
-                />
-              </div>
-            </div>
-
-            <div className="card-widget">
-              <h3>Gallery Photos</h3>
-              {gallery.slice(0, 4).map((item, index) => (
-                <div key={index} className="form-group" style={{ marginTop: index === 0 ? 20 : 0 }}>
-                  <label>Photo {index + 1}</label>
-                  <input value={item.caption || ''} onChange={(e) => updateGallery(index, { caption: e.target.value })} placeholder="Caption" />
-                  <input
-                    value={isDataUrl(item.image) ? getMediaFieldDisplay(item.image) : (item.image || '')}
-                    readOnly={isDataUrl(item.image)}
-                    onChange={(e) => updateGallery(index, { image: e.target.value })}
-                    placeholder="Image URL"
-                  />
-                  <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateGallery(index, { image: value }))} />
-                </div>
-              ))}
-              <button type="button" className="btn btn-outline" onClick={() => updateInvitation({ gallery: [...gallery, { caption: '', image: '' }] })}>Add Photo Slot</button>
-            </div>
-          </div>
-
-          <div className="card-widget">
-            <h3>Story & Invitation Message</h3>
-            <div className="form-row" style={{ marginTop: 20 }}>
-              <div className="form-group">
-                <label>Story Title</label>
-                <input value={form.invitation.story?.title || ''} onChange={(e) => updateInvitation({ story: { ...(form.invitation.story || {}), title: e.target.value } })} />
-              </div>
-              <div className="form-group">
-                <label>Story Heading</label>
-                <input value={firstStory.heading || ''} onChange={(e) => updateStorySection(0, 'heading', e.target.value)} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Story Text</label>
-              <textarea value={firstStory.content || ''} onChange={(e) => updateStorySection(0, 'content', e.target.value)} />
-            </div>
-          </div>
-
-          <div className="dash-grid">
-            <div className="card-widget">
-              <h3>Venue & Schedule</h3>
-              {['ceremony', 'reception'].map((type) => (
-                <div key={type} style={{ marginBottom: 20, marginTop: type === 'ceremony' ? 20 : 0 }}>
-                  <h4 style={{ textTransform: 'capitalize', marginBottom: 12 }}>{type}</h4>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Name</label>
-                      <input value={form.invitation.venue?.[type]?.name || ''} onChange={(e) => updateVenue(type, 'name', e.target.value)} />
-                    </div>
-                    <div className="form-group">
-                      <label>Time</label>
-                      <input value={form.invitation.venue?.[type]?.time || ''} onChange={(e) => updateVenue(type, 'time', e.target.value)} />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label>Address</label>
-                    <input value={form.invitation.venue?.[type]?.address || ''} onChange={(e) => updateVenue(type, 'address', e.target.value)} />
-                  </div>
-                  <div className="form-group">
-                    <label>Map URL</label>
-                    <input value={form.invitation.venue?.[type]?.map_url || ''} onChange={(e) => updateVenue(type, 'map_url', e.target.value)} />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="card-widget">
-              <h3>Attire, Gifts & FAQs</h3>
-              <div className="form-group" style={{ marginTop: 20 }}>
-                <label>Dress Code</label>
-                <input value={form.invitation.dress_code || ''} onChange={(e) => updateInvitation({ dress_code: e.target.value })} />
-              </div>
-              <div className="form-group">
-                <label>Guest Attire Notes</label>
-                <textarea value={form.invitation.attire?.guests || ''} onChange={(e) => updateInvitation({ attire: { ...(form.invitation.attire || {}), guests: e.target.value } })} />
-              </div>
-              <div className="form-group">
-                <label>Gift Note</label>
-                <textarea value={form.invitation.gift_registry?.preferences || ''} onChange={(e) => updateInvitation({ gift_registry: { ...(form.invitation.gift_registry || {}), preferences: e.target.value } })} />
-              </div>
-              <div className="form-group">
-                <label>Coordinator</label>
-                <input value={form.invitation.coordinator || ''} onChange={(e) => updateInvitation({ coordinator: e.target.value })} />
-              </div>
-            </div>
-          </div>
+          <WeddingContentFields
+            invitation={form.invitation}
+            event={builderEvent}
+            onInvitationChange={updateInvitation}
+            onVenueChange={updateVenue}
+            onStoryChange={updateStory}
+            onGalleryChange={updateGallery}
+            onEntourageChange={updateEntourage}
+            onAttireChange={updateAttire}
+            onProgramChange={updateProgram}
+            onFaqChange={updateFaq}
+            onFileError={setFileError}
+          />
 
           <div className="card-widget">
             <div style={{ display: 'flex', gap: 12 }}>
