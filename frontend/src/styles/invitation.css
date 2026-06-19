@@ -432,7 +432,7 @@
   margin-bottom: 20px;
 }
 
-.inv-rsvp-form input,
+.inv-rsvp-form input:not([type='radio']),
 .inv-rsvp-form textarea,
 .inv-rsvp-form select {
   border: none;
@@ -1246,20 +1246,39 @@
 }
 
 .inv-rsvp-radio-group {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 12px;
 }
 
-.inv-rsvp-radio {
+.inv-rsvp-form label.inv-rsvp-radio {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
+  width: auto;
+  max-width: 100%;
   font-size: 14px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--inv-ink);
+  margin-bottom: 0;
   cursor: pointer;
 }
 
-.inv-rsvp-radio input {
+.inv-rsvp-radio input[type='radio'] {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
   accent-color: var(--inv-primary);
+  cursor: pointer;
 }
 
 .inv-rsvp-success {

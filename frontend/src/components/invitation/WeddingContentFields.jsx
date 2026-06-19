@@ -494,10 +494,10 @@ export default function WeddingContentFields({
         </button>
       </div>
 
-      <div className="dash-grid">
-        <div className="card-widget">
-          <h3>Wedding Gift</h3>
-          <div className="form-group" style={{ marginTop: 20 }}>
+      <div className="card-widget">
+        <h3>Wedding Gift</h3>
+        <div className="card-form-stack">
+          <div className="form-group">
             <label>A Note on Gifts</label>
             <textarea
               value={invitation.gift_registry?.preferences || ''}
@@ -513,12 +513,11 @@ export default function WeddingContentFields({
               rows={4}
             />
           </div>
-        </div>
 
-        <div className="card-widget">
-          <h3>FAQs & Coordinator</h3>
+          <h4 className="card-subheading">FAQs & Coordinator</h4>
+
           {faqs.map((faq, index) => (
-            <div key={index} style={{ marginBottom: 16, marginTop: index === 0 ? 20 : 0 }}>
+            <div key={index} className="faq-item-fields">
               <div className="form-group">
                 <label>Question {index + 1}</label>
                 <input value={faq.question || ''} onChange={(e) => onFaqChange(index, 'question', e.target.value)} />
@@ -533,7 +532,6 @@ export default function WeddingContentFields({
             type="button"
             className="btn btn-outline"
             onClick={() => onInvitationChange({ faqs: [...faqs, { question: '', answer: '' }] })}
-            style={{ marginBottom: 20 }}
           >
             Add FAQ
           </button>
