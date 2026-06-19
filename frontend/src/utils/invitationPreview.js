@@ -6,6 +6,7 @@ import {
 import { stripLargeDataUrls } from './mediaUpload';
 import { normalizeEventDate } from './eventDate';
 import { normalizeInvitationContent } from './invitationContent';
+import { resolveInvitationThemeFields, extractInvitationThemeInput } from './invitationTheme';
 
 export const STORAGE_PREFIX = 'invitation-draft';
 export const CLIENT_PREVIEW_KEY = 'client-latest-preview-slug';
@@ -26,15 +27,15 @@ function normalizeEventDateValue(dateValue, fallback) {
   return normalizeEventDate(dateValue, fallback);
 }
 
-function cleanStory(story) {
+function cleanStory(story, invitation = {}) {
   const sections = (story?.sections || []).filter(
     (section) => pickText(section.heading) || pickText(section.content),
   );
   return {
     title: pickText(story?.title),
-    image: pickText(story?.image),
-    invitation_message: pickText(story?.invitation_message),
-    acceptance_message: pickText(story?.acceptance_message),
+    image: pickText(story?.image) || pickText(invitation?.story_image),
+    invitation_message: pickText(story?.invitation_message) || pickText(invitation?.invitation_message),
+    acceptance_message: pickText(story?.acceptance_message) || pickText(invitation?.acceptance_message),
     sections,
   };
 }
@@ -88,11 +89,38 @@ function hasAttireDetails(attire, dressCode) {
   );
 }
 
+export function mergeInvitationPayloadWithDraft(apiPayload, draft) {
+  if (!apiPayload) return draft || null;
+  if (!draft?.invitation) return apiPayload;
+
+  const draftTheme = extractInvitationThemeInput(draft.invitation);
+  const apiTheme = extractInvitationThemeInput(apiPayload.invitation || {});
+  const draftMotif = draftTheme.color_motif || 'classic-gold';
+  const apiMotif = apiTheme.color_motif || 'classic-gold';
+
+  if (draftMotif === 'classic-gold' && apiMotif !== 'classic-gold') return apiPayload;
+  if (draftMotif === apiMotif) return apiPayload;
+
+  const themeFields = resolveInvitationThemeFields({
+    ...(apiPayload.invitation || {}),
+    ...draftTheme,
+    color_motif: draftMotif,
+  });
+
+  return {
+    ...apiPayload,
+    invitation: {
+      ...(apiPayload.invitation || {}),
+      ...themeFields,
+    },
+  };
+}
+
 export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_messages } = {}) {
   const eventType = event.event_type || 'wedding';
   const template = TYPE_DEMOS[eventType] || demoWeddingInvitation;
   const templateInv = template.invitation;
-  const story = cleanStory(invitation.story);
+  const story = cleanStory(invitation.story, invitation);
   const venue = cleanVenue(invitation.venue);
   const gallery = cleanGallery(invitation.gallery);
   const program = (invitation.program || []).filter(
@@ -104,6 +132,7 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
   const brideProfile = cleanProfile(invitation.bride_profile);
   const normalized = normalizeInvitationContent({
     ...invitation,
+    ...extractInvitationThemeInput(invitation),
     story,
     venue,
     gallery,
@@ -111,6 +140,7 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
     groom_profile: groomProfile || invitation.groom_profile,
     bride_profile: brideProfile || invitation.bride_profile,
   });
+  const themeFields = resolveInvitationThemeFields(normalized);
 
   return {
     event: {
@@ -124,9 +154,8 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       status: event.status || template.event.status || 'draft',
     },
     invitation: {
-      primary_color: templateInv.primary_color,
-      secondary_color: templateInv.secondary_color,
-      font_family: templateInv.font_family,
+      ...normalized,
+      font_family: pickText(invitation.font_family) || templateInv.font_family,
       qr_enabled: invitation.qr_enabled ?? templateInv.qr_enabled,
       opening_line: pickText(invitation.opening_line) || templateInv.opening_line,
       hero_caption: pickText(invitation.hero_caption) || templateInv.hero_caption,
@@ -163,6 +192,7 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       attire: hasAttireDetails(invitation.attire, invitation.dress_code)
         ? normalized.attire
         : templateInv.attire,
+      ...themeFields,
     },
     guest_messages: guest_messages || [],
   };

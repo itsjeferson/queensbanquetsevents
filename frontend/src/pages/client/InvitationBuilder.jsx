@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { eventService } from '../../services/invitationService';
 import { useAuth } from '../../hooks/useAuth';
 import {
   buildInvitationPreviewData,
+  getPreviewPath,
   saveClientPreviewSlug,
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
@@ -132,6 +133,13 @@ export default function InvitationBuilder() {
     saveInvitationDraft(previewData);
     saveClientPreviewSlug(user?.id, slug);
   };
+
+  useEffect(() => {
+    if (!hasEventName) return;
+
+    const slug = form.slug || slugFromEventName(form.event_name);
+    persistInvitationPreview(null, slug);
+  }, [form.event_name, form.event_type, form.event_date, form.slug, form.invitation, hasEventName, user?.id]);
 
   const handlePublish = async () => {
     const slug = form.slug || slugFromEventName(form.event_name);
@@ -312,8 +320,19 @@ export default function InvitationBuilder() {
           />
 
           <div className="card-widget">
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <button type="button" className="btn btn-outline" onClick={() => setStep(0)}>Back</button>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => {
+                  const slug = form.slug || slugFromEventName(form.event_name);
+                  persistInvitationPreview(null, slug);
+                  window.open(getPreviewPath(slug), '_blank', 'noopener,noreferrer');
+                }}
+              >
+                Preview Invitation
+              </button>
               <button type="button" className="btn btn-gold" onClick={() => setStep(2)}>Next: Publish</button>
             </div>
           </div>

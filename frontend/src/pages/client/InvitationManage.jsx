@@ -16,6 +16,7 @@ import {
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
 import { normalizeInvitationContent } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
+import '../../styles/invitation.css';
 
 const INVITATION_ENTRY = '/#';
 const AUTO_SAVE_DELAY_MS = 600;
@@ -434,40 +435,17 @@ export default function InvitationManage({ variant = 'client' }) {
         </div>
       )}
 
-      <div className="dash-grid">
-        <div className="card-widget">
-          <h3>Event Settings</h3>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Event Name</label>
-              <input value={event.event_name || ''} onChange={(e) => updateEvent({ event_name: e.target.value })} />
-            </div>
-            <div className="form-group">
-              <label>Event Date</label>
-              <input type="datetime-local" value={toDatetimeLocalValue(event.event_date)} onChange={(e) => updateEvent({ event_date: e.target.value })} />
-            </div>
-          </div>
-        </div>
-
-        <div className="card-widget">
-          <h3>Share Your Invitation</h3>
+      <div className="card-widget">
+        <h3>Event Settings</h3>
+        <div className="form-row">
           <div className="form-group">
-            <label>Slug URL</label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input readOnly value={shareUrl} />
-              <button type="button" className="action-btn" onClick={() => navigator.clipboard.writeText(shareUrl)}>Copy</button>
-            </div>
+            <label>Event Name</label>
+            <input value={event.event_name || ''} onChange={(e) => updateEvent({ event_name: e.target.value })} />
           </div>
           <div className="form-group">
-            <label>Code URL</label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input readOnly value={codeUrl} />
-              <button type="button" className="action-btn" onClick={() => navigator.clipboard.writeText(codeUrl)}>Copy</button>
-            </div>
+            <label>Event Date</label>
+            <input type="datetime-local" value={toDatetimeLocalValue(event.event_date)} onChange={(e) => updateEvent({ event_date: e.target.value })} />
           </div>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Invite Code: <strong>{event.invite_code}</strong></p>
-          {invitation?.qr_enabled && <QRShare url={shareUrl} enabled />}
-          <Link to={config.rsvpPath} className="btn btn-outline" style={{ marginTop: 12 }}>RSVP Monitoring</Link>
         </div>
       </div>
 
@@ -484,6 +462,29 @@ export default function InvitationManage({ variant = 'client' }) {
         onFaqChange={updateFaq}
         onFileError={setFileError}
       />
+
+      <div className="card-widget">
+        <h3>Share Your Invitation</h3>
+        <div className="card-form-stack">
+          <div className="form-group">
+            <label>Slug URL</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input readOnly value={shareUrl} />
+              <button type="button" className="action-btn" onClick={() => navigator.clipboard.writeText(shareUrl)}>Copy</button>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Code URL</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input readOnly value={codeUrl} />
+              <button type="button" className="action-btn" onClick={() => navigator.clipboard.writeText(codeUrl)}>Copy</button>
+            </div>
+          </div>
+          <p className="form-help">Invite Code: <strong>{event.invite_code}</strong></p>
+          {invitation?.qr_enabled && <QRShare url={shareUrl} enabled />}
+          <Link to={config.rsvpPath} className="btn btn-outline">RSVP Monitoring</Link>
+        </div>
+      </div>
 
       <InvitationPreviewModal
         open={previewOpen}

@@ -2,6 +2,7 @@ import MediaField from '../common/MediaField/MediaField';
 import { MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
 import { defaultAttire, defaultEntourage } from '../../utils/invitationContent';
 import EntourageNameListEditor from './EntourageNameListEditor';
+import InvitationMotifPicker from './InvitationMotifPicker';
 
 function ColorSwatchPicker({ colors = [], onChange, labelPrefix = 'Color' }) {
   const swatches = colors.length >= 4 ? colors.slice(0, 4) : [...colors, ...Array(4 - colors.length).fill('#F4EEE7')].slice(0, 4);
@@ -60,6 +61,8 @@ export default function WeddingContentFields({
 
   return (
     <>
+      <InvitationMotifPicker invitation={invitation} onInvitationChange={onInvitationChange} />
+
       <div className="card-widget">
         <h3>Cover & Hero</h3>
         <div className="form-row" style={{ marginTop: 20 }}>
@@ -221,71 +224,69 @@ export default function WeddingContentFields({
         </div>
       </div>
 
-      <div className="wedding-media-grid">
-        <div className="card-widget">
-          <h3>Photos, Music & Video</h3>
-          <div className="card-form-stack">
-            <MediaField
-              label="Cover Photo URL"
-              value={invitation.cover_image || ''}
-              onChange={(value) => onInvitationChange({ cover_image: value })}
-              accept="image/*"
-              maxSizeMb={MAX_IMAGE_SIZE_MB}
-              onError={onFileError}
-            />
-            <MediaField
-              label="Background Video URL"
-              value={invitation.background_video || ''}
-              onChange={(value) => onInvitationChange({ background_video: value })}
-              accept="video/*"
-              maxSizeMb={MAX_VIDEO_SIZE_MB}
-              onError={onFileError}
-            />
-            <MediaField
-              label="Music URL"
-              value={invitation.music_url || ''}
-              onChange={(value) => onInvitationChange({ music_url: value })}
-              accept="audio/*"
-              maxSizeMb={MAX_AUDIO_SIZE_MB}
-              onError={onFileError}
-            />
-          </div>
+      <div className="card-widget">
+        <h3>Photos, Music & Video</h3>
+        <div className="card-form-stack">
+          <MediaField
+            label="Cover Photo URL"
+            value={invitation.cover_image || ''}
+            onChange={(value) => onInvitationChange({ cover_image: value })}
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={onFileError}
+          />
+          <MediaField
+            label="Background Video URL"
+            value={invitation.background_video || ''}
+            onChange={(value) => onInvitationChange({ background_video: value })}
+            accept="video/*"
+            maxSizeMb={MAX_VIDEO_SIZE_MB}
+            onError={onFileError}
+          />
+          <MediaField
+            label="Music URL"
+            value={invitation.music_url || ''}
+            onChange={(value) => onInvitationChange({ music_url: value })}
+            accept="audio/*"
+            maxSizeMb={MAX_AUDIO_SIZE_MB}
+            onError={onFileError}
+          />
         </div>
+      </div>
 
-        <div className="card-widget">
-          <h3>Happy Moments Gallery</h3>
-          <div className="card-form-stack">
-            <p className="form-help">
-              Photos appear in the slideshow. Photo 3 is also used as the countdown background.
-            </p>
-            {gallery.map((item, index) => (
-              <div key={index} className="gallery-photo-item">
-                <div className="form-group">
-                  <label>Photo {index + 1} Caption</label>
-                  <input
-                    value={item.caption || ''}
-                    onChange={(e) => onGalleryChange(index, { caption: e.target.value })}
-                    placeholder="Caption"
-                  />
-                </div>
-                <MediaField
-                  label={`Photo ${index + 1} Image`}
-                  value={item.image || ''}
-                  onChange={(value) => onGalleryChange(index, { image: value })}
-                  accept="image/*"
-                  maxSizeMb={MAX_IMAGE_SIZE_MB}
-                  onError={onFileError}
+      <div className="card-widget">
+        <h3>Happy Moments Gallery</h3>
+        <div className="card-form-stack">
+          <p className="form-help">
+            Photos appear in the slideshow. Photo 3 is also used as the countdown background.
+          </p>
+          {gallery.map((item, index) => (
+            <div key={index} className="gallery-photo-item">
+              <div className="form-group">
+                <label>Photo {index + 1} Caption</label>
+                <input
+                  value={item.caption || ''}
+                  onChange={(e) => onGalleryChange(index, { caption: e.target.value })}
+                  placeholder="Caption"
                 />
               </div>
-            ))}
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={() => onInvitationChange({ gallery: [...gallery, { caption: '', image: '' }] })}
-            >
-              Add Photo Slot
-            </button>
-          </div>
+              <MediaField
+                label={`Photo ${index + 1} Image`}
+                value={item.image || ''}
+                onChange={(value) => onGalleryChange(index, { image: value })}
+                accept="image/*"
+                maxSizeMb={MAX_IMAGE_SIZE_MB}
+                onError={onFileError}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => onInvitationChange({ gallery: [...gallery, { caption: '', image: '' }] })}
+          >
+            Add Photo Slot
+          </button>
         </div>
       </div>
 

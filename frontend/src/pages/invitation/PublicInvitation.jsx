@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
-import { buildInvitationPreviewData, getLocalInvitationDraft } from '../../utils/invitationPreview';
+import { buildInvitationPreviewData, getLocalInvitationDraft, mergeInvitationPayloadWithDraft } from '../../utils/invitationPreview';
 import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
@@ -12,17 +12,18 @@ export default function PublicInvitation() {
 
   useEffect(() => {
     async function load() {
+      const draft = getLocalInvitationDraft(slug);
+
       try {
         const res = await invitationService.getPreviewBySlug(slug);
-        setData(buildInvitationPreviewData(res.data));
+        setData(buildInvitationPreviewData(mergeInvitationPayloadWithDraft(res.data, draft)));
         return;
       } catch {
         try {
           const res = await invitationService.getBySlug(slug);
-          setData(buildInvitationPreviewData(res.data));
+          setData(buildInvitationPreviewData(mergeInvitationPayloadWithDraft(res.data, draft)));
           return;
         } catch {
-          const draft = getLocalInvitationDraft(slug);
           if (draft) {
             setData(buildInvitationPreviewData(draft));
             return;

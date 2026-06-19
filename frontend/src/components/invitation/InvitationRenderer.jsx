@@ -18,6 +18,12 @@ import GuestBook from './GuestBook';
 import QRShare from './QRShare';
 import InvitationFooter from './InvitationFooter';
 import { normalizeInvitationContent } from '../../utils/invitationContent';
+import {
+  buildInvitationThemeCss,
+  extractInvitationThemeInput,
+  getInvitationThemeStyles,
+} from '../../utils/invitationTheme';
+import '../../styles/invitation.css';
 
 const TYPE_LABELS = {
   wedding: { together: 'Together With Their Families', invite: 'Invite You To Celebrate Their Wedding' },
@@ -32,11 +38,14 @@ export default function InvitationRenderer({ data }) {
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
-  const invitation = normalizeInvitationContent(rawInvitation);
+  const themeInput = extractInvitationThemeInput(rawInvitation);
+  const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
   const shareUrl = window.location.href;
-  const primaryColor = invitation.primary_color || '#B47B36';
-  const secondaryColor = invitation.secondary_color || '#EFE7DD';
+  const themedInvitation = { ...invitation, ...themeInput };
+  const themeStyles = getInvitationThemeStyles(themedInvitation);
+  const themeCss = buildInvitationThemeCss(themedInvitation);
+  const themeId = themeInput.color_motif || 'classic-gold';
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;
@@ -63,10 +72,13 @@ export default function InvitationRenderer({ data }) {
   };
 
   return (
-    <div
-      className="invitation-page"
-      style={{ '--inv-primary': primaryColor, '--inv-paper': secondaryColor }}
-    >
+    <>
+      <style>{themeCss}</style>
+      <div
+        className="invitation-page"
+        data-inv-theme={themeId}
+        style={themeStyles}
+      >
       {invitation.music_url && (
         <audio ref={audioRef} src={invitation.music_url} loop preload="auto" playsInline />
       )}
@@ -128,6 +140,7 @@ export default function InvitationRenderer({ data }) {
           <InvitationFooter eventName={event.event_name} shareUrl={shareUrl} />
         </main>
       )}
-    </div>
+      </div>
+    </>
   );
 }

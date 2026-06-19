@@ -80,7 +80,7 @@ class InvitationPage
             'cover_image' => $row['cover_image'] ?? '',
             'music_url' => $row['background_music'] ?? '',
             'background_video' => $story['background_video'] ?? '',
-            'primary_color' => $row['primary_color'] ?? '#D4AF37',
+            'primary_color' => $row['primary_color'] ?? ($story['primary_color'] ?? '#D4AF37'),
             'secondary_color' => $story['secondary_color'] ?? '#F4EEE7',
             'font_family' => $row['font_family'] ?? 'Playfair Display',
             'opening_line' => $story['opening_line'] ?? '',
@@ -92,7 +92,10 @@ class InvitationPage
             'coordinator_phone' => $story['coordinator_phone'] ?? '',
             'story' => [
                 'title' => $story['title'] ?? '',
+                'image' => $story['image'] ?? '',
                 'sections' => $story['sections'] ?? [],
+                'invitation_message' => $story['invitation_message'] ?? '',
+                'acceptance_message' => $story['acceptance_message'] ?? '',
             ],
             'venue' => $row['venue'] ?? [],
             'dress_code' => $row['dress_code'] ?? '',
@@ -113,6 +116,8 @@ class InvitationPage
             'bride_profile' => $story['bride_profile'] ?? [],
             'entourage' => $row['entourage'] ?? [],
             'qr_enabled' => (int) ($row['qr_enabled'] ?? 1),
+            'color_motif' => $story['color_motif'] ?? 'classic-gold',
+            'background_color' => $story['background_color'] ?? '#FFFAF5',
             'published_at' => $row['published_at'] ?? null,
         ];
     }
@@ -135,6 +140,11 @@ class InvitationPage
         $story['coordinator_phone'] = $data['coordinator_phone'] ?? ($story['coordinator_phone'] ?? '');
         $story['background_video'] = $data['background_video'] ?? ($story['background_video'] ?? '');
         $story['secondary_color'] = $data['secondary_color'] ?? ($story['secondary_color'] ?? '#F4EEE7');
+        $story['background_color'] = $data['background_color'] ?? ($story['background_color'] ?? '#FFFAF5');
+        $story['color_motif'] = $data['color_motif'] ?? ($story['color_motif'] ?? 'classic-gold');
+        if (!empty($data['primary_color'])) {
+            $story['primary_color'] = $data['primary_color'];
+        }
         $story['attire'] = $data['attire'] ?? ($story['attire'] ?? []);
         $story['faqs'] = $data['faqs'] ?? ($story['faqs'] ?? []);
         $story['opening_hero_image'] = $data['opening_hero_image'] ?? ($story['opening_hero_image'] ?? '');
@@ -142,8 +152,8 @@ class InvitationPage
         $story['couple_display_name'] = $data['couple_display_name'] ?? ($story['couple_display_name'] ?? '');
         $story['secondary_quote'] = $data['secondary_quote'] ?? ($story['secondary_quote'] ?? '');
         $story['image'] = $data['story_image'] ?? ($story['image'] ?? '');
-        $story['invitation_message'] = $data['invitation_message'] ?? ($story['invitation_message'] ?? '');
-        $story['acceptance_message'] = $data['acceptance_message'] ?? ($story['acceptance_message'] ?? '');
+        $story['invitation_message'] = $story['invitation_message'] ?? ($data['invitation_message'] ?? '');
+        $story['acceptance_message'] = $story['acceptance_message'] ?? ($data['acceptance_message'] ?? '');
         $story['groom_profile'] = $data['groom_profile'] ?? ($story['groom_profile'] ?? []);
         $story['bride_profile'] = $data['bride_profile'] ?? ($story['bride_profile'] ?? []);
 

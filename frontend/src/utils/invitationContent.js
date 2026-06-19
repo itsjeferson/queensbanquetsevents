@@ -1,3 +1,5 @@
+import { resolveInvitationThemeFields, extractInvitationThemeInput } from './invitationTheme';
+
 export const defaultGroomProfile = () => ({
   name: '',
   photo: '',
@@ -95,6 +97,10 @@ export const defaultWeddingInvitationContent = {
   faqs: [],
   entourage: defaultEntourage(),
   qr_enabled: 1,
+  color_motif: 'classic-gold',
+  primary_color: '#B47B36',
+  secondary_color: '#F4EEE7',
+  background_color: '#FFFAF5',
 };
 
 function asList(value) {
@@ -157,6 +163,7 @@ function mergeEntourage(entourage) {
 export function normalizeInvitationContent(invitation = {}) {
   const story = invitation.story || {};
   const venue = invitation.venue || {};
+  const themeInput = extractInvitationThemeInput(invitation);
 
   return {
     ...defaultWeddingInvitationContent,
@@ -183,6 +190,7 @@ export function normalizeInvitationContent(invitation = {}) {
     program: invitation.program?.length ? invitation.program : defaultWeddingProgram(),
     gallery: Array.isArray(invitation.gallery) ? invitation.gallery : [],
     faqs: Array.isArray(invitation.faqs) ? invitation.faqs : [],
+    ...resolveInvitationThemeFields(themeInput),
   };
 }
 
