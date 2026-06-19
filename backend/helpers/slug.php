@@ -1,10 +1,17 @@
 <?php
 function generateSlug(string $text): string
 {
-    $slug = strtolower(trim($text));
-    $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
-    $slug = preg_replace('/[\s-]+/', '-', $slug);
-    return trim($slug, '-');
+    $parts = preg_split('/[^a-zA-Z0-9]+/', trim($text), -1, PREG_SPLIT_NO_EMPTY);
+    if (!$parts) {
+        return '';
+    }
+
+    $parts = array_map(
+        fn(string $part): string => ucfirst(strtolower($part)),
+        $parts
+    );
+
+    return implode('-', $parts);
 }
 
 function generateInviteCode(): string

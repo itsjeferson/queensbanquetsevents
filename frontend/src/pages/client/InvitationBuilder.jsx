@@ -7,6 +7,7 @@ import {
   saveClientPreviewSlug,
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
+import { slugFromEventName } from '../../utils/slug';
 import '../../styles/invitation.css';
 
 const EVENT_TYPES = [
@@ -18,14 +19,6 @@ const EVENT_TYPES = [
 ];
 
 const STEPS = ['Event Info', 'Content', 'Publish'];
-
-function slugFromEventName(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -227,7 +220,7 @@ export default function InvitationBuilder() {
                     const event_name = e.target.value;
                     setForm({ ...form, event_name, slug: slugFromEventName(event_name) });
                   }}
-                  placeholder="John & Jane"
+                  placeholder="John & Mae"
                 />
               </div>
               <div className="form-group">
@@ -241,7 +234,7 @@ export default function InvitationBuilder() {
             </div>
             <div className="form-group">
               <label>Custom URL Slug</label>
-              <input value={form.slug} readOnly placeholder="john&jane" />
+              <input value={form.slug} readOnly placeholder="John-Mae" />
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
                 Auto-generated from event name. Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
               </p>
