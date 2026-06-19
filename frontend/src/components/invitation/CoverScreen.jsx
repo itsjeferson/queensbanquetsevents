@@ -1,9 +1,14 @@
+import { parseEventDate } from '../../utils/eventDate';
+
 export default function CoverScreen({ event, invitation, onOpen, labels }) {
-  const date = new Date(event.event_date).toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const parsed = parseEventDate(event.event_date);
+  const date = parsed
+    ? parsed.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+    : '';
 
   return (
     <section className="inv-cover" id="cover">

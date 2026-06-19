@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from '../../components/common/Table/DataTable';
 import { eventService } from '../../services/invitationService';
@@ -9,11 +9,16 @@ import {
   getPreviewPath,
   getClientPreviewSlug,
   getLocalInvitationDraft,
+  buildInvitationPreviewData,
   saveClientPreviewSlug,
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
+import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
+import MediaField from '../../components/common/MediaField/MediaField';
+import { getMediaFieldDisplay, isDataUrl, readFileAsDataUrl, MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
 
 const INVITATION_ENTRY = '/#';
+const AUTO_SAVE_DELAY_MS = 600;
 
 const emptyInvitation = {
   opening_line: '',
@@ -43,19 +48,12 @@ const emptyInvitation = {
 };
 
 
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 const demoEvents = [];
 
 function mapInvitationFromApi(invitation) {
-  return { ...emptyInvitation, ...(invitation || {}) };
+  const merged = { ...emptyInvitation, ...(invitation || {}) };
+  merged.gallery = Array.isArray(merged.gallery) ? merged.gallery : [];
+  return merged;
 }
 
 const MANAGE_CONFIG = {
@@ -117,7 +115,7 @@ function InvitationManagerList({ variant = 'client' }) {
             if (key === 'status') return <span className={`badge ${statusBadge[row.status] || 'badge-gray'}`}>{row.status}</span>;
             if (key === 'actions') return (
               <span>
-                <Link to={`${config.basePath}/${row.id}`} className="action-btn">Manage</Link>
+                <Link to={`${config.basePath}/${row.id}`} className="action-btn">Edit</Link>
                 {row.status === 'published' && row.slug && (
                   <a href={`${INVITATION_ENTRY}/invite/${row.slug}`} target="_blank" rel="noreferrer" className="action-btn">View</a>
                 )}
@@ -138,12 +136,26 @@ export default function InvitationManage({ variant = 'client' }) {
   if (!id) return <InvitationManagerList variant={variant} />;
   const [event, setEvent] = useState(null);
   const [invitation, setInvitation] = useState(emptyInvitation);
-  const [saved, setSaved] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('idle');
+  const [dirty, setDirty] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [usingLocalDraft, setUsingLocalDraft] = useState(false);
+  const [fileError, setFileError] = useState('');
+  const readyToTrackChanges = useRef(false);
+  const autoSaveTimerRef = useRef(null);
+  const savingRef = useRef(false);
+
+  const markDirty = useCallback(() => {
+    setDirty(true);
+    setSaveStatus('unsaved');
+  }, []);
 
   useEffect(() => {
+    readyToTrackChanges.current = false;
+    setDirty(false);
+    setSaveStatus('idle');
+
     eventService.getById(id).then((res) => {
       setEvent(res.data.event);
       setInvitation(mapInvitationFromApi(res.data.invitation));
@@ -164,6 +176,10 @@ export default function InvitationManage({ variant = 'client' }) {
 
       setEvent(null);
       setLoadError(true);
+    }).finally(() => {
+      window.setTimeout(() => {
+        readyToTrackChanges.current = true;
+      }, 0);
     });
   }, [id, user?.id]);
 
@@ -177,13 +193,18 @@ export default function InvitationManage({ variant = 'client' }) {
     return `${window.location.origin}${INVITATION_ENTRY}/event/${event.invite_code}`;
   }, [event]);
 
+  const updateEvent = (patch) => {
+    markDirty();
+    setEvent((current) => ({ ...current, ...patch }));
+  };
+
   const updateInvitation = (patch) => {
-    setSaved(false);
+    markDirty();
     setInvitation((current) => ({ ...current, ...patch }));
   };
 
   const updateVenue = (type, field, value) => {
-    setSaved(false);
+    markDirty();
     setInvitation((current) => ({
       ...current,
       venue: {
@@ -194,7 +215,7 @@ export default function InvitationManage({ variant = 'client' }) {
   };
 
   const updateStorySection = (index, field, value) => {
-    setSaved(false);
+    markDirty();
     setInvitation((current) => {
       const sections = [...(current.story?.sections || [])];
       sections[index] = { ...(sections[index] || {}), [field]: value };
@@ -203,7 +224,7 @@ export default function InvitationManage({ variant = 'client' }) {
   };
 
   const updateGallery = (index, patch) => {
-    setSaved(false);
+    markDirty();
     setInvitation((current) => {
       const gallery = [...(current.gallery || [])];
       gallery[index] = { ...(gallery[index] || {}), ...patch };
@@ -213,22 +234,46 @@ export default function InvitationManage({ variant = 'client' }) {
 
   const handleFile = async (file, onValue) => {
     if (!file) return;
-    const dataUrl = await readFileAsDataUrl(file);
-    onValue(dataUrl);
+    try {
+      const dataUrl = await readFileAsDataUrl(file, MAX_IMAGE_SIZE_MB);
+      onValue(dataUrl);
+      setFileError('');
+    } catch (err) {
+      setFileError(err.message || 'Could not upload file.');
+    }
   };
 
-  const handlePublish = async () => {
-    const data = {
-      event,
+  const persistLocalDraft = useCallback(() => {
+    if (!event) return;
+
+    const normalizedEvent = {
+      ...event,
+      event_date: normalizeEventDateForApi(event.event_date),
+    };
+    const previewData = buildInvitationPreviewData({
+      event: normalizedEvent,
       invitation,
       guest_messages: [],
+    });
+
+    saveInvitationDraft(previewData);
+    if (variant === 'client') saveClientPreviewSlug(user?.id, normalizedEvent?.slug);
+  }, [event, invitation, user?.id, variant]);
+
+  const syncToServer = useCallback(async ({ publish = false } = {}) => {
+    if (!event || savingRef.current) return false;
+
+    savingRef.current = true;
+    setSaveStatus('saving');
+
+    const normalizedEvent = {
+      ...event,
+      event_date: normalizeEventDateForApi(event.event_date),
     };
-    saveInvitationDraft(data);
-    if (variant === 'client') saveClientPreviewSlug(user?.id, event?.slug);
-    setSaved(true);
+    persistLocalDraft();
 
     const payload = {
-      ...event,
+      ...normalizedEvent,
       client_id: user?.id,
       invitation,
     };
@@ -238,26 +283,79 @@ export default function InvitationManage({ variant = 'client' }) {
         const res = await eventService.create(payload);
         const created = res.data;
         if (!created?.id) throw new Error('Create failed');
-        await eventService.publish(created.id);
-        setEvent({ ...created, status: 'published' });
+        if (publish) await eventService.publish(created.id);
+
+        setEvent((current) => ({
+          ...current,
+          ...created,
+          status: publish ? 'published' : created.status,
+        }));
         setUsingLocalDraft(false);
+        setDirty(false);
+        setSaveStatus('saved');
+
         if (String(created.id) !== String(id)) {
           window.location.replace(`${config.basePath}/${created.id}`);
         }
-        return;
+        return true;
       }
 
-      await eventService.update(id, payload);
-      await eventService.publish(id);
-      setEvent({ ...event, status: 'published' });
-      setUsingLocalDraft(false);
-    } catch {
-      if (usingLocalDraft) {
-        setSaved(false);
-      } else {
-        setEvent({ ...event, status: 'published' });
+      const updateRes = await eventService.update(id, payload);
+      if (publish) await eventService.publish(id);
+
+      if (updateRes.data) {
+        setEvent((current) => ({
+          ...current,
+          ...updateRes.data,
+          status: publish ? 'published' : (updateRes.data.status ?? current.status),
+        }));
+      } else if (publish) {
+        setEvent((current) => ({ ...current, status: 'published' }));
       }
+
+      setUsingLocalDraft(false);
+      setDirty(false);
+      setSaveStatus('saved');
+      return true;
+    } catch {
+      setSaveStatus('error');
+      return false;
+    } finally {
+      savingRef.current = false;
     }
+  }, [config.basePath, event, id, invitation, persistLocalDraft, user?.id, usingLocalDraft]);
+
+  useEffect(() => {
+    if (!readyToTrackChanges.current || !dirty || !event) return undefined;
+
+    persistLocalDraft();
+    setSaveStatus('syncing');
+
+    autoSaveTimerRef.current = window.setTimeout(() => {
+      syncToServer({ publish: false });
+    }, AUTO_SAVE_DELAY_MS);
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        window.clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [dirty, event, invitation, persistLocalDraft, syncToServer]);
+
+  const handleUpdateNow = () => {
+    if (autoSaveTimerRef.current) {
+      window.clearTimeout(autoSaveTimerRef.current);
+    }
+    persistLocalDraft();
+    syncToServer({ publish: false });
+  };
+
+  const handlePublish = () => {
+    if (autoSaveTimerRef.current) {
+      window.clearTimeout(autoSaveTimerRef.current);
+    }
+    persistLocalDraft();
+    syncToServer({ publish: true });
   };
 
   if (loadError) {
@@ -285,8 +383,25 @@ export default function InvitationManage({ variant = 'client' }) {
           <h1>{event.event_name}</h1>
           <p>{event.event_type} - {new Date(event.event_date).toLocaleDateString()} - <span className={`badge ${event.status === 'published' ? 'badge-green' : 'badge-gray'}`}>{event.status}</span></p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button type="button" className="btn btn-gold" onClick={handlePublish}>Save & Publish</button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            type="button"
+            className="btn btn-gold"
+            onClick={handleUpdateNow}
+            disabled={saveStatus === 'saving' || !dirty}
+          >
+            {saveStatus === 'saving' ? 'Saving...' : 'Update Invitation'}
+          </button>
+          {event.status !== 'published' && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={handlePublish}
+              disabled={saveStatus === 'saving'}
+            >
+              Publish
+            </button>
+          )}
           {variant === 'admin' && (
             <button type="button" className="btn btn-outline" onClick={() => setPreviewOpen(true)}>Preview Invitation</button>
           )}
@@ -296,15 +411,45 @@ export default function InvitationManage({ variant = 'client' }) {
         </div>
       </div>
 
-      {usingLocalDraft && (
-        <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.45)', background: 'rgba(212,175,55,0.08)' }}>
-          Showing your locally saved draft. Click Save & Publish to sync it to the server.
+      {fileError && (
+        <div className="card-widget" style={{ borderColor: 'rgba(220,53,69,0.35)', background: 'rgba(220,53,69,0.06)' }}>
+          {fileError}
         </div>
       )}
 
-      {saved && (
+      {usingLocalDraft && (
+        <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.45)', background: 'rgba(212,175,55,0.08)' }}>
+          Showing your locally saved draft. Click Update Invitation to sync it to the server.
+        </div>
+      )}
+
+      {saveStatus === 'syncing' && (
+        <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.35)', background: 'rgba(212,175,55,0.08)' }}>
+          Draft saved locally — syncing to server...
+        </div>
+      )}
+
+      {saveStatus === 'saving' && (
+        <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.35)', background: 'rgba(212,175,55,0.08)' }}>
+          Saving to server...
+        </div>
+      )}
+
+      {saveStatus === 'saved' && (
         <div className="card-widget" style={{ borderColor: 'rgba(40,167,69,0.35)', background: 'rgba(40,167,69,0.06)' }}>
-          Draft saved. Open the preview link to see the updated invitation page.
+          All changes saved. Preview updates instantly — server sync complete.
+        </div>
+      )}
+
+      {saveStatus === 'unsaved' && (
+        <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.35)', background: 'rgba(212,175,55,0.06)' }}>
+          Editing...
+        </div>
+      )}
+
+      {saveStatus === 'error' && (
+        <div className="card-widget" style={{ borderColor: 'rgba(220,53,69,0.35)', background: 'rgba(220,53,69,0.06)' }}>
+          Could not save your changes. Click Update Invitation to try again.
         </div>
       )}
 
@@ -314,11 +459,11 @@ export default function InvitationManage({ variant = 'client' }) {
           <div className="form-row">
             <div className="form-group">
               <label>Event Name</label>
-              <input value={event.event_name || ''} onChange={(e) => setEvent({ ...event, event_name: e.target.value })} />
+              <input value={event.event_name || ''} onChange={(e) => updateEvent({ event_name: e.target.value })} />
             </div>
             <div className="form-group">
               <label>Event Date</label>
-              <input type="datetime-local" value={(event.event_date || '').slice(0, 16)} onChange={(e) => setEvent({ ...event, event_date: e.target.value })} />
+              <input type="datetime-local" value={toDatetimeLocalValue(event.event_date)} onChange={(e) => updateEvent({ event_date: e.target.value })} />
             </div>
           </div>
           <div className="form-row">
@@ -361,21 +506,33 @@ export default function InvitationManage({ variant = 'client' }) {
       <div className="dash-grid">
         <div className="card-widget">
           <h3>Photos, Music & Video</h3>
-          <div className="form-group">
-            <label>Cover Photo URL</label>
-            <input value={invitation.cover_image || ''} onChange={(e) => updateInvitation({ cover_image: e.target.value })} placeholder="https://..." />
-            <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateInvitation({ cover_image: value }))} />
-          </div>
-          <div className="form-group">
-            <label>Background Video URL</label>
-            <input value={invitation.background_video || ''} onChange={(e) => updateInvitation({ background_video: e.target.value })} placeholder="https://...mp4" />
-            <input type="file" accept="video/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateInvitation({ background_video: value }))} />
-          </div>
-          <div className="form-group">
-            <label>Music URL</label>
-            <input value={invitation.music_url || ''} onChange={(e) => updateInvitation({ music_url: e.target.value })} placeholder="https://...mp3" />
-            <input type="file" accept="audio/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateInvitation({ music_url: value }))} />
-          </div>
+          <MediaField
+            label="Cover Photo URL"
+            value={invitation.cover_image || ''}
+            onChange={(value) => updateInvitation({ cover_image: value })}
+            placeholder="https://..."
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={setFileError}
+          />
+          <MediaField
+            label="Background Video URL"
+            value={invitation.background_video || ''}
+            onChange={(value) => updateInvitation({ background_video: value })}
+            placeholder="https://...mp4"
+            accept="video/*"
+            maxSizeMb={MAX_VIDEO_SIZE_MB}
+            onError={setFileError}
+          />
+          <MediaField
+            label="Music URL"
+            value={invitation.music_url || ''}
+            onChange={(value) => updateInvitation({ music_url: value })}
+            placeholder="https://...mp3"
+            accept="audio/*"
+            maxSizeMb={MAX_AUDIO_SIZE_MB}
+            onError={setFileError}
+          />
         </div>
 
         <div className="card-widget">
@@ -384,7 +541,12 @@ export default function InvitationManage({ variant = 'client' }) {
             <div key={index} className="form-group">
               <label>Photo {index + 1}</label>
               <input value={item.caption || ''} onChange={(e) => updateGallery(index, { caption: e.target.value })} placeholder="Caption" />
-              <input value={item.image || ''} onChange={(e) => updateGallery(index, { image: e.target.value })} placeholder="Image URL" />
+              <input
+                value={isDataUrl(item.image) ? getMediaFieldDisplay(item.image) : (item.image || '')}
+                readOnly={isDataUrl(item.image)}
+                onChange={(e) => updateGallery(index, { image: e.target.value })}
+                placeholder="Image URL"
+              />
               <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateGallery(index, { image: value }))} />
             </div>
           ))}

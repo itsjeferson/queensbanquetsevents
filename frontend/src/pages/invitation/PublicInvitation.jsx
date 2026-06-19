@@ -12,27 +12,28 @@ export default function PublicInvitation() {
 
   useEffect(() => {
     async function load() {
-      const draft = getLocalInvitationDraft(slug);
-      if (draft) {
-        setData(buildInvitationPreviewData(draft));
-        setLoading(false);
-        return;
-      }
-
       try {
         const res = await invitationService.getPreviewBySlug(slug);
         setData(buildInvitationPreviewData(res.data));
+        return;
       } catch {
         try {
           const res = await invitationService.getBySlug(slug);
           setData(buildInvitationPreviewData(res.data));
+          return;
         } catch {
+          const draft = getLocalInvitationDraft(slug);
+          if (draft) {
+            setData(buildInvitationPreviewData(draft));
+            return;
+          }
           setData(null);
         }
       } finally {
         setLoading(false);
       }
     }
+
     load();
   }, [slug]);
 

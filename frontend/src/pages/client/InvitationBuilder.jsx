@@ -8,6 +8,8 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { slugFromEventName } from '../../utils/slug';
+import MediaField from '../../components/common/MediaField/MediaField';
+import { getMediaFieldDisplay, isDataUrl, readFileAsDataUrl, MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
 import '../../styles/invitation.css';
 
 const EVENT_TYPES = [
@@ -19,15 +21,6 @@ const EVENT_TYPES = [
 ];
 
 const STEPS = ['Event Info', 'Content', 'Publish'];
-
-function readFileAsDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
 const defaultInvitation = {
   opening_line: '',
@@ -55,6 +48,7 @@ export default function InvitationBuilder() {
   const [step, setStep] = useState(0);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState('');
+  const [fileError, setFileError] = useState('');
   const [form, setForm] = useState({
     event_name: '',
     event_type: 'wedding',
@@ -106,10 +100,15 @@ export default function InvitationBuilder() {
     });
   };
 
-  const handleFile = async (file, onValue) => {
+  const handleFile = async (file, onValue, maxSizeMb = MAX_IMAGE_SIZE_MB) => {
     if (!file) return;
-    const dataUrl = await readFileAsDataUrl(file);
-    onValue(dataUrl);
+    try {
+      const dataUrl = await readFileAsDataUrl(file, maxSizeMb);
+      onValue(dataUrl);
+      setFileError('');
+    } catch (err) {
+      setFileError(err.message || 'Could not upload file.');
+    }
   };
 
   const gallery = form.invitation.gallery?.length ? form.invitation.gallery : [{ caption: '', image: '' }];
@@ -306,20 +305,37 @@ export default function InvitationBuilder() {
           <div className="dash-grid">
             <div className="card-widget">
               <h3>Photos, Music & Video</h3>
-              <div className="form-group" style={{ marginTop: 20 }}>
-                <label>Cover Photo URL</label>
-                <input value={form.invitation.cover_image || ''} onChange={(e) => updateInvitation({ cover_image: e.target.value })} placeholder="https://..." />
-                <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateInvitation({ cover_image: value }))} />
-              </div>
-              <div className="form-group">
-                <label>Background Video URL</label>
-                <input value={form.invitation.background_video || ''} onChange={(e) => updateInvitation({ background_video: e.target.value })} placeholder="https://...mp4" />
-                <input type="file" accept="video/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateInvitation({ background_video: value }))} />
-              </div>
-              <div className="form-group">
-                <label>Music URL</label>
-                <input value={form.invitation.music_url || ''} onChange={(e) => updateInvitation({ music_url: e.target.value })} placeholder="https://...mp3" />
-                <input type="file" accept="audio/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateInvitation({ music_url: value }))} />
+              {fileError && (
+                <p style={{ color: '#DC3545', fontSize: 13, marginTop: 20 }}>{fileError}</p>
+              )}
+              <div style={{ marginTop: fileError ? 12 : 20 }}>
+                <MediaField
+                  label="Cover Photo URL"
+                  value={form.invitation.cover_image || ''}
+                  onChange={(value) => updateInvitation({ cover_image: value })}
+                  placeholder="https://..."
+                  accept="image/*"
+                  maxSizeMb={MAX_IMAGE_SIZE_MB}
+                  onError={setFileError}
+                />
+                <MediaField
+                  label="Background Video URL"
+                  value={form.invitation.background_video || ''}
+                  onChange={(value) => updateInvitation({ background_video: value })}
+                  placeholder="https://...mp4"
+                  accept="video/*"
+                  maxSizeMb={MAX_VIDEO_SIZE_MB}
+                  onError={setFileError}
+                />
+                <MediaField
+                  label="Music URL"
+                  value={form.invitation.music_url || ''}
+                  onChange={(value) => updateInvitation({ music_url: value })}
+                  placeholder="https://...mp3"
+                  accept="audio/*"
+                  maxSizeMb={MAX_AUDIO_SIZE_MB}
+                  onError={setFileError}
+                />
               </div>
             </div>
 
@@ -329,7 +345,12 @@ export default function InvitationBuilder() {
                 <div key={index} className="form-group" style={{ marginTop: index === 0 ? 20 : 0 }}>
                   <label>Photo {index + 1}</label>
                   <input value={item.caption || ''} onChange={(e) => updateGallery(index, { caption: e.target.value })} placeholder="Caption" />
-                  <input value={item.image || ''} onChange={(e) => updateGallery(index, { image: e.target.value })} placeholder="Image URL" />
+                  <input
+                    value={isDataUrl(item.image) ? getMediaFieldDisplay(item.image) : (item.image || '')}
+                    readOnly={isDataUrl(item.image)}
+                    onChange={(e) => updateGallery(index, { image: e.target.value })}
+                    placeholder="Image URL"
+                  />
                   <input type="file" accept="image/*" onChange={(e) => handleFile(e.target.files?.[0], (value) => updateGallery(index, { image: value }))} />
                 </div>
               ))}

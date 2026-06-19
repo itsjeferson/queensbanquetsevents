@@ -39,7 +39,9 @@ class InvitationPage
     public static function update(int $eventId, array $data): void
     {
         $pdo = getConnection();
+        $existing = self::findByEventId($eventId);
         $normalized = self::normalizeInput($data);
+        $normalized = self::preserveMediaFields($normalized, $existing);
         $stmt = $pdo->prepare('UPDATE invitation_pages SET template_id = ?, cover_image = ?, background_music = ?, primary_color = ?, font_family = ?, story = ?, entourage = ?, venue = ?, dress_code = ?, program = ?, gallery = ?, videos = ?, gift_registry = ?, qr_enabled = ? WHERE event_id = ?');
         $stmt->execute([
             $normalized['template_id'],
@@ -143,6 +145,39 @@ class InvitationPage
             'gift_registry' => $data['gift_registry'] ?? [],
             'qr_enabled' => $data['qr_enabled'] ?? 1,
         ];
+    }
+
+    private static function preserveMediaFields(array $normalized, ?array $existing): array
+    {
+        if (!$existing) {
+            return $normalized;
+        }
+
+        if (empty($normalized['cover_image']) && !empty($existing['cover_image'])) {
+            $normalized['cover_image'] = $existing['cover_image'];
+        }
+
+        if (empty($normalized['background_music']) && !empty($existing['music_url'])) {
+            $normalized['background_music'] = $existing['music_url'];
+        }
+
+        $incomingGallery = is_array($normalized['gallery'] ?? null) ? $normalized['gallery'] : [];
+        $hasIncomingImages = (bool) array_filter(
+            $incomingGallery,
+            fn($item) => is_array($item) && !empty($item['image'])
+        );
+
+        if (!$hasIncomingImages && !empty($existing['gallery']) && is_array($existing['gallery'])) {
+            $normalized['gallery'] = $existing['gallery'];
+        }
+
+        $story = is_array($normalized['story'] ?? null) ? $normalized['story'] : [];
+        if (empty($story['background_video']) && !empty($existing['background_video'])) {
+            $story['background_video'] = $existing['background_video'];
+            $normalized['story'] = $story;
+        }
+
+        return $normalized;
     }
 
     private static function decodeJsonFields(array $row): array

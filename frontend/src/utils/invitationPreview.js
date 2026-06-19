@@ -3,6 +3,8 @@ import {
   demoDebutInvitation,
   demoBirthdayInvitation,
 } from '../data/demoInvitation';
+import { stripLargeDataUrls } from './mediaUpload';
+import { normalizeEventDate } from './eventDate';
 
 export const STORAGE_PREFIX = 'invitation-draft';
 export const CLIENT_PREVIEW_KEY = 'client-latest-preview-slug';
@@ -19,9 +21,8 @@ function pickText(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function normalizeEventDate(dateValue, fallback) {
-  if (!dateValue) return fallback;
-  return dateValue.includes('T') ? dateValue : `${dateValue}T16:00:00`;
+function normalizeEventDateValue(dateValue, fallback) {
+  return normalizeEventDate(dateValue, fallback);
 }
 
 function cleanStory(story) {
@@ -86,7 +87,7 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       id: event.id ?? template.event.id,
       event_name: pickText(event.event_name) || 'Your Event',
       event_type: eventType,
-      event_date: normalizeEventDate(event.event_date, template.event.event_date),
+      event_date: normalizeEventDateValue(event.event_date, template.event.event_date),
       slug: pickText(event.slug) || template.event.slug,
       invite_code: pickText(event.invite_code) || template.event.invite_code,
       status: event.status || template.event.status || 'draft',
@@ -157,16 +158,32 @@ export function saveInvitationDraft({ event, invitation, guest_messages }) {
   if (typeof window === 'undefined' || !event) return;
 
   const data = { event, invitation, guest_messages: guest_messages || [] };
-  const payload = JSON.stringify(data);
+  let payload = JSON.stringify(data);
 
-  if (event.id != null) {
-    localStorage.setItem(`${STORAGE_PREFIX}-${event.id}`, payload);
-  }
-  if (event.slug) {
-    localStorage.setItem(`${STORAGE_PREFIX}-slug-${event.slug}`, payload);
-  }
-  if (event.invite_code) {
-    localStorage.setItem(`${STORAGE_PREFIX}-code-${event.invite_code}`, payload);
+  const writeDraft = (draftData) => {
+    payload = JSON.stringify(draftData);
+    if (event.id != null) {
+      localStorage.setItem(`${STORAGE_PREFIX}-${event.id}`, payload);
+    }
+    if (event.slug) {
+      localStorage.setItem(`${STORAGE_PREFIX}-slug-${event.slug}`, payload);
+    }
+    if (event.invite_code) {
+      localStorage.setItem(`${STORAGE_PREFIX}-code-${event.invite_code}`, payload);
+    }
+  };
+
+  try {
+    writeDraft(data);
+  } catch {
+    try {
+      writeDraft({
+        ...data,
+        invitation: stripLargeDataUrls(data.invitation),
+      });
+    } catch {
+      // Skip local draft if storage quota is exceeded.
+    }
   }
 }
 

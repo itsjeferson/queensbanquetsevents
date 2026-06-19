@@ -1,8 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { parseEventDate } from '../../utils/eventDate';
 
 function getTimeLeft(targetDate) {
-  const diff = new Date(targetDate) - new Date();
+  const parsed = parseEventDate(targetDate);
+  if (!parsed) {
+    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  const diff = parsed.getTime() - Date.now();
   if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
   return {
     days: Math.floor(diff / (1000 * 60 * 60 * 24)),
     hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -12,9 +19,10 @@ function getTimeLeft(targetDate) {
 }
 
 export default function Countdown({ eventDate }) {
-  const [time, setTime] = useState(getTimeLeft(eventDate));
+  const [time, setTime] = useState(() => getTimeLeft(eventDate));
 
   useEffect(() => {
+    setTime(getTimeLeft(eventDate));
     const timer = setInterval(() => setTime(getTimeLeft(eventDate)), 1000);
     return () => clearInterval(timer);
   }, [eventDate]);
