@@ -7,6 +7,8 @@ import QRShare from '../../components/invitation/QRShare';
 import InvitationPreviewModal from '../../components/invitation/InvitationPreviewModal';
 import {
   getPreviewPath,
+  getClientPreviewSlug,
+  getLocalInvitationDraft,
   saveClientPreviewSlug,
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
@@ -139,17 +141,31 @@ export default function InvitationManage({ variant = 'client' }) {
   const [saved, setSaved] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [usingLocalDraft, setUsingLocalDraft] = useState(false);
 
   useEffect(() => {
     eventService.getById(id).then((res) => {
       setEvent(res.data.event);
       setInvitation(mapInvitationFromApi(res.data.invitation));
       setLoadError(false);
+      setUsingLocalDraft(false);
     }).catch(() => {
+      const draft =
+        getLocalInvitationDraft(id)
+        || getLocalInvitationDraft(getClientPreviewSlug(user?.id));
+
+      if (draft?.event) {
+        setEvent({ ...draft.event, id: draft.event.id ?? Number(id) });
+        setInvitation(mapInvitationFromApi(draft.invitation));
+        setLoadError(false);
+        setUsingLocalDraft(true);
+        return;
+      }
+
       setEvent(null);
       setLoadError(true);
     });
-  }, [id]);
+  }, [id, user?.id]);
 
   const shareUrl = useMemo(() => {
     if (!event) return '';
@@ -211,19 +227,52 @@ export default function InvitationManage({ variant = 'client' }) {
     if (variant === 'client') saveClientPreviewSlug(user?.id, event?.slug);
     setSaved(true);
 
+    const payload = {
+      ...event,
+      client_id: user?.id,
+      invitation,
+    };
+
     try {
-      await eventService.update(id, {
-        ...event,
-        invitation,
-      });
+      if (usingLocalDraft && user?.id) {
+        const res = await eventService.create(payload);
+        const created = res.data;
+        if (!created?.id) throw new Error('Create failed');
+        await eventService.publish(created.id);
+        setEvent({ ...created, status: 'published' });
+        setUsingLocalDraft(false);
+        if (String(created.id) !== String(id)) {
+          window.location.replace(`${config.basePath}/${created.id}`);
+        }
+        return;
+      }
+
+      await eventService.update(id, payload);
       await eventService.publish(id);
       setEvent({ ...event, status: 'published' });
+      setUsingLocalDraft(false);
     } catch {
-      setEvent({ ...event, status: 'published' });
+      if (usingLocalDraft) {
+        setSaved(false);
+      } else {
+        setEvent({ ...event, status: 'published' });
+      }
     }
   };
 
-  if (loadError) return <p>Invitation not found.</p>;
+  if (loadError) {
+    return (
+      <div className="card-widget">
+        <h3>Invitation not found</h3>
+        <p style={{ marginTop: 12, color: 'var(--text-muted)' }}>
+          This invitation could not be loaded from the server. If you just published, try opening Invitation Management from the sidebar to see your events list.
+        </p>
+        <Link to="/client/invitation-manage" className="btn btn-gold" style={{ marginTop: 16 }}>
+          Back to Invitation Management
+        </Link>
+      </div>
+    );
+  }
   if (!event) return <p>Loading invitation...</p>;
 
   const gallery = invitation.gallery?.length ? invitation.gallery : [{ caption: '', image: '' }];
@@ -246,6 +295,12 @@ export default function InvitationManage({ variant = 'client' }) {
           )}
         </div>
       </div>
+
+      {usingLocalDraft && (
+        <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.45)', background: 'rgba(212,175,55,0.08)' }}>
+          Showing your locally saved draft. Click Save & Publish to sync it to the server.
+        </div>
+      )}
 
       {saved && (
         <div className="card-widget" style={{ borderColor: 'rgba(40,167,69,0.35)', background: 'rgba(40,167,69,0.06)' }}>

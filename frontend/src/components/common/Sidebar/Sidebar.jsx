@@ -2,12 +2,20 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import { adminRoleLabel, isAdminRole } from '../../../utils/roles';
 
-export default function Sidebar({ items, footerItem }) {
+export default function Sidebar({ items, footerItem, isOpen = false, onClose, onNavigate }) {
   const { user } = useAuth();
   const userIsAdmin = isAdminRole(user?.role);
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
+      <div className="sidebar-mobile-header">
+        <strong>Menu</strong>
+        {onClose && (
+          <button type="button" className="sidebar-close" onClick={onClose} aria-label="Close menu">
+            ✕
+          </button>
+        )}
+      </div>
       <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border-soft)', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div
@@ -39,6 +47,7 @@ export default function Sidebar({ items, footerItem }) {
               to={item.path}
               className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
               end={item.end}
+              onClick={onNavigate}
             >
               {item.icon && (
                 <span className="icon sidebar-icon">

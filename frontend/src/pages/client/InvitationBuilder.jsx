@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { eventService, templateService } from '../../services/invitationService';
+import { eventService } from '../../services/invitationService';
 import { useAuth } from '../../hooks/useAuth';
 import {
   buildInvitationPreviewData,
@@ -17,10 +17,14 @@ const EVENT_TYPES = [
   { value: 'corporate', label: 'Corporate', icon: '🏢' },
 ];
 
-const STEPS = ['Event Info', 'Choose Theme', 'Content', 'Publish'];
+const STEPS = ['Event Info', 'Content', 'Publish'];
 
 function slugFromEventName(name) {
-  return name.toLowerCase().replace(/\s+/g, '');
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function readFileAsDataUrl(file) {
@@ -56,7 +60,8 @@ export default function InvitationBuilder() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [templates, setTemplates] = useState([]);
+  const [publishing, setPublishing] = useState(false);
+  const [publishError, setPublishError] = useState('');
   const [form, setForm] = useState({
     event_name: '',
     event_type: 'wedding',
@@ -117,25 +122,18 @@ export default function InvitationBuilder() {
   const gallery = form.invitation.gallery?.length ? form.invitation.gallery : [{ caption: '', image: '' }];
   const firstStory = form.invitation.story?.sections?.[0] || {};
 
-  useEffect(() => {
-    templateService.getAll(form.event_type).then((res) => {
-      if (res.data?.length) setTemplates(res.data);
-    }).catch(() => {});
-  }, [form.event_type]);
-
-  const filteredTemplates = templates.filter((t) => t.category === form.event_type);
   const hasEventName = form.event_name.trim().length > 0;
   const hasEventDate = Boolean(form.event_date);
 
   const persistInvitationPreview = (eventId, slug) => {
     const previewData = buildInvitationPreviewData({
       event: {
-        id: eventId,
+        id: eventId ?? undefined,
         event_name: form.event_name,
         event_type: form.event_type,
         event_date: form.event_date,
         slug,
-        status: 'draft',
+        status: eventId ? 'published' : 'draft',
       },
       invitation: { template_id: form.template_id, ...form.invitation },
     });
@@ -144,10 +142,10 @@ export default function InvitationBuilder() {
     saveClientPreviewSlug(user?.id, slug);
   };
 
-  const handleCreate = async () => {
+  const handlePublish = async () => {
     const slug = form.slug || slugFromEventName(form.event_name);
     const eventPayload = {
-      client_id: user?.id || 1,
+      client_id: user?.id,
       event_name: form.event_name,
       event_type: form.event_type,
       event_date: form.event_date,
@@ -155,21 +153,32 @@ export default function InvitationBuilder() {
       invitation: { template_id: form.template_id, ...form.invitation },
     };
 
-    let eventId = 1;
+    setPublishing(true);
+    setPublishError('');
 
     try {
-      const res = await eventService.create(eventPayload);
-      eventId = res.data?.id || 1;
-      persistInvitationPreview(eventId, slug);
-      navigate(`/client/invitation-manage/${eventId}`);
-    } catch {
-      persistInvitationPreview(eventId, slug);
-      navigate('/client/invitation-manage/1');
-    }
-  };
+      if (!user?.id) {
+        throw new Error('You must be logged in to publish an invitation.');
+      }
 
-  const handlePublish = async () => {
-    await handleCreate();
+      const res = await eventService.create(eventPayload);
+      const created = res.data;
+      const eventId = created?.id;
+
+      if (!eventId) {
+        throw new Error('The server did not return an event ID. Please try again.');
+      }
+
+      persistInvitationPreview(eventId, slug);
+      await eventService.publish(eventId);
+      navigate(`/client/invitation-manage/${eventId}`);
+    } catch (err) {
+      persistInvitationPreview(null, slug);
+      const message = err?.message || 'Could not save your invitation to the server.';
+      setPublishError(`${message} Your content is saved locally — open Invitation Management to retry.`);
+    } finally {
+      setPublishing(false);
+    }
   };
 
   return (
@@ -187,7 +196,7 @@ export default function InvitationBuilder() {
         ))}
       </div>
 
-      {step !== 2 ? (
+      {step !== 1 ? (
       <div className="card-widget">
         {step === 0 && (
           <>
@@ -243,34 +252,12 @@ export default function InvitationBuilder() {
               </p>
             )}
             <button type="button" className="btn btn-gold" onClick={() => setStep(1)} disabled={!hasEventName}>
-              Next: Choose Theme
+              Next: Add Content
             </button>
           </>
         )}
 
-        {step === 1 && (
-          <>
-            <h3>Choose a Template</h3>
-            <div className="template-grid" style={{ marginTop: 20 }}>
-              {filteredTemplates.map((t) => (
-                <div
-                  key={t.id}
-                  className={`template-card ${form.template_id === t.id ? 'selected' : ''}`}
-                  onClick={() => setForm({ ...form, template_id: t.id })}
-                >
-                  <div className="template-preview">✦</div>
-                  <h4>{t.template_name}</h4>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-              <button type="button" className="btn btn-outline" onClick={() => setStep(0)}>Back</button>
-              <button type="button" className="btn btn-gold" onClick={() => setStep(2)}>Next: Add Content</button>
-            </div>
-          </>
-        )}
-
-        {step === 3 && (
+        {step === 2 && (
           <>
             <h3>Ready to Publish</h3>
             <div style={{ marginTop: 20, padding: 24, background: 'var(--beige)', borderRadius: 12 }}>
@@ -284,9 +271,21 @@ export default function InvitationBuilder() {
                 Go back to Event Info and select an event date before publishing.
               </p>
             )}
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-              <button type="button" className="btn btn-outline" onClick={() => setStep(2)}>Back</button>
-              <button type="button" className="btn btn-gold" onClick={handlePublish} disabled={!hasEventDate}>Save & Publish</button>
+            {publishError && (
+              <p style={{ fontSize: 13, color: '#DC3545', marginTop: 12 }}>
+                {publishError}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
+              <button type="button" className="btn btn-outline" onClick={() => setStep(1)} disabled={publishing}>Back</button>
+              <button type="button" className="btn btn-gold" onClick={handlePublish} disabled={!hasEventDate || publishing}>
+                {publishing ? 'Publishing...' : 'Save & Publish'}
+              </button>
+              {publishError && (
+                <button type="button" className="btn btn-outline" onClick={() => navigate('/client/invitation-manage')}>
+                  Open Invitation Management
+                </button>
+              )}
             </div>
           </>
         )}
@@ -414,8 +413,8 @@ export default function InvitationBuilder() {
 
           <div className="card-widget">
             <div style={{ display: 'flex', gap: 12 }}>
-              <button type="button" className="btn btn-outline" onClick={() => setStep(1)}>Back</button>
-              <button type="button" className="btn btn-gold" onClick={() => setStep(3)}>Next: Publish</button>
+              <button type="button" className="btn btn-outline" onClick={() => setStep(0)}>Back</button>
+              <button type="button" className="btn btn-gold" onClick={() => setStep(2)}>Next: Publish</button>
             </div>
           </div>
         </>

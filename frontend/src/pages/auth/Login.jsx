@@ -89,9 +89,9 @@ export default function Login() {
               </button>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, textTransform: 'none', fontWeight: 400, color: 'var(--text-muted)', cursor: 'pointer' }}>
-              <input type="checkbox" style={{ width: 'auto' }} /> Remember me
+          <div className="auth-form-meta">
+            <label>
+              <input type="checkbox" /> Remember me
             </label>
             <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--gold-dark)', fontWeight: 500 }}>Forgot password?</Link>
           </div>

@@ -29,9 +29,27 @@ class EventController
         if (empty($data['event_name']) || empty($data['event_type']) || empty($data['event_date'])) {
             sendError('event_name, event_type, and event_date are required', 400);
         }
-        $id = Event::create($data);
-        InvitationPage::create($id, $data['invitation'] ?? []);
-        sendResponse(['success' => true, 'data' => Event::find($id)], 201);
+        if (empty($data['client_id'])) {
+            sendError('client_id is required', 400);
+        }
+
+        try {
+            $id = Event::create($data);
+            InvitationPage::create($id, $data['invitation'] ?? []);
+            sendResponse(['success' => true, 'data' => Event::find($id)], 201);
+        } catch (PDOException $e) {
+            $message = $e->getMessage();
+            if (stripos($message, 'unique') !== false || stripos($message, 'duplicate') !== false) {
+                sendError('An invitation with this URL slug already exists. Use a different event name.', 409);
+            }
+            if (stripos($message, 'foreign key') !== false) {
+                sendError('Invalid client account. Please log out and log in again.', 400);
+            }
+            if (stripos($message, 'value too long') !== false) {
+                sendError('One or more fields are too large. Use image URLs instead of uploaded files for now.', 400);
+            }
+            sendError('Failed to create event', 500);
+        }
     }
 
     public function update(int $id, array $data): void

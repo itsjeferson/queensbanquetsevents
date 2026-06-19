@@ -1,6 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom';
-import PanelNavbar from '../components/common/Navbar/PanelNavbar';
-import Sidebar from '../components/common/Sidebar/Sidebar';
+import { useNavigate } from 'react-router-dom';
 import {
   BuilderIcon,
   DashboardIcon,
@@ -10,6 +8,7 @@ import {
   RsvpIcon,
 } from '../components/common/Sidebar/sidebarIcons';
 import { useAuth } from '../hooks/useAuth';
+import DashboardShell from './DashboardShell';
 
 const clientNav = [
   { path: '/client/dashboard', title: 'Dashboard', icon: DashboardIcon, end: true },
@@ -29,22 +28,14 @@ export default function ClientLayout() {
   };
 
   return (
-    <>
-      <PanelNavbar />
-      <div className="dashboard-layout">
-        <Sidebar
-          items={clientNav}
-          footerItem={
-            <button type="button" className="sidebar-item" onClick={handleSignOut}>
-              <span className="icon sidebar-icon"><LogoutIcon /></span>
-              Logout
-            </button>
-          }
-        />
-        <main className="dashboard-main">
-          <Outlet />
-        </main>
-      </div>
-    </>
+    <DashboardShell
+      navItems={clientNav}
+      footerItem={
+        <button type="button" className="sidebar-item" onClick={handleSignOut}>
+          <span className="icon sidebar-icon"><LogoutIcon /></span>
+          Logout
+        </button>
+      }
+    />
   );
 }
