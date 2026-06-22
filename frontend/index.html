@@ -44,7 +44,8 @@
         var hashPath = codeMatch
           ? '/#/i/' + decodeURIComponent(segment)
           : '/#/invite/' + decodeURIComponent(segment);
-        location.replace(location.origin + hashPath + location.search);
+        var search = location.search || '';
+        location.replace(location.origin + hashPath + search);
       })();
     </script>
     <script type="module" src="/src/app/main.jsx"></script>

@@ -6,6 +6,12 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;');
 }
 
+function isPreviewBot(userAgent) {
+  return /bot|crawl|facebookexternalhit|facebot|twitterbot|whatsapp|telegram|slack|discord|linkedin|preview|embed/i.test(
+    userAgent || '',
+  );
+}
+
 function pickCoupleName(event, invitation) {
   return (
     invitation?.couple_display_name?.trim()
@@ -27,6 +33,13 @@ function pickImage(invitation) {
   return typeof image === 'string' && image.startsWith('http') ? image : '';
 }
 
+function buildInvitePath(slug, code, guest) {
+  const guestQuery = guest ? '?guest=1' : '';
+  if (slug) return `/invite/${encodeURIComponent(slug)}${guestQuery}`;
+  if (code) return `/i/${encodeURIComponent(code)}${guestQuery}`;
+  return '/';
+}
+
 export default async function handler(req, res) {
   const slug = typeof req.query.slug === 'string' ? req.query.slug : '';
   const code = typeof req.query.code === 'string' ? req.query.code : '';
@@ -34,6 +47,14 @@ export default async function handler(req, res) {
 
   const siteUrl = (process.env.VITE_PUBLIC_SITE_URL || 'https://queensbanquetsevents.vercel.app').replace(/\/$/, '');
   const apiUrl = (process.env.VITE_API_URL || process.env.API_URL || 'https://queens-banquet-api.onrender.com').replace(/\/$/, '');
+
+  const invitePath = buildInvitePath(slug, code, guest);
+  const inviteUrl = `${siteUrl}${invitePath}`;
+  const shareUrl = slug
+    ? `${siteUrl}/share/${encodeURIComponent(slug)}${guest ? '?guest=1' : ''}`
+    : code
+      ? `${siteUrl}/share/by-code/${encodeURIComponent(code)}${guest ? '?guest=1' : ''}`
+      : siteUrl;
 
   let title = 'Wedding Invitation';
   let description = "You're invited to celebrate with us.";
@@ -61,17 +82,16 @@ export default async function handler(req, res) {
     // Fall back to generic preview copy.
   }
 
-  const redirectParams = new URLSearchParams();
-  if (slug) redirectParams.set('open', slug);
-  if (code) redirectParams.set('code', code);
-  if (guest) redirectParams.set('guest', guest);
-  const redirectUrl = `${siteUrl}/?${redirectParams.toString()}`;
-  const shareUrl = slug
-    ? `${siteUrl}/share/${encodeURIComponent(slug)}${guest ? '?guest=1' : ''}`
-    : code
-      ? `${siteUrl}/share/by-code/${encodeURIComponent(code)}${guest ? '?guest=1' : ''}`
-      : siteUrl;
+  const userAgent = req.headers['user-agent'] || '';
 
+  // Guests: server redirect straight to the invitation path (no ?open= hop).
+  if (!isPreviewBot(userAgent)) {
+    res.writeHead(302, { Location: inviteUrl });
+    res.end();
+    return;
+  }
+
+  // Link-preview crawlers: HTML with Open Graph tags only.
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,12 +108,10 @@ export default async function handler(req, res) {
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   ${image ? `<meta name="twitter:image" content="${escapeHtml(image)}" />` : ''}
-  <meta http-equiv="refresh" content="0;url=${escapeHtml(redirectUrl)}" />
-  <script>location.replace(${JSON.stringify(redirectUrl)})</script>
 </head>
 <body>
-  <p>Opening invitation for ${escapeHtml(title)}…</p>
-  <p><a href="${escapeHtml(redirectUrl)}">Continue to invitation</a></p>
+  <p>${escapeHtml(title)}</p>
+  <p><a href="${escapeHtml(inviteUrl)}">Open invitation</a></p>
 </body>
 </html>`;
 
