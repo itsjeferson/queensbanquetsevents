@@ -79,11 +79,11 @@ export default function InvitationExperienceSettings({
               name="content_reveal_mode"
               value="full"
               checked={revealMode === 'full'}
-              onChange={() => onChange({ content_reveal_mode: 'full' })}
+              onChange={() => onChange({ content_reveal_mode: 'full', content_reveal_order: [] })}
             />
             <span>
               <strong>Show full content at once</strong>
-              <small>All sections appear immediately after opening (current default).</small>
+              <small>Every section appears immediately after opening — no scroll fade-in.</small>
             </span>
           </label>
           <label className="inv-settings-radio">

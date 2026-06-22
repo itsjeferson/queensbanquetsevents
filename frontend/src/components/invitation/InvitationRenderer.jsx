@@ -6,6 +6,7 @@ import { FloralThemeProvider } from './FloralThemeContext';
 import { normalizeInvitationContent, getCoupleDisplayName } from '../../utils/invitationContent';
 import {
   getVisibleContentRevealOrder,
+  resolveInvitationSectionOrder,
 } from '../../utils/contentReveal';
 import {
   buildInvitationThemeCss,
@@ -67,7 +68,7 @@ export default function InvitationRenderer({
   const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
   const revealOptions = { hideRsvp: saveTheDateEnabled };
-  const sectionOrder = getVisibleContentRevealOrder(invitation.content_reveal_order, revealOptions);
+  const sectionOrder = resolveInvitationSectionOrder(invitation, revealOptions);
   const unlockContext = useMemo(
     () => (routeIdentifier ? { ...event, routeIdentifier } : event),
     [event, routeIdentifier],

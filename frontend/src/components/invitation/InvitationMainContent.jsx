@@ -209,8 +209,9 @@ export default function InvitationMainContent({
       {sectionOrder.map((sectionId, index) => {
         const section = renderInvitationSection(sectionId, {
           ...sectionCtx,
-          animateHero: index === 0,
-          animateEntry: gradualReveal ? index > 0 : true,
+          gradualReveal,
+          animateHero: gradualReveal && index === 0,
+          animateEntry: gradualReveal && index > 0,
         });
         if (!section) return null;
         return <div key={sectionId}>{section}</div>;

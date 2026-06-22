@@ -296,7 +296,9 @@ export function normalizeInvitationContent(invitation = {}) {
     std_cover_image: invitation.std_cover_image || '',
     std_photo: invitation.std_photo || invitation.std_cover_image || '',
     std_location: invitation.std_location || '',
-    content_reveal_mode: invitation.content_reveal_mode === 'gradual' ? 'gradual' : 'full',
+    content_reveal_mode: (invitation.content_reveal_mode ?? invitation.story?.content_reveal_mode) === 'gradual'
+      ? 'gradual'
+      : 'full',
     content_reveal_order: Array.isArray(invitation.content_reveal_order)
       ? invitation.content_reveal_order
       : [],

@@ -92,6 +92,14 @@ export function moveContentRevealSection(order, sectionId, direction, options = 
   return updated;
 }
 
+export function resolveInvitationSectionOrder(invitation = {}, options = {}) {
+  const gradual = invitation.content_reveal_mode === 'gradual';
+  if (gradual) {
+    return getVisibleContentRevealOrder(invitation.content_reveal_order, options);
+  }
+  return getDefaultContentRevealOrder(options);
+}
+
 export function getContentRevealSectionLabel(sectionId) {
   return CONTENT_REVEAL_SECTIONS.find((section) => section.id === sectionId)?.label || sectionId;
 }
