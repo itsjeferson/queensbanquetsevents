@@ -40,7 +40,7 @@ function buildInvitePath(slug, code, guest) {
   return '/';
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const slug = typeof req.query.slug === 'string' ? req.query.slug : '';
   const code = typeof req.query.code === 'string' ? req.query.code : '';
   const guest = req.query.guest === '1' ? '1' : '';
@@ -84,14 +84,12 @@ export default async function handler(req, res) {
 
   const userAgent = req.headers['user-agent'] || '';
 
-  // Guests: server redirect straight to the invitation path (no ?open= hop).
   if (!isPreviewBot(userAgent)) {
     res.writeHead(302, { Location: inviteUrl });
     res.end();
     return;
   }
 
-  // Link-preview crawlers: HTML with Open Graph tags only.
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,4 +116,4 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
   res.status(200).send(html);
-}
+};

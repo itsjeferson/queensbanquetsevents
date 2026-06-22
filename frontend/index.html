@@ -11,6 +11,37 @@
     <div id="root"></div>
     <script>
       (function () {
+        var path = location.pathname;
+        var search = location.search || '';
+
+        function go(hashPath) {
+          location.replace(location.origin + hashPath + search);
+        }
+
+        var shareCodeMatch = path.match(/^\/share\/by-code\/([^/]+)\/?$/);
+        if (shareCodeMatch) {
+          go('/#/i/' + decodeURIComponent(shareCodeMatch[1]));
+          return;
+        }
+
+        var shareSlugMatch = path.match(/^\/share\/([^/]+)\/?$/);
+        if (shareSlugMatch) {
+          go('/#/invite/' + decodeURIComponent(shareSlugMatch[1]));
+          return;
+        }
+
+        var inviteMatch = path.match(/^\/(?:invite|invitation)\/([^/]+)\/?$/);
+        if (inviteMatch) {
+          go('/#/invite/' + decodeURIComponent(inviteMatch[1]));
+          return;
+        }
+
+        var codeMatch = path.match(/^\/i\/([^/]+)\/?$/);
+        if (codeMatch) {
+          go('/#/i/' + decodeURIComponent(codeMatch[1]));
+          return;
+        }
+
         if (location.hash && location.hash.length > 2) return;
 
         var params = new URLSearchParams(location.search);
@@ -32,20 +63,7 @@
           location.replace(
             location.origin + '/#/i/' + encodeURIComponent(code) + (codeTail ? '?' + codeTail : ''),
           );
-          return;
         }
-
-        var path = location.pathname;
-        var inviteMatch = path.match(/^\/(?:invite|invitation)\/([^/]+)\/?$/);
-        var codeMatch = path.match(/^\/i\/([^/]+)\/?$/);
-        var segment = inviteMatch ? inviteMatch[1] : codeMatch ? codeMatch[1] : null;
-        if (!segment) return;
-
-        var hashPath = codeMatch
-          ? '/#/i/' + decodeURIComponent(segment)
-          : '/#/invite/' + decodeURIComponent(segment);
-        var search = location.search || '';
-        location.replace(location.origin + hashPath + search);
       })();
     </script>
     <script type="module" src="/src/app/main.jsx"></script>
