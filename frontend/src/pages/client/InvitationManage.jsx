@@ -508,7 +508,11 @@ export default function InvitationManage({ variant = 'client' }) {
         </div>
       </div>
 
-      <InvitationExperienceSettings invitation={invitation} onChange={updateInvitation} />
+      <InvitationExperienceSettings
+        invitation={invitation}
+        onChange={updateInvitation}
+        onFileError={setFileError}
+      />
 
       <WeddingContentFields
         invitation={invitation}

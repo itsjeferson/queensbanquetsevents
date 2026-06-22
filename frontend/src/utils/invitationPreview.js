@@ -92,7 +92,7 @@ function hasAttireDetails(attire, dressCode) {
 
 function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors'];
+  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo'];
 
   fields.forEach((field) => {
     if (draftInvitation[field] !== undefined && draftInvitation[field] !== null) {
@@ -105,7 +105,7 @@ function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
 
 function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['save_the_date_enabled', 'std_message', 'std_cover_image', 'std_location', 'content_reveal_mode'];
+  const fields = ['save_the_date_enabled', 'std_message', 'std_cover_image', 'std_photo', 'std_location', 'content_reveal_mode', 'content_reveal_order'];
 
   fields.forEach((field) => {
     if (field in draftInvitation) {
@@ -257,8 +257,10 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       save_the_date_enabled: normalized.save_the_date_enabled,
       std_message: pickText(invitation.std_message) || normalized.std_message,
       std_cover_image: pickText(invitation.std_cover_image) || normalized.std_cover_image,
+      std_photo: pickText(invitation.std_photo) || pickText(invitation.std_cover_image) || normalized.std_photo,
       std_location: pickText(invitation.std_location) || normalized.std_location,
       content_reveal_mode: normalized.content_reveal_mode,
+      content_reveal_order: normalized.content_reveal_order,
       ...themeFields,
     },
     guest_messages: guest_messages || [],

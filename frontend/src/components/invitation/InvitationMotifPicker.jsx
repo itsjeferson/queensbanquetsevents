@@ -44,7 +44,7 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
     <div className="card-widget">
       <h3>Color Motif</h3>
       <p className="form-help" style={{ marginTop: 12 }}>
-        Choose a palette for your invitation. Custom colors start white — set each role below for headings, backgrounds, accents, and florals.
+        Choose a palette for your invitation page. Save the Date uses a fixed look and is not affected by these colors.
       </p>
 
       <div className="inv-motif-grid">

@@ -277,6 +277,7 @@ export default function InvitationBuilder() {
             <InvitationExperienceSettings
               invitation={form.invitation}
               onChange={(patch) => updateInvitation(patch)}
+              onFileError={setFileError}
               embedded
             />
             <div style={{ marginTop: 20, padding: 24, background: 'var(--beige)', borderRadius: 12 }}>

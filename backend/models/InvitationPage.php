@@ -122,8 +122,10 @@ class InvitationPage
             'save_the_date_enabled' => (bool) ($story['save_the_date_enabled'] ?? false),
             'std_message' => $story['std_message'] ?? '',
             'std_cover_image' => $story['std_cover_image'] ?? '',
+            'std_photo' => $story['std_photo'] ?? ($story['std_cover_image'] ?? ''),
             'std_location' => $story['std_location'] ?? '',
             'content_reveal_mode' => ($story['content_reveal_mode'] ?? 'full') === 'gradual' ? 'gradual' : 'full',
+            'content_reveal_order' => is_array($story['content_reveal_order'] ?? null) ? $story['content_reveal_order'] : [],
             'published_at' => $row['published_at'] ?? null,
         ];
     }
@@ -168,10 +170,14 @@ class InvitationPage
         $story['save_the_date_enabled'] = (bool) ($data['save_the_date_enabled'] ?? ($story['save_the_date_enabled'] ?? false));
         $story['std_message'] = $data['std_message'] ?? ($story['std_message'] ?? '');
         $story['std_cover_image'] = $data['std_cover_image'] ?? ($story['std_cover_image'] ?? '');
+        $story['std_photo'] = $data['std_photo'] ?? ($data['std_cover_image'] ?? ($story['std_photo'] ?? ($story['std_cover_image'] ?? '')));
         $story['std_location'] = $data['std_location'] ?? ($story['std_location'] ?? '');
         $story['content_reveal_mode'] = ($data['content_reveal_mode'] ?? ($story['content_reveal_mode'] ?? 'full')) === 'gradual'
             ? 'gradual'
             : 'full';
+        if (isset($data['content_reveal_order']) && is_array($data['content_reveal_order'])) {
+            $story['content_reveal_order'] = array_values(array_slice($data['content_reveal_order'], 0, 20));
+        }
 
         return [
             'template_id' => $data['template_id'] ?? null,
@@ -218,6 +224,14 @@ class InvitationPage
         $story = is_array($normalized['story'] ?? null) ? $normalized['story'] : [];
         if (empty($story['background_video']) && !empty($existing['background_video'])) {
             $story['background_video'] = $existing['background_video'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['std_photo']) && !empty($existing['std_photo'])) {
+            $story['std_photo'] = $existing['std_photo'];
+            $normalized['story'] = $story;
+        } elseif (empty($story['std_photo']) && !empty($existing['std_cover_image'])) {
+            $story['std_photo'] = $existing['std_cover_image'];
             $normalized['story'] = $story;
         }
 

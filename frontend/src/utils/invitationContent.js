@@ -106,8 +106,10 @@ export const defaultWeddingInvitationContent = {
   save_the_date_enabled: false,
   std_message: '',
   std_cover_image: '',
+  std_photo: '',
   std_location: '',
   content_reveal_mode: 'full',
+  content_reveal_order: [],
 };
 
 function asList(value) {
@@ -247,6 +249,12 @@ export function prepareInvitationForApiSave(invitation) {
     };
   });
 
+  const stdPhoto = invitation.std_photo || invitation.std_cover_image;
+  if (canPersistMediaUrl(stdPhoto, VENUE_IMAGE_SAVE_MAX_CHARS)) {
+    stripped.std_photo = stdPhoto;
+    stripped.std_cover_image = stdPhoto;
+  }
+
   return {
     ...stripped,
     entourage: cleanEntourageLists(stripped.entourage),
@@ -286,8 +294,12 @@ export function normalizeInvitationContent(invitation = {}) {
     save_the_date_enabled: Boolean(invitation.save_the_date_enabled),
     std_message: invitation.std_message || '',
     std_cover_image: invitation.std_cover_image || '',
+    std_photo: invitation.std_photo || invitation.std_cover_image || '',
     std_location: invitation.std_location || '',
     content_reveal_mode: invitation.content_reveal_mode === 'gradual' ? 'gradual' : 'full',
+    content_reveal_order: Array.isArray(invitation.content_reveal_order)
+      ? invitation.content_reveal_order
+      : [],
     ...resolveInvitationThemeFields(themeInput),
   };
 }
@@ -296,10 +308,17 @@ export function getCoupleDisplayName(event, invitation) {
   return invitation.couple_display_name?.trim() || event?.event_name?.trim() || 'Our Wedding';
 }
 
+export function splitCoupleDisplayName(name = '') {
+  return name
+    .trim()
+    .split(/\s*&\s*|\s+and\s+|\s+\+\s+/i)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
 export function getCoupleInitials(event, invitation) {
   if (invitation.couple_initials?.trim()) return invitation.couple_initials.trim();
-  const name = getCoupleDisplayName(event, invitation);
-  const parts = name.split(/\s*&\s*|\s+and\s+/i).map((part) => part.trim()).filter(Boolean);
+  const parts = splitCoupleDisplayName(getCoupleDisplayName(event, invitation));
   if (parts.length >= 2) {
     return `${parts[0][0] || ''}&${parts[1][0] || ''}`.toUpperCase();
   }

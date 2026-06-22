@@ -1,6 +1,19 @@
-export default function InvitationExperienceSettings({ invitation, onChange, embedded = false }) {
+import ContentRevealOrderEditor from './ContentRevealOrderEditor';
+import MediaField from '../common/MediaField/MediaField';
+import { MAX_IMAGE_SIZE_MB } from '../../utils/mediaUpload';
+import { normalizeContentRevealOrder } from '../../utils/contentReveal';
+
+export default function InvitationExperienceSettings({
+  invitation,
+  onChange,
+  embedded = false,
+  onFileError,
+}) {
   const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const revealMode = invitation.content_reveal_mode === 'gradual' ? 'gradual' : 'full';
+  const revealOrder = normalizeContentRevealOrder(invitation.content_reveal_order, {
+    hideRsvp: saveTheDateEnabled,
+  });
 
   const content = (
     <div className="inv-guest-experience">
@@ -19,7 +32,7 @@ export default function InvitationExperienceSettings({ invitation, onChange, emb
           <span>
             <strong>Save the Date first</strong>
             <small>
-              Guests see couple name, wedding date, countdown, and RSVP before the full invitation unlocks.
+              Guests see the date, couple name, location, photo, and RSVP before the full invitation unlocks.
             </small>
           </span>
         </label>
@@ -28,21 +41,32 @@ export default function InvitationExperienceSettings({ invitation, onChange, emb
       {saveTheDateEnabled && (
         <>
           <div className="form-group">
-            <label>Tagline (below wreath)</label>
+            <label>Save the Date heading</label>
             <input
               value={invitation.std_message || ''}
               onChange={(e) => onChange({ std_message: e.target.value })}
-              placeholder="For the wedding of"
+              placeholder="Save the Date"
             />
           </div>
           <div className="form-group">
-            <label>Save the Date cover image URL (optional)</label>
+            <label>Location</label>
             <input
-              value={invitation.std_cover_image || ''}
-              onChange={(e) => onChange({ std_cover_image: e.target.value })}
-              placeholder="Leave blank to use invitation cover image"
+              value={invitation.std_location || ''}
+              onChange={(e) => onChange({ std_location: e.target.value })}
+              placeholder="San Antonio, Texas"
             />
           </div>
+          <MediaField
+            label="Couple photo"
+            urlLabel="Online photo URL"
+            placeholder="https://example.com/couple-photo.jpg"
+            urlHint="Paste a direct link to a couple photo, or upload a file from your device."
+            value={invitation.std_photo || invitation.std_cover_image || ''}
+            onChange={(value) => onChange({ std_photo: value, std_cover_image: value })}
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={onFileError}
+          />
         </>
       )}
 
@@ -72,10 +96,17 @@ export default function InvitationExperienceSettings({ invitation, onChange, emb
             />
             <span>
               <strong>Show content gradually</strong>
-              <small>Sections fade in one by one as guests scroll.</small>
+              <small>Sections unlock one at a time in your chosen order, then the full invitation appears.</small>
             </span>
           </label>
         </div>
+        {revealMode === 'gradual' && (
+          <ContentRevealOrderEditor
+            order={revealOrder}
+            hideRsvp={saveTheDateEnabled}
+            onChange={(content_reveal_order) => onChange({ content_reveal_order })}
+          />
+        )}
       </div>
     </div>
   );
