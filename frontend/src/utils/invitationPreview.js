@@ -205,7 +205,6 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       gallery: gallery.length ? gallery : templateInv.gallery,
       program: program.length ? program : normalized.program,
       videos: (invitation.videos || []).filter((item) => pickText(item?.url)),
-      entourage: invitation.entourage || templateInv.entourage,
       faqs: (invitation.faqs || []).filter((item) => pickText(item?.question)),
       gift_registry: giftPreferences || paymentDetails
         ? {

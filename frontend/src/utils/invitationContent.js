@@ -1,4 +1,5 @@
 import { resolveInvitationThemeFields, extractInvitationThemeInput } from './invitationTheme';
+import { stripLargeDataUrls } from './mediaUpload';
 
 export const defaultGroomProfile = () => ({
   name: '',
@@ -180,6 +181,58 @@ function mergeEntourage(entourage) {
     ring_bearer: asList(entourage.ring_bearer),
     coin_bearer: asList(entourage.coin_bearer),
     flower_girls: asList(entourage.flower_girls),
+  };
+}
+
+function cleanEntourageLists(entourage) {
+  if (!entourage || typeof entourage !== 'object') return entourage;
+
+  const listKeys = [
+    'best_men',
+    'maid_of_honor',
+    'groomsmen',
+    'bridesmaids',
+    'bible_bearer',
+    'ring_bearer',
+    'coin_bearer',
+    'flower_girls',
+  ];
+  const cleaned = { ...entourage };
+
+  listKeys.forEach((key) => {
+    if (key in cleaned) cleaned[key] = asList(cleaned[key]);
+  });
+
+  if (cleaned.groom) {
+    cleaned.groom = { ...cleaned.groom, parents: asList(cleaned.groom.parents) };
+  }
+  if (cleaned.bride) {
+    cleaned.bride = { ...cleaned.bride, parents: asList(cleaned.bride.parents) };
+  }
+  if (cleaned.principal_sponsors && !Array.isArray(cleaned.principal_sponsors)) {
+    cleaned.principal_sponsors = {
+      male: asList(cleaned.principal_sponsors.male),
+      female: asList(cleaned.principal_sponsors.female),
+    };
+  }
+  if (cleaned.secondary_sponsors && !Array.isArray(cleaned.secondary_sponsors)) {
+    cleaned.secondary_sponsors = {
+      candle: asList(cleaned.secondary_sponsors.candle),
+      veil: asList(cleaned.secondary_sponsors.veil),
+      cord: asList(cleaned.secondary_sponsors.cord),
+    };
+  }
+
+  return cleaned;
+}
+
+/** Strip embedded media blobs so text updates (entourage, etc.) can sync to the API. */
+export function prepareInvitationForApiSave(invitation) {
+  if (!invitation) return invitation;
+  const stripped = stripLargeDataUrls(invitation);
+  return {
+    ...stripped,
+    entourage: cleanEntourageLists(stripped.entourage),
   };
 }
 

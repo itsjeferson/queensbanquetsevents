@@ -14,7 +14,7 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
-import { normalizeInvitationContent } from '../../utils/invitationContent';
+import { normalizeInvitationContent, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
@@ -262,7 +262,7 @@ export default function InvitationManage({ variant = 'client' }) {
     const payload = {
       ...normalizedEvent,
       client_id: user?.id,
-      invitation,
+      invitation: prepareInvitationForApiSave(invitation),
     };
 
     try {

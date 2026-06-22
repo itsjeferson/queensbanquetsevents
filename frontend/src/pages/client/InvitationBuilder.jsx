@@ -9,7 +9,7 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { slugFromEventName } from '../../utils/slug';
-import { defaultWeddingInvitationContent, normalizeInvitationContent } from '../../utils/invitationContent';
+import { defaultWeddingInvitationContent, normalizeInvitationContent, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
@@ -150,7 +150,7 @@ export default function InvitationBuilder() {
       event_type: form.event_type,
       event_date: form.event_date,
       slug,
-      invitation: { template_id: form.template_id, ...form.invitation },
+      invitation: prepareInvitationForApiSave({ template_id: form.template_id, ...form.invitation }),
     };
 
     setPublishing(true);
