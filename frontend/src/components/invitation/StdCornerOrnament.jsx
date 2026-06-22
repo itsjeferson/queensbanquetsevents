@@ -13,10 +13,15 @@ function Leaf({ cx, cy, rotate, gradId }) {
   );
 }
 
-export default function StdCornerOrnament({ className = '' }) {
+export default function StdCornerOrnament({ className = '', floralTheme = null }) {
+  const bloom = floralTheme?.bloom || 'var(--inv-floral-bloom, var(--inv-primary))';
+  const bloomSoft = floralTheme?.bloomSoft || 'var(--inv-floral-bloom-soft, var(--inv-primary))';
+  const leaf = floralTheme?.leaf || 'var(--inv-floral-leaf, var(--inv-primary-dark))';
+  const leafSoft = floralTheme?.leafSoft || 'var(--inv-floral-leaf-soft, var(--inv-primary-dark))';
   const uid = useId().replace(/:/g, '');
-  const bloomGrad = `std-bloom-${uid}`;
-  const leafGrad = `std-leaf-${uid}`;
+  const colorKey = `${bloom}-${leaf}`.replace(/[^a-zA-Z0-9]/g, '');
+  const bloomGrad = `std-bloom-${uid}-${colorKey}`;
+  const leafGrad = `std-leaf-${uid}-${colorKey}`;
 
   return (
     <svg
@@ -28,12 +33,12 @@ export default function StdCornerOrnament({ className = '' }) {
     >
       <defs>
         <linearGradient id={bloomGrad} x1="0.15" y1="0.05" x2="0.85" y2="0.95">
-          <stop offset="0%" stopColor="var(--inv-floral-bloom, var(--inv-primary))" stopOpacity="0.95" />
-          <stop offset="100%" stopColor="var(--inv-floral-bloom-soft, var(--inv-primary))" stopOpacity="0.72" />
+          <stop offset="0%" stopColor={bloom} stopOpacity="0.95" />
+          <stop offset="100%" stopColor={bloomSoft} stopOpacity="0.72" />
         </linearGradient>
         <linearGradient id={leafGrad} x1="0" y1="0.2" x2="1" y2="0.9">
-          <stop offset="0%" stopColor="var(--inv-floral-leaf, var(--inv-primary-dark))" stopOpacity="0.92" />
-          <stop offset="100%" stopColor="var(--inv-floral-leaf-soft, var(--inv-primary-dark))" stopOpacity="0.78" />
+          <stop offset="0%" stopColor={leaf} stopOpacity="0.92" />
+          <stop offset="100%" stopColor={leafSoft} stopOpacity="0.78" />
         </linearGradient>
       </defs>
 
@@ -85,7 +90,7 @@ export default function StdCornerOrnament({ className = '' }) {
         cx="98"
         cy="28"
         r="4.5"
-        fill="var(--inv-floral-leaf, var(--inv-primary-dark))"
+        fill={leaf}
         opacity="0.35"
       />
     </svg>

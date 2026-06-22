@@ -1,3 +1,18 @@
+import { normalizeColorToHex } from './colorInput';
+
+export const PALETTE_COLOR_COUNT = 6;
+export const ATTIRE_COLOR_COUNT = 4;
+export const PALETTE_DEFAULT_COLOR = '#FFFFFF';
+
+export const PALETTE_COLOR_LABELS = [
+  'Headings',
+  'Background',
+  'Section Background',
+  'Accent',
+  'Floral Bloom',
+  'Floral Detail',
+];
+
 export const INVITATION_MOTIFS = [
   {
     id: 'classic-gold',
@@ -58,12 +73,20 @@ export const INVITATION_MOTIFS = [
   {
     id: 'custom',
     name: 'Custom Colors',
-    primary_color: '#B47B36',
-    secondary_color: '#F4EEE7',
-    background_color: '#FFFAF5',
-    accent_colors: ['#F4EEE7', '#D4AF37', '#C27691', '#8B4513'],
+    primary_color: PALETTE_DEFAULT_COLOR,
+    secondary_color: PALETTE_DEFAULT_COLOR,
+    background_color: PALETTE_DEFAULT_COLOR,
+    accent_colors: [PALETTE_DEFAULT_COLOR, PALETTE_DEFAULT_COLOR, PALETTE_DEFAULT_COLOR, PALETTE_DEFAULT_COLOR],
   },
 ];
+
+function padPalette(colors = [], fallback = PALETTE_DEFAULT_COLOR, count = PALETTE_COLOR_COUNT) {
+  const padded = colors.length >= count
+    ? colors.slice(0, count)
+    : [...colors, ...Array(count - colors.length).fill(fallback)].slice(0, count);
+
+  return padded.map((color) => normalizeColorToHex(color || fallback, fallback));
+}
 
 function parseHex(hex) {
   const value = String(hex || '').replace('#', '').trim();
@@ -100,59 +123,137 @@ export function getMotifById(motifId) {
   return INVITATION_MOTIFS.find((motif) => motif.id === motifId) || INVITATION_MOTIFS[0];
 }
 
+export function getMotifPaletteColors(motif) {
+  return padPalette([
+    motif.primary_color,
+    motif.background_color,
+    motif.secondary_color,
+    motif.accent_colors[1] || motif.primary_color,
+    motif.accent_colors[2] || motif.primary_color,
+    motif.accent_colors[3] || motif.primary_color,
+  ]);
+}
+
+export function getMotifPreviewColors(motif) {
+  return getMotifPaletteColors(motif);
+}
+
+export function resolveInvitationPalette(invitation = {}, motif = getMotifById(invitation.color_motif || 'classic-gold')) {
+  if (Array.isArray(invitation.palette_colors) && invitation.palette_colors.length >= PALETTE_COLOR_COUNT) {
+    return padPalette(invitation.palette_colors);
+  }
+
+  if ((invitation.color_motif || 'classic-gold') === 'custom') {
+    return padPalette([
+      invitation.primary_color,
+      invitation.background_color,
+      invitation.secondary_color,
+      invitation.palette_colors?.[3],
+      invitation.palette_colors?.[4],
+      invitation.palette_colors?.[5],
+    ]);
+  }
+
+  return getMotifPaletteColors(motif);
+}
+
+export function getFloralThemeColors(invitation = {}) {
+  const styles = getInvitationThemeStyles(invitation);
+  return {
+    bloom: styles['--inv-floral-bloom'],
+    bloomSoft: styles['--inv-floral-bloom-soft'],
+    leaf: styles['--inv-floral-leaf'],
+    leafSoft: styles['--inv-floral-leaf-soft'],
+    line: styles['--inv-floral-line'],
+  };
+}
+
 export function applyMotifToInvitation(invitation, motifId) {
   const motif = getMotifById(motifId);
 
   if (motifId === 'custom') {
-    return {
-      color_motif: 'custom',
-      primary_color: invitation.primary_color || motif.primary_color,
-      secondary_color: invitation.secondary_color || motif.secondary_color,
-      background_color: invitation.background_color || motif.background_color,
-    };
+    const palette = Array.isArray(invitation.palette_colors) && invitation.palette_colors.length >= PALETTE_COLOR_COUNT
+      ? getInvitationPaletteColors(invitation, motif)
+      : Array(PALETTE_COLOR_COUNT).fill(PALETTE_DEFAULT_COLOR);
+    return applyCustomPaletteColors(invitation, palette);
   }
+
+  const palette = getMotifPaletteColors(motif);
 
   return {
     color_motif: motif.id,
-    primary_color: motif.primary_color,
-    secondary_color: motif.secondary_color,
-    background_color: motif.background_color,
+    primary_color: palette[0],
+    background_color: palette[1],
+    secondary_color: palette[2],
+    palette_colors: palette,
     attire: {
       ...(invitation.attire || {}),
       ladies_colors: [...motif.accent_colors],
       gentlemen_colors: [...motif.accent_colors],
+      color_baseline: [...motif.accent_colors],
     },
   };
+}
+
+export function getInvitationPaletteColors(invitation = {}, fallbackMotif = getMotifById('classic-gold')) {
+  return resolveInvitationPalette(invitation, fallbackMotif);
+}
+
+/** @deprecated Use getInvitationPaletteColors */
+export function getCustomPaletteColors(invitation = {}, fallbackMotif = getMotifById('classic-gold')) {
+  return getInvitationPaletteColors(invitation, fallbackMotif);
+}
+
+export function applyCustomPaletteColors(invitation = {}, colors = []) {
+  const palette = padPalette(colors, PALETTE_DEFAULT_COLOR);
+
+  return {
+    color_motif: 'custom',
+    primary_color: palette[0],
+    background_color: palette[1],
+    secondary_color: palette[2],
+    palette_colors: palette,
+  };
+}
+
+export function getAttireColorBaseline(invitation = {}) {
+  const stored = invitation.attire?.color_baseline;
+  if (Array.isArray(stored) && stored.filter(Boolean).length >= ATTIRE_COLOR_COUNT) {
+    return stored.slice(0, ATTIRE_COLOR_COUNT).map((color) => normalizeColorToHex(color));
+  }
+
+  const motifId = invitation.color_motif || 'classic-gold';
+  const motif = getMotifById(motifId);
+  return motif.accent_colors.slice(0, ATTIRE_COLOR_COUNT).map((color) => normalizeColorToHex(color));
+}
+
+/** Only colors the client changed from the saved baseline should appear on the invitation. */
+export function getCustomizedAttireColors(colors = [], invitation = {}) {
+  if (!Array.isArray(colors)) return [];
+
+  const baseline = getAttireColorBaseline(invitation);
+  return colors
+    .slice(0, ATTIRE_COLOR_COUNT)
+    .filter((color, index) => {
+      if (!color?.trim()) return false;
+      return normalizeColorToHex(color) !== normalizeColorToHex(baseline[index] || '');
+    });
 }
 
 export function getInvitationTheme(invitation = {}) {
   const motifId = invitation.color_motif || 'classic-gold';
   const motif = getMotifById(motifId);
-
-  if (motifId !== 'custom') {
-    const primary = motif.primary_color;
-    return {
-      primary,
-      secondary: motif.secondary_color,
-      background: motif.background_color,
-      primary_dark: darkenHex(primary, 0.18),
-      accent_colors: invitation.attire?.ladies_colors?.length
-        ? invitation.attire.ladies_colors
-        : motif.accent_colors,
-    };
-  }
-
-  const primary = invitation.primary_color || motif.primary_color;
-  const secondary = invitation.secondary_color || motif.secondary_color;
-  const background = invitation.background_color || motif.background_color;
+  const palette = resolveInvitationPalette(invitation, motif);
+  const primary = palette[0] || motif.primary_color;
 
   return {
     primary,
-    secondary,
-    background,
+    secondary: palette[2] || motif.secondary_color,
+    background: palette[1] || motif.background_color,
     primary_dark: darkenHex(primary, 0.18),
+    palette,
     accent_colors: invitation.attire?.ladies_colors?.length
-      ? invitation.attire.ladies_colors
+      ? invitation.attire.ladies_colors.slice(0, ATTIRE_COLOR_COUNT)
       : motif.accent_colors,
   };
 }
@@ -164,16 +265,17 @@ export function extractInvitationThemeInput(invitation = {}) {
     primary_color: invitation.primary_color,
     secondary_color: invitation.secondary_color || story.secondary_color,
     background_color: invitation.background_color || story.background_color,
+    palette_colors: invitation.palette_colors,
   };
 }
 
 export function getInvitationThemeStyles(invitation = {}) {
   const themeInput = extractInvitationThemeInput(invitation);
   const theme = getInvitationTheme({ ...invitation, ...themeInput });
+  const palette = theme.palette || resolveInvitationPalette({ ...invitation, ...themeInput });
   const rgb = parseHex(theme.primary);
-  const accents = theme.accent_colors || [];
-  const bloom = accents[2] || theme.primary;
-  const leaf = accents[3] || theme.primary_dark;
+  const bloom = palette[4] || theme.primary;
+  const leaf = palette[5] || theme.primary_dark;
 
   return {
     '--inv-primary': theme.primary,
@@ -189,7 +291,7 @@ export function getInvitationThemeStyles(invitation = {}) {
     '--inv-floral-bloom-soft': rgbaFromHex(bloom, 0.62),
     '--inv-floral-leaf': leaf,
     '--inv-floral-leaf-soft': rgbaFromHex(leaf, 0.72),
-    '--inv-floral-line': theme.primary,
+    '--inv-floral-line': palette[3] || theme.primary,
     background: theme.background,
   };
 }
@@ -205,10 +307,13 @@ export function buildInvitationThemeCss(invitation = {}) {
 export function resolveInvitationThemeFields(invitation = {}) {
   const themeInput = extractInvitationThemeInput(invitation);
   const theme = getInvitationTheme({ ...invitation, ...themeInput });
+  const palette = theme.palette || resolveInvitationPalette({ ...invitation, ...themeInput });
+
   return {
     color_motif: themeInput.color_motif || 'classic-gold',
     primary_color: theme.primary,
     secondary_color: theme.secondary,
     background_color: theme.background,
+    palette_colors: palette,
   };
 }

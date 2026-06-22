@@ -1,32 +1,9 @@
 import MediaField from '../common/MediaField/MediaField';
+import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
 import { MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
 import { defaultAttire, defaultEntourage } from '../../utils/invitationContent';
 import EntourageNameListEditor from './EntourageNameListEditor';
 import InvitationMotifPicker from './InvitationMotifPicker';
-
-function ColorSwatchPicker({ colors = [], onChange, labelPrefix = 'Color' }) {
-  const swatches = colors.length >= 4 ? colors.slice(0, 4) : [...colors, ...Array(4 - colors.length).fill('#F4EEE7')].slice(0, 4);
-
-  return (
-    <div className="form-row" style={{ gap: 12, flexWrap: 'wrap' }}>
-      {swatches.map((color, index) => (
-        <div key={index} className="form-group" style={{ flex: '0 0 auto' }}>
-          <label>{labelPrefix} {index + 1}</label>
-          <input
-            type="color"
-            value={color || '#F4EEE7'}
-            onChange={(e) => {
-              const next = [...swatches];
-              next[index] = e.target.value;
-              onChange(next);
-            }}
-            style={{ width: 48, height: 36, padding: 0, border: 'none', cursor: 'pointer' }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function WeddingContentFields({
   invitation,
@@ -463,6 +440,7 @@ export default function WeddingContentFields({
           colors={attire.ladies_colors}
           onChange={(colors) => onAttireChange('ladies_colors', colors)}
           labelPrefix="Ladies Color"
+          count={4}
         />
         <div className="form-group">
           <label>Guests — Gentlemen</label>
@@ -472,6 +450,7 @@ export default function WeddingContentFields({
           colors={attire.gentlemen_colors}
           onChange={(colors) => onAttireChange('gentlemen_colors', colors)}
           labelPrefix="Gentlemen Color"
+          count={4}
         />
         <div className="form-group">
           <label>Reminders</label>

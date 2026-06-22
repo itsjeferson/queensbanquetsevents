@@ -1,40 +1,50 @@
 import {
   INVITATION_MOTIFS,
+  PALETTE_COLOR_COUNT,
+  PALETTE_COLOR_LABELS,
+  PALETTE_DEFAULT_COLOR,
+  applyCustomPaletteColors,
   applyMotifToInvitation,
+  getFloralThemeColors,
+  getInvitationPaletteColors,
   getInvitationThemeStyles,
   getMotifById,
+  getMotifPreviewColors,
 } from '../../utils/invitationTheme';
+import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
+import StdCornerOrnament from './StdCornerOrnament';
 import '../../styles/invitation.css';
 
 export default function InvitationMotifPicker({ invitation, onInvitationChange }) {
   const activeMotif = invitation.color_motif || 'classic-gold';
   const isCustom = activeMotif === 'custom';
   const activeTheme = getMotifById(activeMotif);
+  const customPalette = getInvitationPaletteColors(invitation, activeTheme);
   const previewTheme = {
     color_motif: activeMotif,
-    primary_color: invitation.primary_color || activeTheme.primary_color,
-    secondary_color: invitation.secondary_color || activeTheme.secondary_color,
-    background_color: invitation.background_color || activeTheme.background_color,
+    primary_color: customPalette[0],
+    background_color: customPalette[1],
+    secondary_color: customPalette[2],
+    palette_colors: customPalette,
+    attire: invitation.attire,
   };
   const previewStyles = getInvitationThemeStyles(previewTheme);
+  const floralTheme = getFloralThemeColors(previewTheme);
   const selectedPrimary = previewTheme.primary_color;
 
   const handleSelectMotif = (motifId) => {
     onInvitationChange(applyMotifToInvitation(invitation, motifId));
   };
 
-  const handleCustomColor = (field, value) => {
-    onInvitationChange({
-      color_motif: 'custom',
-      [field]: value,
-    });
+  const handleCustomPaletteChange = (colors) => {
+    onInvitationChange(applyCustomPaletteColors(invitation, colors));
   };
 
   return (
     <div className="card-widget">
       <h3>Color Motif</h3>
       <p className="form-help" style={{ marginTop: 12 }}>
-        Choose a palette for your invitation. The theme updates headings, accents, and section colors instantly.
+        Choose a palette for your invitation. Custom colors start white — set each role below for headings, backgrounds, accents, and florals.
       </p>
 
       <div className="inv-motif-grid">
@@ -46,10 +56,10 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
             style={activeMotif === motif.id ? { borderColor: motif.primary_color } : undefined}
             onClick={() => handleSelectMotif(motif.id)}
           >
-            <span className="inv-motif-swatches">
-              <span style={{ background: motif.primary_color }} />
-              <span style={{ background: motif.secondary_color }} />
-              <span style={{ background: motif.accent_colors[2] }} />
+            <span className="inv-motif-swatches inv-motif-swatches-6">
+              {getMotifPreviewColors(motif).map((color, index) => (
+                <span key={`${motif.id}-${index}`} style={{ background: color }} />
+              ))}
             </span>
             <strong>{motif.name}</strong>
           </button>
@@ -58,32 +68,13 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
 
       {isCustom && (
         <div className="card-form-stack" style={{ marginTop: 20 }}>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Primary Color</label>
-              <input
-                type="color"
-                value={invitation.primary_color || getMotifById('classic-gold').primary_color}
-                onChange={(e) => handleCustomColor('primary_color', e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label>Background Accent</label>
-              <input
-                type="color"
-                value={invitation.secondary_color || getMotifById('classic-gold').secondary_color}
-                onChange={(e) => handleCustomColor('secondary_color', e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label>Page Background</label>
-              <input
-                type="color"
-                value={invitation.background_color || getMotifById('classic-gold').background_color}
-                onChange={(e) => handleCustomColor('background_color', e.target.value)}
-              />
-            </div>
-          </div>
+          <ColorSwatchPicker
+            colors={customPalette}
+            onChange={handleCustomPaletteChange}
+            labels={PALETTE_COLOR_LABELS}
+            fallback={PALETTE_DEFAULT_COLOR}
+            count={PALETTE_COLOR_COUNT}
+          />
         </div>
       )}
 
@@ -91,6 +82,9 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
         className="invitation-page inv-motif-live-preview"
         style={previewStyles}
       >
+        <div className="inv-motif-floral-preview" aria-hidden="true">
+          <StdCornerOrnament className="inv-motif-floral-sample" floralTheme={floralTheme} />
+        </div>
         <p className="inv-section-tag">Preview</p>
         <p className="inv-script-title inv-script-title-small">Your Wedding Heading</p>
         <div className="inv-divider" />

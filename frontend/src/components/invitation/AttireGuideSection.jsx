@@ -1,8 +1,10 @@
-export default function AttireGuideSection({ attire, dressCode }) {
+import { getCustomizedAttireColors } from '../../utils/invitationTheme';
+
+export default function AttireGuideSection({ attire, dressCode, invitation = {} }) {
   if (!attire && !dressCode) return null;
 
-  const ladiesColors = Array.isArray(attire?.ladies_colors) ? attire.ladies_colors.filter(Boolean) : [];
-  const gentlemenColors = Array.isArray(attire?.gentlemen_colors) ? attire.gentlemen_colors.filter(Boolean) : [];
+  const ladiesColors = getCustomizedAttireColors(attire?.ladies_colors, invitation);
+  const gentlemenColors = getCustomizedAttireColors(attire?.gentlemen_colors, invitation);
   const hasContent = dressCode
     || attire?.female_primary_sponsors
     || attire?.male_primary_sponsors
@@ -41,8 +43,13 @@ export default function AttireGuideSection({ attire, dressCode }) {
             <p>{attire.ladies}</p>
             {ladiesColors.length > 0 && (
               <div className="inv-color-swatches">
-                {ladiesColors.map((color) => (
-                  <span key={color} className="inv-color-swatch" style={{ background: color }} title={color} />
+                {ladiesColors.map((color, index) => (
+                  <span
+                    key={`ladies-${color}-${index}`}
+                    className="inv-color-swatch"
+                    style={{ background: color }}
+                    title={color}
+                  />
                 ))}
               </div>
             )}
@@ -54,8 +61,13 @@ export default function AttireGuideSection({ attire, dressCode }) {
             <p>{attire.gentlemen}</p>
             {gentlemenColors.length > 0 && (
               <div className="inv-color-swatches">
-                {gentlemenColors.map((color) => (
-                  <span key={color} className="inv-color-swatch" style={{ background: color }} title={color} />
+                {gentlemenColors.map((color, index) => (
+                  <span
+                    key={`gentlemen-${color}-${index}`}
+                    className="inv-color-swatch"
+                    style={{ background: color }}
+                    title={color}
+                  />
                 ))}
               </div>
             )}

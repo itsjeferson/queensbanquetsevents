@@ -102,6 +102,7 @@ export const defaultWeddingInvitationContent = {
   primary_color: '#B47B36',
   secondary_color: '#F4EEE7',
   background_color: '#FFFAF5',
+  palette_colors: [],
   save_the_date_enabled: false,
   std_message: '',
   std_cover_image: '',

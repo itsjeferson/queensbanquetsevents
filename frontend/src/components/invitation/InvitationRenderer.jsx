@@ -20,11 +20,15 @@ import InvitationFooter from './InvitationFooter';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import RevealSection from './RevealSection';
 import FloralCornerFrame from './FloralCornerFrame';
+import { FloralThemeProvider } from './FloralThemeContext';
 import { normalizeInvitationContent, getCoupleDisplayName } from '../../utils/invitationContent';
 import {
   buildInvitationThemeCss,
   extractInvitationThemeInput,
+  getFloralThemeColors,
+  getInvitationPaletteColors,
   getInvitationThemeStyles,
+  resolveInvitationThemeFields,
 } from '../../utils/invitationTheme';
 import { hasRsvpUnlocked, setRsvpUnlocked, clearRsvpUnlock } from '../../utils/rsvpUnlock';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
@@ -62,6 +66,18 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
   const themeInput = extractInvitationThemeInput(rawInvitation);
   const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
+  const palette = getInvitationPaletteColors(invitation);
+  const themedInvitation = {
+    ...invitation,
+    ...resolveInvitationThemeFields({
+      ...invitation,
+      palette_colors: palette,
+      primary_color: palette[0],
+      background_color: palette[1],
+      secondary_color: palette[2],
+    }),
+    palette_colors: palette,
+  };
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
   const coupleName = getCoupleDisplayName(event, invitation);
   const shareUrl = getInvitationShareUrl({
@@ -69,8 +85,8 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
     inviteCode: event?.invite_code,
     guestPreview: true,
   });
-  const themedInvitation = { ...invitation, ...themeInput };
   const themeStyles = getInvitationThemeStyles(themedInvitation);
+  const floralTheme = getFloralThemeColors(themedInvitation);
   const themeCss = buildInvitationThemeCss(themedInvitation);
   const themeId = themeInput.color_motif || 'classic-gold';
 
@@ -146,6 +162,7 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
         data-reveal-mode={gradualReveal ? 'gradual' : 'full'}
         style={themeStyles}
       >
+        <FloralThemeProvider value={floralTheme}>
         {invitation.music_url && (
           <audio ref={audioRef} src={invitation.music_url} loop preload="auto" playsInline />
         )}
@@ -226,7 +243,11 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
             </FloralSection>
 
             <FloralSection gradual={gradualReveal}>
-              <AttireGuideSection attire={invitation.attire} dressCode={invitation.dress_code} />
+              <AttireGuideSection
+                attire={invitation.attire}
+                dressCode={invitation.dress_code}
+                invitation={invitation}
+              />
             </FloralSection>
 
             <FloralSection gradual={gradualReveal}>
@@ -258,6 +279,7 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
             </SectionWrap>
           </main>
         )}
+        </FloralThemeProvider>
       </div>
     </>
   );

@@ -43,14 +43,6 @@ export default function InvitationExperienceSettings({ invitation, onChange, emb
               placeholder="Leave blank to use invitation cover image"
             />
           </div>
-          <div className="form-group">
-            <label>Location line (optional override)</label>
-            <input
-              value={invitation.std_location || ''}
-              onChange={(e) => onChange({ std_location: e.target.value })}
-              placeholder="Leave blank to use Ceremony & Reception venues from invitation"
-            />
-          </div>
         </>
       )}
 

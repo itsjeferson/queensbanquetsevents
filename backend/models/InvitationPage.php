@@ -118,6 +118,7 @@ class InvitationPage
             'qr_enabled' => (int) ($row['qr_enabled'] ?? 1),
             'color_motif' => $story['color_motif'] ?? 'classic-gold',
             'background_color' => $story['background_color'] ?? '#FFFAF5',
+            'palette_colors' => is_array($story['palette_colors'] ?? null) ? $story['palette_colors'] : [],
             'save_the_date_enabled' => (bool) ($story['save_the_date_enabled'] ?? false),
             'std_message' => $story['std_message'] ?? '',
             'std_cover_image' => $story['std_cover_image'] ?? '',
@@ -147,6 +148,9 @@ class InvitationPage
         $story['secondary_color'] = $data['secondary_color'] ?? ($story['secondary_color'] ?? '#F4EEE7');
         $story['background_color'] = $data['background_color'] ?? ($story['background_color'] ?? '#FFFAF5');
         $story['color_motif'] = $data['color_motif'] ?? ($story['color_motif'] ?? 'classic-gold');
+        if (isset($data['palette_colors']) && is_array($data['palette_colors'])) {
+            $story['palette_colors'] = array_values(array_slice($data['palette_colors'], 0, 6));
+        }
         if (!empty($data['primary_color'])) {
             $story['primary_color'] = $data['primary_color'];
         }
@@ -214,6 +218,13 @@ class InvitationPage
         $story = is_array($normalized['story'] ?? null) ? $normalized['story'] : [];
         if (empty($story['background_video']) && !empty($existing['background_video'])) {
             $story['background_video'] = $existing['background_video'];
+            $normalized['story'] = $story;
+        }
+
+        $existingStory = is_array($existing['story'] ?? null) ? $existing['story'] : [];
+        $existingPalette = $existing['palette_colors'] ?? ($existingStory['palette_colors'] ?? null);
+        if (empty($story['palette_colors']) && !empty($existingPalette) && is_array($existingPalette)) {
+            $story['palette_colors'] = $existingPalette;
             $normalized['story'] = $story;
         }
 

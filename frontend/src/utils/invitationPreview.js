@@ -90,6 +90,19 @@ function hasAttireDetails(attire, dressCode) {
   );
 }
 
+function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
+  const merged = { ...apiInvitation };
+  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors'];
+
+  fields.forEach((field) => {
+    if (draftInvitation[field] !== undefined && draftInvitation[field] !== null) {
+      merged[field] = draftInvitation[field];
+    }
+  });
+
+  return merged;
+}
+
 function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
   const fields = ['save_the_date_enabled', 'std_message', 'std_cover_image', 'std_location', 'content_reveal_mode'];
@@ -128,7 +141,10 @@ function withDraftGuestExperience(payload, draft) {
 
   return {
     ...payload,
-    invitation: mergeGuestExperienceFields(payload.invitation || {}, draft.invitation),
+    invitation: mergeThemeFields(
+      mergeGuestExperienceFields(payload.invitation || {}, draft.invitation),
+      draft.invitation,
+    ),
   };
 }
 

@@ -1,13 +1,36 @@
 import { parseEventDate } from '../../utils/eventDate';
 import FloralCornerFrame from './FloralCornerFrame';
 
+function hasVenueContent(venue = {}) {
+  return Boolean(
+    venue.name?.trim()
+    || venue.address?.trim()
+    || venue.time?.trim()
+    || venue.image?.trim()
+    || venue.map_url?.trim(),
+  );
+}
+
 function VenueCard({ label, venue }) {
-  if (!venue?.name?.trim() && !venue?.address?.trim() && !venue?.time?.trim()) return null;
+  if (!hasVenueContent(venue)) return null;
 
   return (
     <article className="inv-venue-card">
       <span className="inv-venue-label">{label}</span>
-      {venue.image && <img src={venue.image} alt={venue.name || label} className="inv-venue-image" />}
+      {venue.image && (
+        venue.map_url ? (
+          <a
+            href={venue.map_url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Open ${venue.name || label} on map`}
+          >
+            <img src={venue.image} alt={venue.name || label} className="inv-venue-image" />
+          </a>
+        ) : (
+          <img src={venue.image} alt={venue.name || label} className="inv-venue-image" />
+        )
+      )}
       {venue.name && <h3>{venue.name}</h3>}
       {venue.time && <p className="inv-venue-time">{venue.time}</p>}
       {venue.address && <p className="inv-venue-address">{venue.address}</p>}
@@ -33,8 +56,8 @@ export default function WeddingDetailsSection({ event, venue }) {
 
   const ceremony = venue?.ceremony;
   const reception = venue?.reception;
-  const hasCeremony = ceremony?.name || ceremony?.address || ceremony?.time;
-  const hasReception = reception?.name || reception?.address || reception?.time;
+  const hasCeremony = hasVenueContent(ceremony);
+  const hasReception = hasVenueContent(reception);
 
   if (!dateLabel && !hasCeremony && !hasReception) return null;
 
