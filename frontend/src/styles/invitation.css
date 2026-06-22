@@ -2170,13 +2170,75 @@
 
 .inv-reveal-order-item {
   display: grid;
-  grid-template-columns: 28px 1fr auto;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   padding: 12px 14px;
   border: 1px solid var(--border-soft);
   border-radius: 10px;
   background: var(--white);
+}
+
+.inv-reveal-order-item--hidden {
+  opacity: 0.72;
+  background: var(--gray-light);
+}
+
+.inv-reveal-order-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.inv-reveal-order-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--gold-dark);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.inv-reveal-order-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.inv-reveal-visibility-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--gray-light);
+}
+
+.inv-reveal-visibility-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.inv-reveal-visibility-btn--active {
+  background: var(--white);
+  color: var(--black);
+  box-shadow: 0 1px 4px rgba(26, 26, 26, 0.08);
+}
+
+.inv-reveal-visibility-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .inv-reveal-order-index {
@@ -2205,40 +2267,6 @@
 
 .inv-reveal-order-note {
   margin-top: 12px;
-}
-
-.inv-main-sequential {
-  padding-bottom: 48px;
-}
-
-.inv-sequential-controls {
-  text-align: center;
-  padding: 32px 20px 12px;
-}
-
-.inv-sequential-btn {
-  min-width: 220px;
-}
-
-.inv-sequential-progress {
-  margin: 12px 0 0;
-  font-size: 13px;
-  color: var(--inv-muted, var(--text-muted));
-}
-
-.inv-sequential-new {
-  animation: invSequentialEnter 0.65s ease;
-}
-
-@keyframes invSequentialEnter {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Save the Date — fixed styling (invitation palette does not apply) */

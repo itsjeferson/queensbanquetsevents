@@ -1,7 +1,7 @@
 import ContentRevealOrderEditor from './ContentRevealOrderEditor';
 import MediaField from '../common/MediaField/MediaField';
 import { MAX_IMAGE_SIZE_MB } from '../../utils/mediaUpload';
-import { normalizeContentRevealOrder } from '../../utils/contentReveal';
+import { getDefaultContentRevealOrder, getVisibleContentRevealOrder } from '../../utils/contentReveal';
 
 export default function InvitationExperienceSettings({
   invitation,
@@ -11,7 +11,7 @@ export default function InvitationExperienceSettings({
 }) {
   const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const revealMode = invitation.content_reveal_mode === 'gradual' ? 'gradual' : 'full';
-  const revealOrder = normalizeContentRevealOrder(invitation.content_reveal_order, {
+  const revealOrder = getVisibleContentRevealOrder(invitation.content_reveal_order, {
     hideRsvp: saveTheDateEnabled,
   });
 
@@ -92,11 +92,16 @@ export default function InvitationExperienceSettings({
               name="content_reveal_mode"
               value="gradual"
               checked={revealMode === 'gradual'}
-              onChange={() => onChange({ content_reveal_mode: 'gradual' })}
+              onChange={() => onChange({
+                content_reveal_mode: 'gradual',
+                content_reveal_order: invitation.content_reveal_order?.length
+                  ? invitation.content_reveal_order
+                  : getDefaultContentRevealOrder({ hideRsvp: saveTheDateEnabled }),
+              })}
             />
             <span>
               <strong>Show content gradually</strong>
-              <small>Sections unlock one at a time in your chosen order, then the full invitation appears.</small>
+              <small>Sections fade in as guests scroll. Pick which sections appear and what they see first.</small>
             </span>
           </label>
         </div>

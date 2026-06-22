@@ -190,10 +190,7 @@ export default function InvitationMainContent({
   guestMessages,
   saveTheDateEnabled,
   sectionOrder,
-  mode = 'full',
-  revealedCount = 1,
-  onShowNext,
-  onViewFullInvitation,
+  gradualReveal = false,
 }) {
   const sectionCtx = {
     event,
@@ -202,57 +199,19 @@ export default function InvitationMainContent({
     shareUrl,
     guestMessages,
     saveTheDateEnabled,
-    gradualReveal: false,
-    animateHero: mode === 'full',
+    gradualReveal,
+    animateHero: true,
     animateEntry: true,
   };
 
-  if (mode === 'sequential') {
-    const visibleOrder = sectionOrder.slice(0, revealedCount);
-
-    return (
-      <main id="inv-main" className="inv-main inv-main-sequential">
-        {visibleOrder.map((sectionId, index) => (
-          <div
-            key={`${sectionId}-${index}`}
-            className={index === revealedCount - 1 ? 'inv-sequential-new' : ''}
-          >
-            {renderInvitationSection(sectionId, {
-              ...sectionCtx,
-              gradualReveal: false,
-              animateHero: index === 0,
-              animateEntry: index === revealedCount - 1,
-            })}
-          </div>
-        ))}
-
-        <div className="inv-sequential-controls">
-          {revealedCount < sectionOrder.length ? (
-            <>
-              <button type="button" className="btn btn-gold inv-sequential-btn" onClick={onShowNext}>
-                Show Next Section
-              </button>
-              <p className="inv-sequential-progress">
-                {revealedCount} of {sectionOrder.length} sections
-              </p>
-            </>
-          ) : (
-            <>
-              <button type="button" className="btn btn-gold inv-sequential-btn" onClick={onViewFullInvitation}>
-                View Full Invitation
-              </button>
-              <p className="inv-sequential-progress">All sections unlocked</p>
-            </>
-          )}
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main id="inv-main" className="inv-main">
-      {sectionOrder.map((sectionId) => {
-        const section = renderInvitationSection(sectionId, sectionCtx);
+      {sectionOrder.map((sectionId, index) => {
+        const section = renderInvitationSection(sectionId, {
+          ...sectionCtx,
+          animateHero: index === 0,
+          animateEntry: gradualReveal ? index > 0 : true,
+        });
         if (!section) return null;
         return <div key={sectionId}>{section}</div>;
       })}

@@ -5,9 +5,7 @@ import InvitationMainContent from './InvitationMainContent';
 import { FloralThemeProvider } from './FloralThemeContext';
 import { normalizeInvitationContent, getCoupleDisplayName } from '../../utils/invitationContent';
 import {
-  normalizeContentRevealOrder,
-  readSequentialRevealProgress,
-  writeSequentialRevealProgress,
+  getVisibleContentRevealOrder,
 } from '../../utils/contentReveal';
 import {
   buildInvitationThemeCss,
@@ -65,14 +63,7 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
   const revealOptions = { hideRsvp: saveTheDateEnabled };
-  const sequentialOrder = normalizeContentRevealOrder(invitation.content_reveal_order, revealOptions);
-  const fullOrder = normalizeContentRevealOrder([], revealOptions);
-
-  const savedProgress = readSequentialRevealProgress(event);
-  const [sequentialComplete, setSequentialComplete] = useState(savedProgress.complete);
-  const [revealedCount, setRevealedCount] = useState(
-    Math.min(savedProgress.revealedCount, sequentialOrder.length) || 1,
-  );
+  const sectionOrder = getVisibleContentRevealOrder(invitation.content_reveal_order, revealOptions);
 
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
     if (resetRsvpUnlock && saveTheDateEnabled) return false;
@@ -97,18 +88,6 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
     setRsvpUnlockedState(unlocked);
     if (saveTheDateEnabled && unlocked) setOpened(true);
   }, [event?.slug, event?.id, event?.invite_code, saveTheDateEnabled, resetRsvpUnlock]);
-
-  useEffect(() => {
-    if (!gradualReveal) {
-      setSequentialComplete(false);
-      setRevealedCount(1);
-      return;
-    }
-
-    const progress = readSequentialRevealProgress(event);
-    setSequentialComplete(progress.complete);
-    setRevealedCount(Math.min(progress.revealedCount, sequentialOrder.length) || 1);
-  }, [event?.slug, event?.id, gradualReveal, sequentialOrder.length]);
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;
@@ -142,29 +121,9 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
     }
   };
 
-  const handleShowNextSection = () => {
-    setRevealedCount((current) => {
-      const next = Math.min(current + 1, sequentialOrder.length);
-      writeSequentialRevealProgress(event, { complete: false, revealedCount: next });
-      return next;
-    });
-  };
-
-  const handleViewFullInvitation = () => {
-    setSequentialComplete(true);
-    writeSequentialRevealProgress(event, {
-      complete: true,
-      revealedCount: sequentialOrder.length,
-    });
-    window.setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 80);
-  };
-
   const showSaveTheDate = saveTheDateEnabled && !rsvpUnlocked;
   const showCover = !showSaveTheDate && !opened;
   const showInvitation = opened && !showSaveTheDate;
-  const useSequentialReveal = gradualReveal && !sequentialComplete;
 
   return (
     <>
@@ -206,11 +165,8 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
             shareUrl={shareUrl}
             guestMessages={guestMessages}
             saveTheDateEnabled={saveTheDateEnabled}
-            sectionOrder={useSequentialReveal ? sequentialOrder : fullOrder}
-            mode={useSequentialReveal ? 'sequential' : 'full'}
-            revealedCount={revealedCount}
-            onShowNext={handleShowNextSection}
-            onViewFullInvitation={handleViewFullInvitation}
+            sectionOrder={sectionOrder}
+            gradualReveal={gradualReveal}
           />
         )}
         </FloralThemeProvider>

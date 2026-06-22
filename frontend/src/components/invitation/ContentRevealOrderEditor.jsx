@@ -1,7 +1,8 @@
 import {
-  getAvailableRevealSections,
+  buildContentRevealEditorRows,
   getContentRevealSectionLabel,
-  normalizeContentRevealOrder,
+  moveContentRevealSection,
+  setContentRevealVisibility,
 } from '../../utils/contentReveal';
 
 export default function ContentRevealOrderEditor({
@@ -9,53 +10,88 @@ export default function ContentRevealOrderEditor({
   hideRsvp = false,
   onChange,
 }) {
-  const normalizedOrder = normalizeContentRevealOrder(order, { hideRsvp });
+  const options = { hideRsvp };
+  const rows = buildContentRevealEditorRows(order, options);
+  const visibleRows = rows.filter((row) => row.visible);
 
-  const moveSection = (index, direction) => {
-    const nextIndex = index + direction;
-    if (nextIndex < 0 || nextIndex >= normalizedOrder.length) return;
+  const setVisibility = (sectionId, visible) => {
+    onChange(setContentRevealVisibility(order, sectionId, visible, options));
+  };
 
-    const updated = [...normalizedOrder];
-    const [item] = updated.splice(index, 1);
-    updated.splice(nextIndex, 0, item);
-    onChange(updated);
+  const moveSection = (sectionId, direction) => {
+    onChange(moveContentRevealSection(order, sectionId, direction, options));
   };
 
   return (
     <div className="inv-reveal-order">
       <p className="form-help">
-        Choose the order sections appear for guests. The first item shows when they open the invitation, then each section unlocks consecutively until the full invitation is shown.
+        Choose which sections guests see and in what order. The first visible section appears immediately when they open the invitation; the rest fade in as they scroll.
       </p>
       <ol className="inv-reveal-order-list">
-        {normalizedOrder.map((sectionId, index) => (
-          <li key={sectionId} className="inv-reveal-order-item">
-            <span className="inv-reveal-order-index">{index + 1}</span>
-            <span className="inv-reveal-order-label">{getContentRevealSectionLabel(sectionId)}</span>
-            <span className="inv-reveal-order-actions">
-              <button
-                type="button"
-                className="action-btn"
-                onClick={() => moveSection(index, -1)}
-                disabled={index === 0}
-                aria-label={`Move ${getContentRevealSectionLabel(sectionId)} up`}
-              >
-                Up
-              </button>
-              <button
-                type="button"
-                className="action-btn"
-                disabled={index === normalizedOrder.length - 1}
-                onClick={() => moveSection(index, 1)}
-                aria-label={`Move ${getContentRevealSectionLabel(sectionId)} down`}
-              >
-                Down
-              </button>
-            </span>
-          </li>
-        ))}
+        {rows.map((row) => {
+          const visibleIndex = visibleRows.findIndex((item) => item.id === row.id);
+
+          return (
+            <li
+              key={row.id}
+              className={`inv-reveal-order-item${row.visible ? '' : ' inv-reveal-order-item--hidden'}`}
+            >
+              <span className="inv-reveal-order-index">{row.visible ? visibleIndex + 1 : '—'}</span>
+              <div className="inv-reveal-order-copy">
+                <span className="inv-reveal-order-label">{getContentRevealSectionLabel(row.id)}</span>
+                {row.shownFirst && (
+                  <span className="inv-reveal-order-badge">Shown first to guests</span>
+                )}
+              </div>
+              <div className="inv-reveal-order-controls">
+                <div className="inv-reveal-visibility-toggle" role="group" aria-label={`Visibility for ${getContentRevealSectionLabel(row.id)}`}>
+                  <button
+                    type="button"
+                    className={`inv-reveal-visibility-btn${row.visible ? ' inv-reveal-visibility-btn--active' : ''}`}
+                    onClick={() => setVisibility(row.id, true)}
+                    aria-pressed={row.visible}
+                  >
+                    Show Content
+                  </button>
+                  <button
+                    type="button"
+                    className={`inv-reveal-visibility-btn${!row.visible ? ' inv-reveal-visibility-btn--active' : ''}`}
+                    onClick={() => setVisibility(row.id, false)}
+                    aria-pressed={!row.visible}
+                    disabled={row.visible && visibleRows.length === 1}
+                  >
+                    Don&apos;t Show
+                  </button>
+                </div>
+                {row.visible && (
+                  <span className="inv-reveal-order-actions">
+                    <button
+                      type="button"
+                      className="action-btn"
+                      onClick={() => moveSection(row.id, -1)}
+                      disabled={visibleIndex === 0}
+                      aria-label={`Move ${getContentRevealSectionLabel(row.id)} up`}
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      className="action-btn"
+                      disabled={visibleIndex === visibleRows.length - 1}
+                      onClick={() => moveSection(row.id, 1)}
+                      aria-label={`Move ${getContentRevealSectionLabel(row.id)} down`}
+                    >
+                      Down
+                    </button>
+                  </span>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ol>
       <p className="form-help inv-reveal-order-note">
-        Available sections: {getAvailableRevealSections({ hideRsvp }).map((section) => section.label).join(', ')}.
+        {visibleRows.length} section{visibleRows.length === 1 ? '' : 's'} visible to guests.
       </p>
     </div>
   );
