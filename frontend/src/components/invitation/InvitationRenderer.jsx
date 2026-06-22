@@ -20,7 +20,7 @@ import InvitationFooter from './InvitationFooter';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import RevealSection from './RevealSection';
 import FloralCornerFrame from './FloralCornerFrame';
-import { normalizeInvitationContent } from '../../utils/invitationContent';
+import { normalizeInvitationContent, getCoupleDisplayName } from '../../utils/invitationContent';
 import {
   buildInvitationThemeCss,
   extractInvitationThemeInput,
@@ -63,6 +63,7 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const themeInput = extractInvitationThemeInput(rawInvitation);
   const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
+  const coupleName = getCoupleDisplayName(event, invitation);
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
     inviteCode: event?.invite_code,
@@ -253,7 +254,7 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
             </SectionWrap>
 
             <SectionWrap gradual={gradualReveal}>
-              <InvitationFooter eventName={event.event_name} shareUrl={shareUrl} />
+              <InvitationFooter eventName={coupleName} shareUrl={shareUrl} />
             </SectionWrap>
           </main>
         )}

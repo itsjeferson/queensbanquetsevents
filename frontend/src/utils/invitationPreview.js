@@ -322,8 +322,9 @@ export function getClientPreviewSlug(clientId) {
 
 export function getPreviewPath(slug, { guestPreview = true, resetRsvp = false } = {}) {
   const params = new URLSearchParams();
-  params.set('open', slug);
   if (guestPreview) params.set('guest', '1');
   if (resetRsvp) params.set('reset', '1');
-  return `/?${params.toString()}`;
+  const query = params.toString();
+  const suffix = query ? `?${query}` : '';
+  return `/share/${encodeURIComponent(slug)}${suffix}`;
 }

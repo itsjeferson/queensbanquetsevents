@@ -7,25 +7,24 @@ export function getPublicSiteOrigin() {
 }
 
 /**
- * Query-based paths survive phone QR scanners (hash fragments are often dropped).
- * Example: /?open=Mark-She
+ * Share paths use /share/:slug so link previews get couple-specific Open Graph tags
+ * from the share-preview API before redirecting guests into the app.
  */
 export function getInvitationSharePath({ slug, inviteCode, guestPreview = false } = {}) {
   const params = new URLSearchParams();
+  if (guestPreview) params.set('guest', '1');
+  const query = params.toString();
+  const suffix = query ? `?${query}` : '';
 
   if (slug) {
-    params.set('open', slug);
-  } else if (inviteCode) {
-    params.set('code', inviteCode);
-  } else {
-    return '';
+    return `/share/${encodeURIComponent(slug)}${suffix}`;
   }
 
-  if (guestPreview) {
-    params.set('guest', '1');
+  if (inviteCode) {
+    return `/share/by-code/${encodeURIComponent(inviteCode)}${suffix}`;
   }
 
-  return `/?${params.toString()}`;
+  return '';
 }
 
 export function getInvitationShareUrl(options = {}) {

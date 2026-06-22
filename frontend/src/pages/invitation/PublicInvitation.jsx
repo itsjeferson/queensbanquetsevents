@@ -9,6 +9,7 @@ import {
   isInvitationDraftStorageKey,
   mergeInvitationPayloadWithDraft,
 } from '../../utils/invitationPreview';
+import { applyInvitationPageMeta, resetInvitationPageMeta } from '../../utils/invitationPageMeta';
 import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
@@ -64,7 +65,13 @@ export default function PublicInvitation() {
 
   useEffect(() => {
     loadInvitation({ showLoading: true });
+    return () => resetInvitationPageMeta();
   }, [loadInvitation]);
+
+  useEffect(() => {
+    if (!data?.event || !data?.invitation) return;
+    applyInvitationPageMeta({ event: data.event, invitation: data.invitation });
+  }, [data]);
 
   useEffect(() => {
     if (!identifier || lookupByCode) return undefined;

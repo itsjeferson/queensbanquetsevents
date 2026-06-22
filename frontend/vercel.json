@@ -7,6 +7,8 @@
     { "source": "/queens-banquet-events.html", "destination": "/", "permanent": false }
   ],
   "rewrites": [
+    { "source": "/share/:slug", "destination": "/api/share-preview?slug=:slug" },
+    { "source": "/share/by-code/:code", "destination": "/api/share-preview?code=:code" },
     { "source": "/invite/:slug", "destination": "/index.html" },
     { "source": "/invitation/:slug", "destination": "/index.html" },
     { "source": "/i/:code", "destination": "/index.html" }
