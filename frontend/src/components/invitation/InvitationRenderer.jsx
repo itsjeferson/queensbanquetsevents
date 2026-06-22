@@ -27,6 +27,7 @@ import {
   getInvitationThemeStyles,
 } from '../../utils/invitationTheme';
 import { hasRsvpUnlocked, setRsvpUnlocked, clearRsvpUnlock } from '../../utils/rsvpUnlock';
+import { getInvitationShareUrl } from '../../utils/invitationShare';
 import '../../styles/invitation.css';
 
 const TYPE_LABELS = {
@@ -62,7 +63,7 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const themeInput = extractInvitationThemeInput(rawInvitation);
   const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
-  const shareUrl = window.location.href;
+  const shareUrl = getInvitationShareUrl({ slug: event?.slug, inviteCode: event?.invite_code });
   const themedInvitation = { ...invitation, ...themeInput };
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const themeCss = buildInvitationThemeCss(themedInvitation);

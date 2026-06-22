@@ -15,6 +15,7 @@ import {
 } from '../../utils/invitationPreview';
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
 import { normalizeInvitationContent } from '../../utils/invitationContent';
+import { getInvitationShareUrl } from '../../utils/invitationShare';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
@@ -155,12 +156,12 @@ export default function InvitationManage({ variant = 'client' }) {
 
   const shareUrl = useMemo(() => {
     if (!event) return '';
-    return `${window.location.origin}${INVITATION_ENTRY}/invite/${event.slug}`;
+    return getInvitationShareUrl({ slug: event.slug });
   }, [event]);
 
   const codeUrl = useMemo(() => {
     if (!event) return '';
-    return `${window.location.origin}${INVITATION_ENTRY}/event/${event.invite_code}`;
+    return getInvitationShareUrl({ inviteCode: event.invite_code });
   }, [event]);
 
   const updateEvent = (patch) => {
