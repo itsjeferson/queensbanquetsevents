@@ -21,6 +21,63 @@ export function formatSaveTheDateLine(eventDate) {
   return `${day}${ordinalSuffix(day)} ${month} ${year}`;
 }
 
+export function formatSaveTheDateCompact(eventDate) {
+  const parsed = parseEventDate(eventDate);
+  if (!parsed) return '';
+
+  const day = String(parsed.getDate()).padStart(2, '0');
+  const month = String(parsed.getMonth() + 1).padStart(2, '0');
+  const year = parsed.getFullYear();
+
+  return `${day}.${month}.${year}`;
+}
+
+export function formatStdCoupleName(displayName = '') {
+  const trimmed = displayName.trim();
+  if (!trimmed) return '';
+
+  return trimmed
+    .replace(/\s*&\s*/g, ' + ')
+    .replace(/\s+and\s+/gi, ' + ');
+}
+
+export function getSaveTheDateLocationLine(invitation = {}) {
+  return invitation.std_location?.trim().toUpperCase() || '';
+}
+
+export function getSaveTheDatePhoto(invitation = {}) {
+  return invitation.std_photo?.trim()
+    || invitation.std_cover_image?.trim()
+    || invitation.cover_image?.trim()
+    || '';
+}
+
+const DEFAULT_STD_PHOTO_LAYOUT = {
+  buttonTop: '70%',
+  objectPosition: 'center 34%',
+};
+
+/** Align RSVP button near groom palm level based on photo proportions. */
+export function getStdPhotoLayout(naturalWidth, naturalHeight) {
+  if (!naturalWidth || !naturalHeight) return DEFAULT_STD_PHOTO_LAYOUT;
+
+  const ratio = naturalHeight / naturalWidth;
+
+  if (ratio >= 1.2) {
+    return { buttonTop: '72%', objectPosition: 'center 44%' };
+  }
+  if (ratio >= 1.0) {
+    return { buttonTop: '70%', objectPosition: 'center 40%' };
+  }
+  if (ratio >= 0.72) {
+    return { buttonTop: '66%', objectPosition: 'center 34%' };
+  }
+  if (ratio >= 0.55) {
+    return { buttonTop: '62%', objectPosition: 'center 34%' };
+  }
+  return { buttonTop: '58%', objectPosition: 'center 30%' };
+}
+
 function formatVenueLocationText(venue = {}) {
   const name = venue.name?.trim();
   if (name) return name.toUpperCase();

@@ -808,6 +808,13 @@
   letter-spacing: 0.02em;
 }
 
+.inv-couple-amp {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 /* Opened hero */
 .inv-opened-hero {
   position: relative;
@@ -2144,4 +2151,471 @@
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 8px;
+}
+
+.inv-reveal-order {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.inv-reveal-order-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inv-reveal-order-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--white);
+}
+
+.inv-reveal-order-index {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--beige);
+  color: var(--black);
+}
+
+.inv-reveal-order-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--black);
+}
+
+.inv-reveal-order-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.inv-reveal-order-note {
+  margin-top: 12px;
+}
+
+.inv-main-sequential {
+  padding-bottom: 48px;
+}
+
+.inv-sequential-controls {
+  text-align: center;
+  padding: 32px 20px 12px;
+}
+
+.inv-sequential-btn {
+  min-width: 220px;
+}
+
+.inv-sequential-progress {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--inv-muted, var(--text-muted));
+}
+
+.inv-sequential-new {
+  animation: invSequentialEnter 0.65s ease;
+}
+
+@keyframes invSequentialEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Save the Date — fixed styling (invitation palette does not apply) */
+.invitation-page[data-guest-stage='save-the-date'] {
+  --std-primary: #211c19;
+  --std-primary-dark: #000000;
+  --std-primary-rgb: 33, 28, 25;
+  --std-ink: #211c19;
+  --std-muted: #666666;
+  --std-background: #ffffff;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
+  background: #2a2a2a;
+  color: var(--std-ink);
+}
+
+/* Save the Date — full-viewport responsive layout */
+.inv-std.inv-std-modern:not(.inv-std-modern-rsvp-view) {
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
+  height: 100vh;
+  height: 100dvh;
+  height: 100svh;
+  overflow: hidden;
+  background: #2a2a2a;
+}
+
+.inv-std.inv-std-modern {
+  min-height: 0;
+}
+
+.inv-std-modern {
+  position: relative;
+  width: 100%;
+}
+
+.inv-std-modern-media {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
+  height: 100vh;
+  height: 100dvh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #2a2a2a;
+}
+
+.inv-std-modern-rsvp-view .inv-std-modern-media {
+  min-height: auto;
+  height: auto;
+}
+
+.inv-std-modern-photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.inv-std-modern-photo-fallback {
+  position: absolute;
+  inset: 0;
+  min-height: 100%;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42)),
+    linear-gradient(135deg, #ececeb, #d8d8d7 52%, #c8c8c7);
+}
+
+.inv-std-modern-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.78) 0%,
+      rgba(255, 255, 255, 0.42) 24%,
+      rgba(255, 255, 255, 0.12) 46%,
+      rgba(255, 255, 255, 0) 62%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
+  pointer-events: none;
+}
+
+.inv-std-modern-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  padding:
+    max(clamp(28px, 6vw, 52px), env(safe-area-inset-top, 0px))
+    max(20px, env(safe-area-inset-right, 0px))
+    24px
+    max(20px, env(safe-area-inset-left, 0px));
+}
+
+.inv-std-modern-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.inv-std-modern-kicker {
+  margin: 0 0 clamp(14px, 3vw, 20px);
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(10px, 2.2vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.inv-std-modern-date {
+  margin: 0 0 clamp(12px, 2.5vw, 18px);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(30px, 7vw, 48px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--std-ink, #211c19);
+  line-height: 1.05;
+}
+
+.inv-std-modern-couple {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(34px, 7.5vw, 58px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
+  color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-couple .inv-couple-amp {
+  font-size: 1.05em;
+  padding: 0 0.06em;
+}
+
+.inv-std-modern-divider {
+  width: min(220px, 52vw);
+  height: 1px;
+  margin: clamp(16px, 3vw, 22px) auto clamp(12px, 2.5vw, 16px);
+  background: rgba(33, 28, 25, 0.18);
+}
+
+.inv-std-modern-location {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(10px, 2.2vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--std-muted, #6d625b);
+}
+
+@keyframes invStdRsvpReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.inv-std-modern-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  padding:
+    0
+    max(20px, env(safe-area-inset-right, 0px))
+    0
+    max(20px, env(safe-area-inset-left, 0px));
+  pointer-events: none;
+}
+
+.inv-std-modern-actions .inv-std-modern-rsvp-btn {
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--std-ink, #211c19);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.inv-std-modern-actions .inv-std-modern-rsvp-btn:hover {
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-rsvp-btn,
+.inv-std-modern-confirm-btn {
+  min-width: min(100%, 320px);
+  width: min(100%, 320px);
+  max-width: calc(100vw - 40px);
+  padding: 16px 32px;
+  border: none;
+  border-radius: 8px;
+  background: var(--std-primary, #1e2a44);
+  color: #fff;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.inv-std-modern-actions .inv-std-modern-rsvp-btn:not(.inv-std-modern-rsvp-btn--visible) {
+  opacity: 0;
+  transform: translateY(20px) scale(0.94);
+  pointer-events: none;
+}
+
+.inv-std-modern-confirm-btn {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.inv-std-modern-rsvp-btn--visible {
+  animation: invStdRsvpReveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-std-modern-rsvp-btn--visible {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.inv-std-modern-actions .inv-std-modern-rsvp-btn--visible {
+  pointer-events: auto;
+}
+
+.inv-std-modern-confirm-btn:hover {
+  background: var(--std-primary-dark, #151e31);
+}
+
+.inv-std-modern-rsvp-view {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
+  background: #ffffff;
+}
+
+.inv-std-modern-rsvp-panel {
+  width: min(520px, 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(32px, 8vw, 48px) 24px calc(32px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-back {
+  margin-bottom: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: var(--std-ink, #211c19);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date {
+  padding: 0;
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-note {
+  color: #666666;
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date input[type="text"],
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date input:not([type="radio"]):not([type="checkbox"]) {
+  border-radius: 999px;
+  padding: 14px 18px;
+  border-color: rgba(0, 0, 0, 0.18);
+  color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date input:focus {
+  border-color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date .form-group > label {
+  color: #666666;
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date .form-group label.inv-rsvp-radio input[type='radio'] {
+  accent-color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-rsvp-panel .inv-rsvp-save-the-date .form-group label.inv-rsvp-radio:has(input:checked) {
+  color: var(--std-ink, #211c19);
+}
+
+.inv-std-modern-rsvp-panel .inv-std-modern-confirm-btn {
+  margin-top: 8px;
+  border-radius: 999px;
+  width: 100%;
+  background: var(--std-ink, #211c19);
+  border-color: var(--std-ink, #211c19);
+  color: #ffffff;
+}
+
+.inv-std-modern-rsvp-panel .inv-std-modern-confirm-btn:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-std-rsvp-heading-line {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-std-rsvp-heading-text {
+  color: var(--std-ink, #211c19);
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date input[type='text'],
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date input:not([type='radio']):not([type='checkbox']) {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date input:focus {
+  border-color: var(--std-ink, #211c19);
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date .form-group label.inv-rsvp-radio input[type='radio'] {
+  accent-color: var(--std-ink, #211c19);
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date .form-group label.inv-rsvp-radio:has(input:checked) {
+  color: var(--std-ink, #211c19);
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date .btn-gold {
+  background: var(--std-ink, #211c19);
+  border-color: var(--std-ink, #211c19);
+  color: #ffffff;
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date .btn-gold:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+.invitation-page[data-guest-stage='save-the-date'] .inv-rsvp-save-the-date .inv-rsvp-success {
+  border-color: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--std-ink, #211c19);
 }

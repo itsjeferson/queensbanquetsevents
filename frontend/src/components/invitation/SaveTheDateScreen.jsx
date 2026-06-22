@@ -1,58 +1,128 @@
+import { useEffect, useState } from 'react';
 import { getCoupleDisplayName } from '../../utils/invitationContent';
-import { formatSaveTheDateLine } from '../../utils/saveTheDateFormat';
-import Countdown from './Countdown';
-import LaurelWreath from './LaurelWreath';
+import {
+  formatSaveTheDateCompact,
+  getSaveTheDateLocationLine,
+  getSaveTheDatePhoto,
+  getStdPhotoLayout,
+} from '../../utils/saveTheDateFormat';
+import CoupleNameHeading from './CoupleNameHeading';
 import RSVPForm from './RSVPForm';
-import FloralCornerFrame from './FloralCornerFrame';
+
+const RSVP_BUTTON_DELAY_MIN_MS = 2000;
+const RSVP_BUTTON_DELAY_MAX_MS = 4000;
+
+function getRsvpButtonRevealDelay() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return 400;
+
+  const range = RSVP_BUTTON_DELAY_MAX_MS - RSVP_BUTTON_DELAY_MIN_MS;
+  return RSVP_BUTTON_DELAY_MIN_MS + Math.floor(Math.random() * (range + 1));
+}
 
 export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) {
+  const [showRsvpForm, setShowRsvpForm] = useState(false);
+  const [showRsvpButton, setShowRsvpButton] = useState(false);
+  const [photoLayout, setPhotoLayout] = useState(getStdPhotoLayout());
   const coupleDisplay = getCoupleDisplayName(event, invitation);
-  const coupleName = coupleDisplay.toUpperCase();
-  const dateLine = formatSaveTheDateLine(event.event_date);
-  const tagline = invitation.std_message?.trim() || 'FOR THE WEDDING OF';
+  const dateLine = formatSaveTheDateCompact(event.event_date);
+  const locationLine = getSaveTheDateLocationLine(invitation);
+  const photoUrl = getSaveTheDatePhoto(invitation);
+  const heading = invitation.std_message?.trim() || 'Save the Date';
   const rsvpNote = invitation.rsvp_note?.trim()
-    || `You are special to us, ${coupleDisplay}. Kindly confirm your attendance so we may prepare for your presence on our wedding day.`;
+    || 'You are special to us. Kindly confirm your attendance below.';
+
+  useEffect(() => {
+    setPhotoLayout(getStdPhotoLayout());
+  }, [photoUrl]);
+
+  const handlePhotoLoad = (event) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+    setPhotoLayout(getStdPhotoLayout(naturalWidth, naturalHeight));
+  };
+
+  useEffect(() => {
+    if (showRsvpForm) {
+      setShowRsvpButton(false);
+      return undefined;
+    }
+
+    setShowRsvpButton(false);
+    const timer = window.setTimeout(() => setShowRsvpButton(true), getRsvpButtonRevealDelay());
+    return () => window.clearTimeout(timer);
+  }, [showRsvpForm, photoUrl]);
+
+  if (showRsvpForm) {
+    return (
+      <section className="inv-std inv-std-modern inv-std-modern-rsvp-view" id="save-the-date">
+        <div className="inv-std-modern-rsvp-panel">
+          <button
+            type="button"
+            className="inv-std-modern-back"
+            onClick={() => setShowRsvpForm(false)}
+          >
+            Back
+          </button>
+          <RSVPForm
+            eventId={event.id}
+            note={rsvpNote}
+            onSuccess={onRsvpSuccess}
+            submitLabel="Confirm & View Invitation"
+            variant="save-the-date"
+          />
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="inv-std" id="save-the-date">
-      <FloralCornerFrame className="inv-std-splash">
-        <div className="inv-std-wreath-wrap">
-          <LaurelWreath className="inv-std-wreath" />
-          <div className="inv-std-wreath-title">
-            <span className="inv-std-wreath-word inv-std-wreath-word-lg">SAVE</span>
-            <span className="inv-std-wreath-word inv-std-wreath-word-sm">THE</span>
-            <span className="inv-std-wreath-word inv-std-wreath-word-lg">DATE</span>
+    <section className="inv-std inv-std-modern" id="save-the-date">
+      <div className="inv-std-modern-media">
+        {photoUrl ? (
+          <img
+            className="inv-std-modern-photo"
+            src={photoUrl}
+            alt={coupleDisplay || 'Couple photo'}
+            onLoad={handlePhotoLoad}
+            style={{ objectPosition: photoLayout.objectPosition }}
+          />
+        ) : (
+          <div className="inv-std-modern-photo inv-std-modern-photo-fallback" aria-hidden="true" />
+        )}
+
+        <div className="inv-std-modern-shade" aria-hidden="true" />
+
+        <div className="inv-std-modern-card">
+          <div className="inv-std-modern-content">
+            <p className="inv-std-modern-kicker">{heading}</p>
+            {dateLine && <p className="inv-std-modern-date">{dateLine}</p>}
+            {coupleDisplay && (
+              <CoupleNameHeading name={coupleDisplay} className="inv-std-modern-couple" />
+            )}
+            {locationLine && (
+              <>
+                <div className="inv-std-modern-divider" aria-hidden="true" />
+                <p className="inv-std-modern-location">{locationLine}</p>
+              </>
+            )}
           </div>
         </div>
-        <p className="inv-std-scroll-hint" aria-hidden="true">
-          <span>Scroll</span>
-        </p>
-      </FloralCornerFrame>
 
-      <div className="inv-std-details">
-        <FloralCornerFrame className="inv-floral-frame-paper">
-          <div className="inv-std-paper">
-          <p className="inv-std-tagline">{tagline.toUpperCase()}</p>
-          <h1 className="inv-std-couple">{coupleName}</h1>
-          {dateLine && <p className="inv-std-date">{dateLine}</p>}
-          <p className="inv-std-follow">FORMAL INVITATION TO FOLLOW</p>
-
-          <div className="inv-std-countdown">
-            <p className="inv-std-section-label">THE COUNTDOWN</p>
-            <Countdown eventDate={event.event_date} />
-          </div>
-
-          <div className="inv-std-rsvp">
-            <RSVPForm
-              eventId={event.id}
-              note={rsvpNote}
-              onSuccess={onRsvpSuccess}
-              submitLabel="Confirm & View Invitation"
-              variant="save-the-date"
-            />
-          </div>
-          </div>
-        </FloralCornerFrame>
+        <div
+          className="inv-std-modern-actions"
+          style={{ top: photoLayout.buttonTop }}
+        >
+          <button
+            type="button"
+            className={`inv-std-modern-rsvp-btn${showRsvpButton ? ' inv-std-modern-rsvp-btn--visible' : ''}`}
+            onClick={() => setShowRsvpForm(true)}
+            disabled={!showRsvpButton}
+            aria-hidden={!showRsvpButton}
+            tabIndex={showRsvpButton ? 0 : -1}
+          >
+            CONFIRM RSVP
+          </button>
+        </div>
       </div>
     </section>
   );

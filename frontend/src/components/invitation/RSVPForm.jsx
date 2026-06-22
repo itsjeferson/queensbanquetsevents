@@ -81,7 +81,7 @@ export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send
               </label>
             </div>
           </div>
-          <button type="submit" className="btn btn-gold btn-lg" style={{ width: '100%' }} disabled={loading}>
+          <button type="submit" className="btn btn-gold btn-lg inv-std-modern-confirm-btn" style={{ width: '100%' }} disabled={loading}>
             {loading ? 'Sending...' : submitLabel}
           </button>
         </form>
