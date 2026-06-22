@@ -9,6 +9,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        var path = location.pathname;
+        var inviteMatch = path.match(/^\/(?:invite|invitation)\/([^/]+)\/?$/);
+        var codeMatch = path.match(/^\/i\/([^/]+)\/?$/);
+        var segment = inviteMatch ? inviteMatch[1] : codeMatch ? codeMatch[1] : null;
+        if (!segment) return;
+        var hashPath = codeMatch ? '/#/i/' + decodeURIComponent(segment) : '/#/invite/' + decodeURIComponent(segment);
+        location.replace(location.origin + hashPath + location.search);
+      })();
+    </script>
     <script type="module" src="/src/app/main.jsx"></script>
   </body>
 </html>

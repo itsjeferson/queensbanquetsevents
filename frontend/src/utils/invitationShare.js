@@ -6,20 +6,26 @@ export function getPublicSiteOrigin() {
   return '';
 }
 
-export function getInvitationShareUrl({ slug, inviteCode } = {}) {
-  const origin = getPublicSiteOrigin();
-
+/** Path-only link (no hash) — works reliably in QR codes and phone cameras. */
+export function getInvitationSharePath({ slug, inviteCode } = {}) {
   if (slug) {
-    return `${origin}/#/invite/${encodeURIComponent(slug)}`;
+    return `/invite/${encodeURIComponent(slug)}`;
   }
 
   if (inviteCode) {
-    return `${origin}/#/event/${encodeURIComponent(inviteCode)}`;
+    return `/i/${encodeURIComponent(inviteCode)}`;
   }
 
-  if (typeof window === 'undefined') return origin;
+  return '';
+}
 
-  const { pathname, hash } = window.location;
-  const base = `${origin}${pathname}${hash || ''}`;
-  return base.split('?')[0];
+export function getInvitationShareUrl({ slug, inviteCode } = {}) {
+  const origin = getPublicSiteOrigin();
+  const path = getInvitationSharePath({ slug, inviteCode });
+
+  if (path) {
+    return `${origin}${path}`;
+  }
+
+  return origin || '';
 }

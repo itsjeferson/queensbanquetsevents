@@ -324,7 +324,7 @@ export function getPreviewPath(slug, { guestPreview = true, resetRsvp = false } 
   const params = new URLSearchParams();
   if (guestPreview) params.set('guest', '1');
   if (resetRsvp) params.set('reset', '1');
-  const path = `/#/invite/${encodeURIComponent(slug)}`;
+  const path = `/invite/${encodeURIComponent(slug)}`;
   const query = params.toString();
   return query ? `${path}?${query}` : path;
 }

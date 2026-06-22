@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
@@ -12,56 +12,71 @@ import {
 import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
-  const { slug } = useParams();
+  const { slug, code } = useParams();
   const [searchParams] = useSearchParams();
   const resetRsvpUnlock = searchParams.get('reset') === '1';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const lookupByCode = Boolean(code && !slug);
+  const identifier = slug || code;
+
+  const draftKey = useMemo(() => {
+    if (!identifier) return null;
+    return lookupByCode ? identifier.toUpperCase() : identifier;
+  }, [identifier, lookupByCode]);
+
   const loadInvitation = useCallback(async ({ showLoading = false } = {}) => {
-    if (!slug) return;
+    if (!identifier) return;
     if (showLoading) setLoading(true);
 
-    const draft = getLocalInvitationDraft(slug);
+    const draft = getLocalInvitationDraft(draftKey);
+
+    const applyPayload = (payload) => {
+      setData(buildInvitationPreviewData(mergeInvitationPayloadWithDraft(payload, draft)));
+    };
 
     try {
-      const res = await invitationService.getPreviewBySlug(slug);
-      setData(buildInvitationPreviewData(mergeInvitationPayloadWithDraft(res.data, draft)));
-      return;
-    } catch {
+      if (lookupByCode) {
+        const res = await invitationService.getByCode(identifier);
+        applyPayload(res.data);
+        return;
+      }
+
       try {
-        const res = await invitationService.getBySlug(slug);
-        setData(buildInvitationPreviewData(mergeInvitationPayloadWithDraft(res.data, draft)));
+        const res = await invitationService.getPreviewBySlug(identifier);
+        applyPayload(res.data);
         return;
       } catch {
-        if (draft) {
-          setData(buildInvitationPreviewData(draft));
-          return;
-        }
-        setData(null);
+        const res = await invitationService.getBySlug(identifier);
+        applyPayload(res.data);
       }
+    } catch {
+      if (draft) {
+        setData(buildInvitationPreviewData(draft));
+        return;
+      }
+      setData(null);
     } finally {
       if (showLoading) setLoading(false);
     }
-  }, [slug]);
+  }, [draftKey, identifier, lookupByCode]);
 
   useEffect(() => {
     loadInvitation({ showLoading: true });
   }, [loadInvitation]);
 
   useEffect(() => {
-    if (!slug) return undefined;
-
-    const matchesSlug = (detail) => detail?.slug === slug;
+    if (!identifier || lookupByCode) return undefined;
 
     const onDraftUpdated = (event) => {
-      if (matchesSlug(event.detail)) {
+      if (event.detail?.slug === identifier) {
         loadInvitation();
       }
     };
 
     const onStorage = (event) => {
-      if (isInvitationDraftStorageKey(event.key, slug)) {
+      if (isInvitationDraftStorageKey(event.key, identifier)) {
         loadInvitation();
       }
     };
@@ -72,7 +87,7 @@ export default function PublicInvitation() {
       window.removeEventListener(INVITATION_DRAFT_UPDATED_EVENT, onDraftUpdated);
       window.removeEventListener('storage', onStorage);
     };
-  }, [loadInvitation, slug]);
+  }, [identifier, loadInvitation, lookupByCode]);
 
   if (loading) {
     return (

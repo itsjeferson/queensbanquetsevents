@@ -21,7 +21,7 @@ import WeddingContentFields from '../../components/invitation/WeddingContentFiel
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
 
-const INVITATION_ENTRY = '/#';
+const INVITATION_ENTRY = '';
 const AUTO_SAVE_DELAY_MS = 600;
 
 function mapInvitationFromApi(invitation) {
