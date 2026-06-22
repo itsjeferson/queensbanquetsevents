@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { guestMessageService } from '../../services/invitationService';
+import FloralCornerFrame from './FloralCornerFrame';
 
 export default function GuestBook({ eventId, messages: initialMessages = [] }) {
   const [messages, setMessages] = useState(initialMessages);
@@ -23,7 +24,8 @@ export default function GuestBook({ eventId, messages: initialMessages = [] }) {
 
   return (
     <section className="inv-section-full" id="guestbook">
-      <div className="inv-section">
+      <FloralCornerFrame className="inv-floral-frame-section">
+        <div className="inv-section">
         <p className="inv-section-tag">Wishes</p>
         <h2>Guest Book</h2>
         <div className="inv-divider" />
@@ -53,7 +55,8 @@ export default function GuestBook({ eventId, messages: initialMessages = [] }) {
             ))}
           </div>
         )}
-      </div>
+        </div>
+      </FloralCornerFrame>
     </section>
   );
 }

@@ -4,7 +4,7 @@ function normalizeNames(value) {
   return [''];
 }
 
-export default function EntourageNameListEditor({ label, names, onChange }) {
+export default function EntourageNameListEditor({ label, names, onChange, addLabel = '+ Add Name' }) {
   const items = normalizeNames(names);
 
   const updateName = (index, value) => {
@@ -41,7 +41,7 @@ export default function EntourageNameListEditor({ label, names, onChange }) {
         </div>
       ))}
       <button type="button" className="btn btn-outline btn-sm" onClick={addName}>
-        + Add Name
+        {addLabel}
       </button>
     </div>
   );

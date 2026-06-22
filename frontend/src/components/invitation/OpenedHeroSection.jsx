@@ -1,7 +1,7 @@
 import { parseEventDate } from '../../utils/eventDate';
 import { getCoupleDisplayName } from '../../utils/invitationContent';
 
-export default function OpenedHeroSection({ event, invitation }) {
+export default function OpenedHeroSection({ event, invitation, animateHero = true }) {
   const parsed = parseEventDate(event.event_date);
   const dateLabel = parsed
     ? parsed.toLocaleDateString('en-US', {
@@ -21,7 +21,7 @@ export default function OpenedHeroSection({ event, invitation }) {
         <div className="inv-opened-hero-bg inv-hero-placeholder" />
       )}
       <div className="inv-opened-hero-overlay" />
-      <div className="inv-opened-hero-content inv-animate-rise">
+      <div className={`inv-opened-hero-content${animateHero ? ' inv-animate-rise' : ''}`}>
         <h1>{getCoupleDisplayName(event, invitation)}</h1>
         <div className="inv-opened-hero-line" />
         {dateLabel && <p className="inv-opened-hero-date">{dateLabel}</p>}

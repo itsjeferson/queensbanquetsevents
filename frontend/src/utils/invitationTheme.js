@@ -171,6 +171,9 @@ export function getInvitationThemeStyles(invitation = {}) {
   const themeInput = extractInvitationThemeInput(invitation);
   const theme = getInvitationTheme({ ...invitation, ...themeInput });
   const rgb = parseHex(theme.primary);
+  const accents = theme.accent_colors || [];
+  const bloom = accents[2] || theme.primary;
+  const leaf = accents[3] || theme.primary_dark;
 
   return {
     '--inv-primary': theme.primary,
@@ -182,6 +185,11 @@ export function getInvitationThemeStyles(invitation = {}) {
     '--inv-primary-soft-strong': rgbaFromHex(theme.primary, 0.18),
     '--inv-primary-border': rgbaFromHex(theme.primary, 0.28),
     '--inv-primary-shadow': rgbaFromHex(theme.primary, 0.35),
+    '--inv-floral-bloom': bloom,
+    '--inv-floral-bloom-soft': rgbaFromHex(bloom, 0.62),
+    '--inv-floral-leaf': leaf,
+    '--inv-floral-leaf-soft': rgbaFromHex(leaf, 0.72),
+    '--inv-floral-line': theme.primary,
     background: theme.background,
   };
 }

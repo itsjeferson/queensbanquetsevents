@@ -11,6 +11,7 @@ import {
 import { slugFromEventName } from '../../utils/slug';
 import { defaultWeddingInvitationContent, normalizeInvitationContent } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
+import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
 
 const EVENT_TYPES = [
@@ -273,6 +274,11 @@ export default function InvitationBuilder() {
         {step === 2 && (
           <>
             <h3>Ready to Publish</h3>
+            <InvitationExperienceSettings
+              invitation={form.invitation}
+              onChange={(patch) => updateInvitation(patch)}
+              embedded
+            />
             <div style={{ marginTop: 20, padding: 24, background: 'var(--beige)', borderRadius: 12 }}>
               <p><strong>Event:</strong> {form.event_name}</p>
               <p><strong>Type:</strong> {form.event_type}</p>
@@ -328,7 +334,11 @@ export default function InvitationBuilder() {
                 onClick={() => {
                   const slug = form.slug || slugFromEventName(form.event_name);
                   persistInvitationPreview(null, slug);
-                  window.open(getPreviewPath(slug), '_blank', 'noopener,noreferrer');
+                  window.open(
+                    getPreviewPath(slug, { resetRsvp: Boolean(form.invitation.save_the_date_enabled) }),
+                    '_blank',
+                    'noopener,noreferrer',
+                  );
                 }}
               >
                 Preview Invitation

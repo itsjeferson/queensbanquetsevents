@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import CoverScreen from './CoverScreen';
 import Countdown from './Countdown';
 import OpenedHeroSection from './OpenedHeroSection';
@@ -17,12 +17,16 @@ import RSVPForm from './RSVPForm';
 import GuestBook from './GuestBook';
 import QRShare from './QRShare';
 import InvitationFooter from './InvitationFooter';
+import SaveTheDateScreen from './SaveTheDateScreen';
+import RevealSection from './RevealSection';
+import FloralCornerFrame from './FloralCornerFrame';
 import { normalizeInvitationContent } from '../../utils/invitationContent';
 import {
   buildInvitationThemeCss,
   extractInvitationThemeInput,
   getInvitationThemeStyles,
 } from '../../utils/invitationTheme';
+import { hasRsvpUnlocked, setRsvpUnlocked, clearRsvpUnlock } from '../../utils/rsvpUnlock';
 import '../../styles/invitation.css';
 
 const TYPE_LABELS = {
@@ -33,10 +37,27 @@ const TYPE_LABELS = {
   corporate: { together: 'You Are Invited', invite: 'Join Us For This Special Event' },
 };
 
-export default function InvitationRenderer({ data }) {
-  const [opened, setOpened] = useState(false);
-  const [musicOn, setMusicOn] = useState(false);
-  const audioRef = useRef(null);
+function isRsvpUnlocked(event, saveTheDateEnabled) {
+  if (!saveTheDateEnabled) return true;
+  return hasRsvpUnlocked(event);
+}
+
+function SectionWrap({ gradual, children, className = '' }) {
+  if (!gradual) return children;
+  return <RevealSection enabled className={className}>{children}</RevealSection>;
+}
+
+function FloralSection({ gradual, children }) {
+  return (
+    <SectionWrap gradual={gradual}>
+      <FloralCornerFrame className="inv-floral-frame-section">
+        {children}
+      </FloralCornerFrame>
+    </SectionWrap>
+  );
+}
+
+export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
   const themeInput = extractInvitationThemeInput(rawInvitation);
   const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
@@ -46,6 +67,33 @@ export default function InvitationRenderer({ data }) {
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const themeCss = buildInvitationThemeCss(themedInvitation);
   const themeId = themeInput.color_motif || 'classic-gold';
+
+  const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
+  const gradualReveal = invitation.content_reveal_mode === 'gradual';
+
+  const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
+    if (resetRsvpUnlock && saveTheDateEnabled) return false;
+    return isRsvpUnlocked(event, saveTheDateEnabled);
+  });
+  const [opened, setOpened] = useState(() => {
+    if (resetRsvpUnlock && saveTheDateEnabled) return false;
+    return saveTheDateEnabled && isRsvpUnlocked(event, saveTheDateEnabled);
+  });
+  const [musicOn, setMusicOn] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (resetRsvpUnlock && saveTheDateEnabled) {
+      clearRsvpUnlock(event);
+      setRsvpUnlockedState(false);
+      setOpened(false);
+      return;
+    }
+
+    const unlocked = isRsvpUnlocked(event, saveTheDateEnabled);
+    setRsvpUnlockedState(unlocked);
+    if (saveTheDateEnabled && unlocked) setOpened(true);
+  }, [event?.slug, event?.id, event?.invite_code, saveTheDateEnabled, resetRsvpUnlock]);
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;
@@ -61,6 +109,14 @@ export default function InvitationRenderer({ data }) {
     setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 120);
   };
 
+  const handleSaveTheDateRsvp = ({ name, attendance }) => {
+    setRsvpUnlocked(event, { name, attendance });
+    setRsvpUnlockedState(true);
+    setOpened(true);
+    startMusic();
+    setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 200);
+  };
+
   const toggleMusic = () => {
     if (!audioRef.current) return;
     if (audioRef.current.paused) {
@@ -71,75 +127,131 @@ export default function InvitationRenderer({ data }) {
     }
   };
 
+  const showSaveTheDate = saveTheDateEnabled && !rsvpUnlocked;
+  const showCover = !showSaveTheDate && !opened;
+  const showInvitation = opened && !showSaveTheDate;
+
   return (
     <>
       <style>{themeCss}</style>
       <div
         className="invitation-page"
         data-inv-theme={themeId}
+        data-reveal-mode={gradualReveal ? 'gradual' : 'full'}
         style={themeStyles}
       >
-      {invitation.music_url && (
-        <audio ref={audioRef} src={invitation.music_url} loop preload="auto" playsInline />
-      )}
-      {invitation.music_url && opened && (
-        <button type="button" className="inv-music-toggle" onClick={toggleMusic}>
-          {musicOn ? 'Pause Music' : 'Play Music'}
-        </button>
-      )}
+        {invitation.music_url && (
+          <audio ref={audioRef} src={invitation.music_url} loop preload="auto" playsInline />
+        )}
+        {invitation.music_url && opened && (
+          <button type="button" className="inv-music-toggle" onClick={toggleMusic}>
+            {musicOn ? 'Pause Music' : 'Play Music'}
+          </button>
+        )}
 
-      <CoverScreen event={event} invitation={invitation} onOpen={scrollToContent} labels={labels} />
-
-      {opened && (
-        <main id="inv-main" className="inv-main">
-          <OpenedHeroSection event={event} invitation={invitation} />
-
-          <QuoteBlock quote={invitation.quote} source={invitation.quote_source} compact />
-
-          <StoryIntroSection story={invitation.story} showMessages={false} />
-
-          <QuoteBlock quote={invitation.secondary_quote} compact />
-
-          <CoupleInitialsSection event={event} invitation={invitation} />
-
-          <StoryIntroSection
-            showTitleImage={false}
-            invitationMessage={invitation.story.invitation_message || invitation.invitation_message}
-            acceptanceMessage={invitation.story.acceptance_message || invitation.acceptance_message}
+        {showSaveTheDate && (
+          <SaveTheDateScreen
+            event={event}
+            invitation={invitation}
+            onRsvpSuccess={handleSaveTheDateRsvp}
           />
+        )}
 
-          <CoupleShowcaseSection groom={invitation.groom_profile} bride={invitation.bride_profile} />
+        {showCover && (
+          <CoverScreen event={event} invitation={invitation} onOpen={scrollToContent} labels={labels} />
+        )}
 
-          <WeddingDetailsSection event={event} venue={invitation.venue} />
+        {showInvitation && (
+          <main id="inv-main" className="inv-main">
+            <SectionWrap gradual={gradualReveal}>
+              <OpenedHeroSection event={event} invitation={invitation} animateHero={!gradualReveal} />
+            </SectionWrap>
 
-          <section className="inv-countdown-band" id="countdown">
-            {invitation.gallery?.[2]?.image && <img src={invitation.gallery[2].image} alt="" />}
-            <div className="inv-countdown-overlay">
-              <p>The Countdown</p>
-              <Countdown eventDate={event.event_date} />
-            </div>
-          </section>
+            <SectionWrap gradual={gradualReveal}>
+              <QuoteBlock quote={invitation.quote} source={invitation.quote_source} compact />
+            </SectionWrap>
 
-          <RSVPForm eventId={event.id} note={invitation.rsvp_note} />
+            <SectionWrap gradual={gradualReveal}>
+              <StoryIntroSection story={invitation.story} showMessages={false} />
+            </SectionWrap>
 
-          <EntourageFullSection entourage={invitation.entourage} />
+            <SectionWrap gradual={gradualReveal}>
+              <QuoteBlock quote={invitation.secondary_quote} compact />
+            </SectionWrap>
 
-          <AttireGuideSection attire={invitation.attire} dressCode={invitation.dress_code} />
+            <FloralSection gradual={gradualReveal}>
+              <CoupleInitialsSection event={event} invitation={invitation} />
+            </FloralSection>
 
-          <TimelineSection program={invitation.program} />
+            <FloralSection gradual={gradualReveal}>
+              <StoryIntroSection
+                showTitleImage={false}
+                invitationMessage={invitation.story.invitation_message || invitation.invitation_message}
+                acceptanceMessage={invitation.story.acceptance_message || invitation.acceptance_message}
+              />
+            </FloralSection>
 
-          <GiftRegistry registry={invitation.gift_registry} />
+            <FloralSection gradual={gradualReveal}>
+              <CoupleShowcaseSection groom={invitation.groom_profile} bride={invitation.bride_profile} />
+            </FloralSection>
 
-          <FaqSection faqs={invitation.faqs} />
+            <SectionWrap gradual={gradualReveal}>
+              <WeddingDetailsSection event={event} venue={invitation.venue} />
+            </SectionWrap>
 
-          <HappyMomentsSlideshow gallery={invitation.gallery} />
+            <SectionWrap gradual={gradualReveal}>
+              <section className="inv-countdown-band" id="countdown">
+                {invitation.gallery?.[2]?.image && <img src={invitation.gallery[2].image} alt="" />}
+                <div className="inv-countdown-overlay">
+                  <p>The Countdown</p>
+                  <Countdown eventDate={event.event_date} />
+                </div>
+              </section>
+            </SectionWrap>
 
-          <GuestBook eventId={event.id} messages={guestMessages} />
+            {!saveTheDateEnabled && (
+              <FloralSection gradual={gradualReveal}>
+                <RSVPForm eventId={event.id} note={invitation.rsvp_note} />
+              </FloralSection>
+            )}
 
-          <QRShare url={shareUrl} enabled={invitation.qr_enabled} />
-          <InvitationFooter eventName={event.event_name} shareUrl={shareUrl} />
-        </main>
-      )}
+            <FloralSection gradual={gradualReveal}>
+              <EntourageFullSection entourage={invitation.entourage} />
+            </FloralSection>
+
+            <FloralSection gradual={gradualReveal}>
+              <AttireGuideSection attire={invitation.attire} dressCode={invitation.dress_code} />
+            </FloralSection>
+
+            <FloralSection gradual={gradualReveal}>
+              <TimelineSection program={invitation.program} />
+            </FloralSection>
+
+            <SectionWrap gradual={gradualReveal}>
+              <GiftRegistry registry={invitation.gift_registry} />
+            </SectionWrap>
+
+            <FloralSection gradual={gradualReveal}>
+              <FaqSection faqs={invitation.faqs} />
+            </FloralSection>
+
+            <SectionWrap gradual={gradualReveal}>
+              <HappyMomentsSlideshow gallery={invitation.gallery} />
+            </SectionWrap>
+
+            <SectionWrap gradual={gradualReveal}>
+              <GuestBook eventId={event.id} messages={guestMessages} />
+            </SectionWrap>
+
+            <SectionWrap gradual={gradualReveal}>
+              <QRShare url={shareUrl} enabled={invitation.qr_enabled} />
+            </SectionWrap>
+
+            <SectionWrap gradual={gradualReveal}>
+              <InvitationFooter eventName={event.event_name} shareUrl={shareUrl} />
+            </SectionWrap>
+          </main>
+        )}
       </div>
     </>
   );

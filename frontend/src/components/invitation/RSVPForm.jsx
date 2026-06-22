@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { rsvpService } from '../../services/invitationService';
 
-export default function RSVPForm({ eventId, note }) {
+export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send', variant = 'default' }) {
   const [form, setForm] = useState({ name: '', attendance: 'yes' });
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,18 +18,30 @@ export default function RSVPForm({ eventId, note }) {
         guest_count: form.attendance === 'yes' ? 1 : 0,
       });
       setStatus('success');
+      onSuccess?.({ name: form.name, attendance: form.attendance });
       setForm({ name: '', attendance: 'yes' });
     } catch {
       setStatus('success');
+      onSuccess?.({ name: form.name, attendance: form.attendance });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="inv-section" id="rsvp">
-      <p className="inv-script-title inv-script-title-small">Attendance Confirmation</p>
-      <div className="inv-divider" />
+    <section className={`inv-section inv-rsvp-${variant}`} id="rsvp">
+      {variant === 'save-the-date' ? (
+        <div className="inv-std-rsvp-heading">
+          <span className="inv-std-rsvp-heading-line" aria-hidden="true" />
+          <p className="inv-std-rsvp-heading-text">RSVP</p>
+          <span className="inv-std-rsvp-heading-line" aria-hidden="true" />
+        </div>
+      ) : (
+        <>
+          <p className="inv-script-title inv-script-title-small">Attendance Confirmation</p>
+          <div className="inv-divider" />
+        </>
+      )}
       <p className="inv-rsvp-note">
         {note || 'Please let us know if you can join us.'}
       </p>
@@ -70,7 +82,7 @@ export default function RSVPForm({ eventId, note }) {
             </div>
           </div>
           <button type="submit" className="btn btn-gold btn-lg" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Sending...' : 'Send'}
+            {loading ? 'Sending...' : submitLabel}
           </button>
         </form>
       )}

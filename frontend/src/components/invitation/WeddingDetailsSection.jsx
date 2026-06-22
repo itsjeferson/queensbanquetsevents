@@ -1,4 +1,5 @@
 import { parseEventDate } from '../../utils/eventDate';
+import FloralCornerFrame from './FloralCornerFrame';
 
 function VenueCard({ label, venue }) {
   if (!venue?.name?.trim() && !venue?.address?.trim() && !venue?.time?.trim()) return null;
@@ -40,12 +41,14 @@ export default function WeddingDetailsSection({ event, venue }) {
   return (
     <section className="inv-details-band" id="details">
       <div className="inv-details-card">
-        <p className="inv-script-title inv-script-title-small">Wedding Details</p>
-        {dateLabel && <h2>{dateLabel}</h2>}
-        <div className="inv-details-grid">
-          {hasCeremony && <VenueCard label="Ceremony" venue={ceremony} />}
-          {hasReception && <VenueCard label="Reception" venue={reception} />}
-        </div>
+        <FloralCornerFrame className="inv-floral-frame-card">
+          <p className="inv-script-title inv-script-title-small">Wedding Details</p>
+          {dateLabel && <h2>{dateLabel}</h2>}
+          <div className="inv-details-grid">
+            {hasCeremony && <VenueCard label="Ceremony" venue={ceremony} />}
+            {hasReception && <VenueCard label="Reception" venue={reception} />}
+          </div>
+        </FloralCornerFrame>
       </div>
     </section>
   );

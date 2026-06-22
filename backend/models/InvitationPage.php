@@ -118,6 +118,11 @@ class InvitationPage
             'qr_enabled' => (int) ($row['qr_enabled'] ?? 1),
             'color_motif' => $story['color_motif'] ?? 'classic-gold',
             'background_color' => $story['background_color'] ?? '#FFFAF5',
+            'save_the_date_enabled' => (bool) ($story['save_the_date_enabled'] ?? false),
+            'std_message' => $story['std_message'] ?? '',
+            'std_cover_image' => $story['std_cover_image'] ?? '',
+            'std_location' => $story['std_location'] ?? '',
+            'content_reveal_mode' => ($story['content_reveal_mode'] ?? 'full') === 'gradual' ? 'gradual' : 'full',
             'published_at' => $row['published_at'] ?? null,
         ];
     }
@@ -156,6 +161,13 @@ class InvitationPage
         $story['acceptance_message'] = $story['acceptance_message'] ?? ($data['acceptance_message'] ?? '');
         $story['groom_profile'] = $data['groom_profile'] ?? ($story['groom_profile'] ?? []);
         $story['bride_profile'] = $data['bride_profile'] ?? ($story['bride_profile'] ?? []);
+        $story['save_the_date_enabled'] = (bool) ($data['save_the_date_enabled'] ?? ($story['save_the_date_enabled'] ?? false));
+        $story['std_message'] = $data['std_message'] ?? ($story['std_message'] ?? '');
+        $story['std_cover_image'] = $data['std_cover_image'] ?? ($story['std_cover_image'] ?? '');
+        $story['std_location'] = $data['std_location'] ?? ($story['std_location'] ?? '');
+        $story['content_reveal_mode'] = ($data['content_reveal_mode'] ?? ($story['content_reveal_mode'] ?? 'full')) === 'gradual'
+            ? 'gradual'
+            : 'full';
 
         return [
             'template_id' => $data['template_id'] ?? null,

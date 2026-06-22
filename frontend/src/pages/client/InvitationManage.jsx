@@ -16,6 +16,7 @@ import {
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
 import { normalizeInvitationContent } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
+import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
 
 const INVITATION_ENTRY = '/#';
@@ -343,6 +344,15 @@ export default function InvitationManage({ variant = 'client' }) {
     syncToServer({ publish: true });
   };
 
+  const handlePreviewInvitation = () => {
+    persistLocalDraft();
+    window.open(
+      getPreviewPath(event.slug, { resetRsvp: Boolean(invitation.save_the_date_enabled) }),
+      '_blank',
+      'noopener,noreferrer',
+    );
+  };
+
   if (loadError) {
     return (
       <div className="card-widget">
@@ -388,7 +398,9 @@ export default function InvitationManage({ variant = 'client' }) {
             <button type="button" className="btn btn-outline" onClick={() => setPreviewOpen(true)}>Preview Invitation</button>
           )}
           {event.slug && variant === 'client' && (
-            <a href={getPreviewPath(event.slug)} target="_blank" rel="noreferrer" className="btn btn-outline">Preview Invitation</a>
+            <button type="button" className="btn btn-outline" onClick={handlePreviewInvitation}>
+              Preview Invitation
+            </button>
           )}
         </div>
       </div>
@@ -448,6 +460,8 @@ export default function InvitationManage({ variant = 'client' }) {
           </div>
         </div>
       </div>
+
+      <InvitationExperienceSettings invitation={invitation} onChange={updateInvitation} />
 
       <WeddingContentFields
         invitation={invitation}

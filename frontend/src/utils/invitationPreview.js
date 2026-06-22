@@ -89,6 +89,28 @@ function hasAttireDetails(attire, dressCode) {
   );
 }
 
+function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
+  const merged = { ...apiInvitation };
+  const fields = ['save_the_date_enabled', 'std_message', 'std_cover_image', 'std_location', 'content_reveal_mode'];
+
+  fields.forEach((field) => {
+    if (field in draftInvitation) {
+      merged[field] = draftInvitation[field];
+    }
+  });
+
+  return merged;
+}
+
+function withDraftGuestExperience(payload, draft) {
+  if (!payload || !draft?.invitation) return payload;
+
+  return {
+    ...payload,
+    invitation: mergeGuestExperienceFields(payload.invitation || {}, draft.invitation),
+  };
+}
+
 export function mergeInvitationPayloadWithDraft(apiPayload, draft) {
   if (!apiPayload) return draft || null;
   if (!draft?.invitation) return apiPayload;
@@ -98,8 +120,12 @@ export function mergeInvitationPayloadWithDraft(apiPayload, draft) {
   const draftMotif = draftTheme.color_motif || 'classic-gold';
   const apiMotif = apiTheme.color_motif || 'classic-gold';
 
-  if (draftMotif === 'classic-gold' && apiMotif !== 'classic-gold') return apiPayload;
-  if (draftMotif === apiMotif) return apiPayload;
+  if (draftMotif === 'classic-gold' && apiMotif !== 'classic-gold') {
+    return withDraftGuestExperience(apiPayload, draft);
+  }
+  if (draftMotif === apiMotif) {
+    return withDraftGuestExperience(apiPayload, draft);
+  }
 
   const themeFields = resolveInvitationThemeFields({
     ...(apiPayload.invitation || {}),
@@ -107,13 +133,13 @@ export function mergeInvitationPayloadWithDraft(apiPayload, draft) {
     color_motif: draftMotif,
   });
 
-  return {
+  return withDraftGuestExperience({
     ...apiPayload,
     invitation: {
       ...(apiPayload.invitation || {}),
       ...themeFields,
     },
-  };
+  }, draft);
 }
 
 export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_messages } = {}) {
@@ -192,6 +218,11 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       attire: hasAttireDetails(invitation.attire, invitation.dress_code)
         ? normalized.attire
         : templateInv.attire,
+      save_the_date_enabled: normalized.save_the_date_enabled,
+      std_message: pickText(invitation.std_message) || normalized.std_message,
+      std_cover_image: pickText(invitation.std_cover_image) || normalized.std_cover_image,
+      std_location: pickText(invitation.std_location) || normalized.std_location,
+      content_reveal_mode: normalized.content_reveal_mode,
       ...themeFields,
     },
     guest_messages: guest_messages || [],
@@ -270,6 +301,11 @@ export function getClientPreviewSlug(clientId) {
   return localStorage.getItem(CLIENT_PREVIEW_KEY);
 }
 
-export function getPreviewPath(slug) {
-  return `/#/invite/${encodeURIComponent(slug)}`;
+export function getPreviewPath(slug, { guestPreview = true, resetRsvp = false } = {}) {
+  const params = new URLSearchParams();
+  if (guestPreview) params.set('guest', '1');
+  if (resetRsvp) params.set('reset', '1');
+  const path = `/#/invite/${encodeURIComponent(slug)}`;
+  const query = params.toString();
+  return query ? `${path}?${query}` : path;
 }

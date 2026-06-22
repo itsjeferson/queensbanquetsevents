@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
 import { buildInvitationPreviewData, getLocalInvitationDraft, mergeInvitationPayloadWithDraft } from '../../utils/invitationPreview';
@@ -7,6 +7,8 @@ import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
   const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+  const resetRsvpUnlock = searchParams.get('reset') === '1';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -55,5 +57,5 @@ export default function PublicInvitation() {
     );
   }
 
-  return <InvitationRenderer data={data} />;
+  return <InvitationRenderer data={data} resetRsvpUnlock={resetRsvpUnlock} />;
 }

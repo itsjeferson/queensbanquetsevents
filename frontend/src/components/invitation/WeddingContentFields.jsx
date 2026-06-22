@@ -341,19 +341,21 @@ export default function WeddingContentFields({
             <input value={entourage.groom?.name || ''} onChange={(e) => updateEntourageNested('groom', 'name', e.target.value)} />
           </div>
           <div className="form-group">
-            <label>Parents of Groom</label>
-            <input value={entourage.groom?.parents || ''} onChange={(e) => updateEntourageNested('groom', 'parents', e.target.value)} />
-          </div>
-        </div>
-        <div className="form-row">
-          <div className="form-group">
             <label>Bride Name</label>
             <input value={entourage.bride?.name || ''} onChange={(e) => updateEntourageNested('bride', 'name', e.target.value)} />
           </div>
-          <div className="form-group">
-            <label>Parents of Bride</label>
-            <input value={entourage.bride?.parents || ''} onChange={(e) => updateEntourageNested('bride', 'parents', e.target.value)} />
-          </div>
+        </div>
+        <div className="form-row">
+          <EntourageNameListEditor
+            label="Parents of Groom"
+            names={entourage.groom?.parents}
+            onChange={(names) => updateEntourageNested('groom', 'parents', names)}
+          />
+          <EntourageNameListEditor
+            label="Parents of Bride"
+            names={entourage.bride?.parents}
+            onChange={(names) => updateEntourageNested('bride', 'parents', names)}
+          />
         </div>
         <div className="form-row">
           <EntourageNameListEditor
@@ -425,11 +427,13 @@ export default function WeddingContentFields({
             onChange={(names) => updateEntourage({ coin_bearer: names })}
           />
         </div>
-        <EntourageNameListEditor
-          label="Flower Girls"
-          names={entourage.flower_girls}
-          onChange={(names) => updateEntourage({ flower_girls: names })}
-        />
+        <div className="form-row">
+          <EntourageNameListEditor
+            label="Flower Girls"
+            names={entourage.flower_girls}
+            onChange={(names) => updateEntourage({ flower_girls: names })}
+          />
+        </div>
       </div>
 
       <div className="card-widget">

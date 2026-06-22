@@ -21,8 +21,8 @@ export const defaultVenueLocation = () => ({
 });
 
 export const defaultEntourage = () => ({
-  groom: { name: '', parents: '' },
-  bride: { name: '', parents: '' },
+  groom: { name: '', parents: [] },
+  bride: { name: '', parents: [] },
   principal_sponsors: { male: [], female: [] },
   secondary_sponsors: { candle: [], veil: [], cord: [] },
   best_men: [],
@@ -101,11 +101,24 @@ export const defaultWeddingInvitationContent = {
   primary_color: '#B47B36',
   secondary_color: '#F4EEE7',
   background_color: '#FFFAF5',
+  save_the_date_enabled: false,
+  std_message: '',
+  std_cover_image: '',
+  std_location: '',
+  content_reveal_mode: 'full',
 };
 
 function asList(value) {
   if (Array.isArray(value)) return value.filter(Boolean);
   if (typeof value === 'string' && value.trim()) return [value.trim()];
+  return [];
+}
+
+function normalizeParents(value) {
+  if (Array.isArray(value)) return asList(value);
+  if (typeof value === 'string' && value.trim()) {
+    return value.split(/\s*&\s*/).map((part) => part.trim()).filter(Boolean);
+  }
   return [];
 }
 
@@ -135,8 +148,18 @@ function mergeEntourage(entourage) {
   return {
     ...base,
     ...entourage,
-    groom: { ...base.groom, ...(entourage.groom || {}) },
-    bride: { ...base.bride, ...(entourage.bride || {}) },
+    groom: {
+      ...base.groom,
+      ...(entourage.groom || {}),
+      name: entourage.groom?.name || '',
+      parents: normalizeParents(entourage.groom?.parents),
+    },
+    bride: {
+      ...base.bride,
+      ...(entourage.bride || {}),
+      name: entourage.bride?.name || '',
+      parents: normalizeParents(entourage.bride?.parents),
+    },
     principal_sponsors: {
       ...base.principal_sponsors,
       ...(entourage.principal_sponsors && !Array.isArray(entourage.principal_sponsors)
@@ -190,6 +213,11 @@ export function normalizeInvitationContent(invitation = {}) {
     program: invitation.program?.length ? invitation.program : defaultWeddingProgram(),
     gallery: Array.isArray(invitation.gallery) ? invitation.gallery : [],
     faqs: Array.isArray(invitation.faqs) ? invitation.faqs : [],
+    save_the_date_enabled: Boolean(invitation.save_the_date_enabled),
+    std_message: invitation.std_message || '',
+    std_cover_image: invitation.std_cover_image || '',
+    std_location: invitation.std_location || '',
+    content_reveal_mode: invitation.content_reveal_mode === 'gradual' ? 'gradual' : 'full',
     ...resolveInvitationThemeFields(themeInput),
   };
 }
