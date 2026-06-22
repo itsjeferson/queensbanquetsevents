@@ -1662,6 +1662,99 @@
   margin: 0 0 10px;
 }
 
+.inv-std-venues {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 22px auto 0;
+  max-width: 520px;
+}
+
+.inv-std-venue-card {
+  text-align: center;
+}
+
+.inv-std-venue-label {
+  display: block;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(9px, 2.1vw, 10px);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--inv-primary);
+  margin-bottom: 8px;
+}
+
+.inv-std-venue-photo {
+  margin: 0 0 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid rgba(var(--inv-primary-rgb), 0.15);
+}
+
+.inv-std-venue-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.inv-std-venue-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(11px, 2.6vw, 13px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.inv-std-venue-time {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(13px, 3vw, 16px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--inv-primary);
+  margin: 6px 0 0;
+}
+
+.inv-std-venue-address {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(10px, 2.4vw, 12px);
+  line-height: 1.5;
+  color: #666;
+  margin: 4px 0 0;
+}
+
+.inv-std-venue-photo a {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.inv-std-venue-map {
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 8px 14px;
+  background: var(--inv-primary);
+  border: 1px solid var(--inv-primary);
+  color: #fff;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.inv-std-venue-map:hover {
+  background: var(--inv-primary-dark);
+  border-color: var(--inv-primary-dark);
+}
+
 .inv-std-location {
   margin: 0 0 12px;
   color: #1a1a1a;
@@ -1940,6 +2033,11 @@
 
   .inv-std-details {
     padding: 40px 18px 56px;
+  }
+
+  .inv-std-venues {
+    grid-template-columns: 1fr;
+    max-width: 280px;
   }
 
   .inv-std .inv-countdown {

@@ -315,6 +315,9 @@ export default function WeddingContentFields({
             </div>
             <MediaField
               label="Venue Photo"
+              urlLabel="Online photo URL"
+              placeholder="https://example.com/venue-photo.jpg"
+              urlHint="Paste a direct link to an online photo (recommended), or upload a file from your device."
               value={invitation.venue?.[type]?.image || ''}
               onChange={(value) => onVenueChange(type, 'image', value)}
               accept="image/*"

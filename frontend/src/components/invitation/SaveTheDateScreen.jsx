@@ -37,14 +37,56 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
           <h1 className="inv-std-couple">{coupleName}</h1>
           {dateLine && <p className="inv-std-date">{dateLine}</p>}
           {locations.length > 0 && (
-            <div className="inv-std-locations">
+            <div className="inv-std-venues">
               {locations.map((location) => (
-                <div key={location.key} className="inv-std-location">
+                <article key={location.key} className="inv-std-venue-card">
                   {location.label && (
-                    <span className="inv-std-location-label">{location.label}</span>
+                    <span className="inv-std-venue-label">{location.label}</span>
                   )}
-                  <span className="inv-std-location-text">{location.text}</span>
-                </div>
+                  {location.image && (
+                    <div className="inv-std-venue-photo">
+                      {location.mapUrl ? (
+                        <a
+                          href={location.mapUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`Open ${location.name || location.label || 'venue'} on map`}
+                        >
+                          <img
+                            src={location.image}
+                            alt={location.name || location.label || 'Venue'}
+                          />
+                        </a>
+                      ) : (
+                        <img
+                          src={location.image}
+                          alt={location.name || location.label || 'Venue'}
+                        />
+                      )}
+                    </div>
+                  )}
+                  {(location.name || location.text) && (
+                    <p className="inv-std-venue-name">
+                      {(location.name || location.text).toUpperCase()}
+                    </p>
+                  )}
+                  {location.address && (
+                    <p className="inv-std-venue-address">{location.address}</p>
+                  )}
+                  {location.time && (
+                    <p className="inv-std-venue-time">{location.time.toUpperCase()}</p>
+                  )}
+                  {location.mapUrl && (
+                    <a
+                      href={location.mapUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inv-std-venue-map"
+                    >
+                      See Location
+                    </a>
+                  )}
+                </article>
               ))}
             </div>
           )}

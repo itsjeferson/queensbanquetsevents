@@ -43,7 +43,6 @@ export function readFileAsDataUrl(file, maxSizeMb) {
 
 function trimMediaString(value, maxLength) {
   if (typeof value !== 'string') return value;
-  if (value.startsWith('data:')) return '';
   if (value.length > maxLength) return '';
   return value;
 }
@@ -64,3 +63,12 @@ export function stripLargeDataUrls(invitation, maxLength = 50000) {
   if (!invitation || typeof invitation !== 'object') return invitation;
   return stripEmbeddedMediaForApi(invitation, maxLength);
 }
+
+export function canPersistMediaUrl(value, maxLength) {
+  if (typeof value !== 'string' || !value.trim()) return false;
+  if (value.startsWith('http://') || value.startsWith('https://')) return true;
+  return value.length <= maxLength;
+}
+
+/** Venue photos may be larger than other fields but must stay under API limits. */
+export const VENUE_IMAGE_SAVE_MAX_CHARS = 1500000;

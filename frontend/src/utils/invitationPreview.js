@@ -106,6 +106,20 @@ function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
     }).entourage;
   }
 
+  if (draftInvitation.venue) {
+    merged.venue = {
+      ceremony: { ...(apiInvitation.venue?.ceremony || {}), ...(draftInvitation.venue?.ceremony || {}) },
+      reception: { ...(apiInvitation.venue?.reception || {}), ...(draftInvitation.venue?.reception || {}) },
+    };
+    ['ceremony', 'reception'].forEach((type) => {
+      const apiImage = apiInvitation.venue?.[type]?.image;
+      const draftImage = draftInvitation.venue?.[type]?.image;
+      if (draftImage && !apiImage) {
+        merged.venue[type] = { ...merged.venue[type], image: draftImage };
+      }
+    });
+  }
+
   return merged;
 }
 

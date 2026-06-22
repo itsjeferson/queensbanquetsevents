@@ -217,6 +217,20 @@ class InvitationPage
             $normalized['story'] = $story;
         }
 
+        $venue = is_array($normalized['venue'] ?? null) ? $normalized['venue'] : [];
+        $existingVenue = is_array($existing['venue'] ?? null) ? $existing['venue'] : [];
+        foreach (['ceremony', 'reception'] as $type) {
+            $incoming = is_array($venue[$type] ?? null) ? $venue[$type] : [];
+            $saved = is_array($existingVenue[$type] ?? null) ? $existingVenue[$type] : [];
+            if (empty($incoming['image']) && !empty($saved['image'])) {
+                $venue[$type] = array_merge($saved, $incoming);
+                $venue[$type]['image'] = $saved['image'];
+            } else {
+                $venue[$type] = $incoming;
+            }
+        }
+        $normalized['venue'] = $venue;
+
         return $normalized;
     }
 

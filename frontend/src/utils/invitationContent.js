@@ -1,5 +1,5 @@
 import { resolveInvitationThemeFields, extractInvitationThemeInput } from './invitationTheme';
-import { stripLargeDataUrls } from './mediaUpload';
+import { stripLargeDataUrls, canPersistMediaUrl, VENUE_IMAGE_SAVE_MAX_CHARS } from './mediaUpload';
 
 export const defaultGroomProfile = () => ({
   name: '',
@@ -229,7 +229,23 @@ function cleanEntourageLists(entourage) {
 /** Strip embedded media blobs so text updates (entourage, etc.) can sync to the API. */
 export function prepareInvitationForApiSave(invitation) {
   if (!invitation) return invitation;
+  const sourceVenue = invitation.venue || {};
   const stripped = stripLargeDataUrls(invitation);
+
+  stripped.venue = {
+    ceremony: { ...(stripped.venue?.ceremony || {}) },
+    reception: { ...(stripped.venue?.reception || {}) },
+  };
+
+  ['ceremony', 'reception'].forEach((type) => {
+    const image = sourceVenue[type]?.image;
+    if (!canPersistMediaUrl(image, VENUE_IMAGE_SAVE_MAX_CHARS)) return;
+    stripped.venue[type] = {
+      ...stripped.venue[type],
+      image,
+    };
+  });
+
   return {
     ...stripped,
     entourage: cleanEntourageLists(stripped.entourage),

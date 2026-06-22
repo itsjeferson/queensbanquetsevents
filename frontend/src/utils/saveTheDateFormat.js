@@ -33,8 +33,32 @@ function formatVenueLocationText(venue = {}) {
   return parts[0].toUpperCase();
 }
 
-function hasVenueLocation(venue = {}) {
-  return Boolean(venue.name?.trim() || venue.address?.trim());
+function hasVenueDetails(venue = {}) {
+  return Boolean(
+    venue.name?.trim()
+    || venue.address?.trim()
+    || venue.time?.trim()
+    || venue.image?.trim()
+    || venue.map_url?.trim(),
+  );
+}
+
+function buildVenueEntry(key, label, venue = {}) {
+  if (!hasVenueDetails(venue)) return null;
+
+  const name = venue.name?.trim() || '';
+  const text = formatVenueLocationText(venue);
+
+  return {
+    key,
+    label,
+    text,
+    name,
+    address: venue.address?.trim() || '',
+    time: venue.time?.trim() || '',
+    image: venue.image?.trim() || '',
+    mapUrl: venue.map_url?.trim() || '',
+  };
 }
 
 export function getSaveTheDateLocations(invitation = {}) {
@@ -43,44 +67,36 @@ export function getSaveTheDateLocations(invitation = {}) {
       key: 'custom',
       label: '',
       text: invitation.std_location.trim().toUpperCase(),
+      name: '',
+      time: '',
+      image: '',
+      address: '',
+      mapUrl: '',
     }];
   }
 
   const ceremony = invitation?.venue?.ceremony || {};
   const reception = invitation?.venue?.reception || {};
-  const ceremonyText = formatVenueLocationText(ceremony);
-  const receptionText = formatVenueLocationText(reception);
-  const hasCeremony = hasVenueLocation(ceremony);
-  const hasReception = hasVenueLocation(reception);
-  const showLabels = hasCeremony && hasReception && ceremonyText !== receptionText;
+  const entries = [
+    buildVenueEntry('ceremony', 'CEREMONY', ceremony),
+    buildVenueEntry('reception', 'RECEPTION', reception),
+  ].filter(Boolean);
 
-  const locations = [];
+  const showLabels = entries.length > 1;
 
-  if (ceremonyText) {
-    locations.push({
-      key: 'ceremony',
-      label: showLabels ? 'CEREMONY' : '',
-      text: ceremonyText,
-    });
-  }
-
-  if (receptionText && (!hasCeremony || receptionText !== ceremonyText)) {
-    locations.push({
-      key: 'reception',
-      label: showLabels ? 'RECEPTION' : '',
-      text: receptionText,
-    });
-  }
-
-  return locations;
+  return entries.map((entry) => ({
+    ...entry,
+    label: showLabels ? entry.label : '',
+  }));
 }
 
 export function getSaveTheDateLocation(invitation = {}) {
   const locations = getSaveTheDateLocations(invitation);
   if (!locations.length) return '';
-  if (locations.length === 1) return locations[0].text;
+  if (locations.length === 1) return locations[0].text || locations[0].name;
   return locations.map((location) => {
-    if (location.label) return `${location.label}: ${location.text}`;
-    return location.text;
+    const place = location.name || location.text;
+    if (location.label && place) return `${location.label}: ${place}`;
+    return place || location.label;
   }).join(' · ');
 }
