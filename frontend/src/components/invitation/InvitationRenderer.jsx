@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CoverScreen from './CoverScreen';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import InvitationMainContent from './InvitationMainContent';
@@ -32,7 +32,12 @@ function isRsvpUnlocked(event, saveTheDateEnabled) {
   return hasRsvpUnlocked(event);
 }
 
-export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
+export default function InvitationRenderer({
+  data,
+  resetRsvpUnlock = false,
+  routeIdentifier = '',
+  onRsvpUnlock,
+}) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
   const themeInput = extractInvitationThemeInput(rawInvitation);
   const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
@@ -64,30 +69,34 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
   const revealOptions = { hideRsvp: saveTheDateEnabled };
   const sectionOrder = getVisibleContentRevealOrder(invitation.content_reveal_order, revealOptions);
+  const unlockContext = useMemo(
+    () => (routeIdentifier ? { ...event, routeIdentifier } : event),
+    [event, routeIdentifier],
+  );
 
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
     if (resetRsvpUnlock && saveTheDateEnabled) return false;
-    return isRsvpUnlocked(event, saveTheDateEnabled);
+    return isRsvpUnlocked(unlockContext, saveTheDateEnabled);
   });
   const [opened, setOpened] = useState(() => {
     if (resetRsvpUnlock && saveTheDateEnabled) return false;
-    return saveTheDateEnabled && isRsvpUnlocked(event, saveTheDateEnabled);
+    return saveTheDateEnabled && isRsvpUnlocked(unlockContext, saveTheDateEnabled);
   });
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
     if (resetRsvpUnlock && saveTheDateEnabled) {
-      clearRsvpUnlock(event);
+      clearRsvpUnlock(unlockContext);
       setRsvpUnlockedState(false);
       setOpened(false);
       return;
     }
 
-    const unlocked = isRsvpUnlocked(event, saveTheDateEnabled);
+    const unlocked = isRsvpUnlocked(unlockContext, saveTheDateEnabled);
     setRsvpUnlockedState(unlocked);
     if (saveTheDateEnabled && unlocked) setOpened(true);
-  }, [event?.slug, event?.id, event?.invite_code, saveTheDateEnabled, resetRsvpUnlock]);
+  }, [event?.slug, event?.id, event?.invite_code, routeIdentifier, saveTheDateEnabled, resetRsvpUnlock]);
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;
@@ -104,9 +113,10 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   };
 
   const handleSaveTheDateRsvp = ({ name, attendance }) => {
-    setRsvpUnlocked(event, { name, attendance });
+    setRsvpUnlocked(unlockContext, { name, attendance });
     setRsvpUnlockedState(true);
     setOpened(true);
+    onRsvpUnlock?.();
     startMusic();
     setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 200);
   };

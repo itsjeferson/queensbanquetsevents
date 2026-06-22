@@ -9,7 +9,7 @@ export function getUnlockKeys(eventOrKey) {
 
   if (typeof eventOrKey === 'object') {
     return [...new Set(
-      [eventOrKey.slug, eventOrKey.id, eventOrKey.invite_code]
+      [eventOrKey.slug, eventOrKey.id, eventOrKey.invite_code, eventOrKey.routeIdentifier]
         .filter((value) => value != null && String(value).trim())
         .map((value) => String(value).trim()),
     )];

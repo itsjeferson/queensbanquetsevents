@@ -4,6 +4,7 @@ import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
 import {
   buildInvitationPreviewData,
+  clearResetSearchParam,
   getLocalInvitationDraft,
   INVITATION_DRAFT_UPDATED_EVENT,
   isInvitationDraftStorageKey,
@@ -14,13 +15,14 @@ import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
   const { slug, code } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const resetRsvpUnlock = searchParams.get('reset') === '1';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const lookupByCode = Boolean(code && !slug);
   const identifier = slug || code;
+  const routeIdentifier = lookupByCode ? identifier?.toUpperCase() : identifier;
 
   const draftKey = useMemo(() => {
     if (!identifier) return null;
@@ -96,6 +98,11 @@ export default function PublicInvitation() {
     };
   }, [identifier, loadInvitation, lookupByCode]);
 
+  useEffect(() => {
+    if (!data || searchParams.get('reset') !== '1') return;
+    clearResetSearchParam(searchParams, setSearchParams);
+  }, [data, searchParams, setSearchParams]);
+
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -113,5 +120,12 @@ export default function PublicInvitation() {
     );
   }
 
-  return <InvitationRenderer data={data} resetRsvpUnlock={resetRsvpUnlock} />;
+  return (
+    <InvitationRenderer
+      data={data}
+      resetRsvpUnlock={resetRsvpUnlock}
+      routeIdentifier={routeIdentifier}
+      onRsvpUnlock={() => clearResetSearchParam(searchParams, setSearchParams)}
+    />
+  );
 }

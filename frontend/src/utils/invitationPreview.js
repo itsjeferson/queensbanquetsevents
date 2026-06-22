@@ -358,3 +358,11 @@ export function getPreviewPath(slug, { guestPreview = true, resetRsvp = false } 
   if (resetRsvp) params.set('reset', '1');
   return `/invite/${encodeURIComponent(slug)}?${params.toString()}`;
 }
+
+export function clearResetSearchParam(searchParams, setSearchParams) {
+  if (searchParams.get('reset') !== '1') return;
+
+  const next = new URLSearchParams(searchParams);
+  next.delete('reset');
+  setSearchParams(next, { replace: true });
+}
