@@ -41,19 +41,26 @@ export function readFileAsDataUrl(file, maxSizeMb) {
   });
 }
 
+function trimMediaString(value, maxLength) {
+  if (typeof value !== 'string') return value;
+  if (value.startsWith('data:')) return '';
+  if (value.length > maxLength) return '';
+  return value;
+}
+
+/** Recursively remove embedded data URLs so API payloads stay small. */
+export function stripEmbeddedMediaForApi(value, maxLength = 50000) {
+  if (typeof value === 'string') return trimMediaString(value, maxLength);
+  if (Array.isArray(value)) return value.map((item) => stripEmbeddedMediaForApi(item, maxLength));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, stripEmbeddedMediaForApi(item, maxLength)]),
+    );
+  }
+  return value;
+}
+
 export function stripLargeDataUrls(invitation, maxLength = 50000) {
   if (!invitation || typeof invitation !== 'object') return invitation;
-
-  const trim = (value) => (typeof value === 'string' && value.length > maxLength ? '' : value);
-
-  return {
-    ...invitation,
-    cover_image: trim(invitation.cover_image),
-    background_video: trim(invitation.background_video),
-    music_url: trim(invitation.music_url),
-    gallery: (invitation.gallery || []).map((item) => ({
-      ...item,
-      image: trim(item?.image),
-    })),
-  };
+  return stripEmbeddedMediaForApi(invitation, maxLength);
 }

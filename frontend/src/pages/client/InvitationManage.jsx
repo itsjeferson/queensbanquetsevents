@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from '../../components/common/Table/DataTable';
 import { eventService } from '../../services/invitationService';
+import { ApiError } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
 import QRShare from '../../components/invitation/QRShare';
 import InvitationPreviewModal from '../../components/invitation/InvitationPreviewModal';
@@ -113,6 +114,7 @@ export default function InvitationManage({ variant = 'client' }) {
   const [loadError, setLoadError] = useState(false);
   const [usingLocalDraft, setUsingLocalDraft] = useState(false);
   const [fileError, setFileError] = useState('');
+  const [saveError, setSaveError] = useState('');
   const readyToTrackChanges = useRef(false);
   const autoSaveTimerRef = useRef(null);
   const savingRef = useRef(false);
@@ -137,16 +139,32 @@ export default function InvitationManage({ variant = 'client' }) {
     readyToTrackChanges.current = false;
     setDirty(false);
     setSaveStatus('idle');
+    setSaveError('');
 
-    eventService.getById(id).then((res) => {
-      setEvent(res.data.event);
-      setInvitation(mapInvitationFromApi(res.data.invitation));
-      setLoadError(false);
-      setUsingLocalDraft(false);
-    }).catch(() => {
+    let cancelled = false;
+
+    async function loadEvent() {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const res = await eventService.getById(id);
+          if (cancelled) return;
+          setEvent(res.data.event);
+          setInvitation(mapInvitationFromApi(res.data.invitation));
+          setLoadError(false);
+          setUsingLocalDraft(false);
+          return;
+        } catch (err) {
+          if (attempt === 0) {
+            await new Promise((resolve) => window.setTimeout(resolve, 1500));
+          }
+        }
+      }
+
       const draft =
         getLocalInvitationDraft(id)
         || getLocalInvitationDraft(getClientPreviewSlug(user?.id));
+
+      if (cancelled) return;
 
       if (draft?.event) {
         setEvent({ ...draft.event, id: draft.event.id ?? Number(id) });
@@ -158,11 +176,19 @@ export default function InvitationManage({ variant = 'client' }) {
 
       setEvent(null);
       setLoadError(true);
-    }).finally(() => {
-      window.setTimeout(() => {
-        readyToTrackChanges.current = true;
-      }, 0);
+    }
+
+    loadEvent().finally(() => {
+      if (!cancelled) {
+        window.setTimeout(() => {
+          readyToTrackChanges.current = true;
+        }, 0);
+      }
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id, user?.id]);
 
   const shareUrl = useMemo(() => {
@@ -270,6 +296,7 @@ export default function InvitationManage({ variant = 'client' }) {
 
     savingRef.current = true;
     setSaveStatus('saving');
+    setSaveError('');
 
     const normalizedEvent = {
       ...event,
@@ -285,38 +312,20 @@ export default function InvitationManage({ variant = 'client' }) {
     };
 
     try {
-      if (usingLocalDraft && user?.id) {
-        const res = await eventService.create(payload);
-        const created = res.data;
-        if (!created?.id) throw new Error('Create failed');
-        if (publish) await eventService.publish(created.id);
+      const updateRes = await eventService.update(id, payload);
+      if (publish) await eventService.publish(id);
 
+      if (updateRes.data) {
         setEvent((current) => ({
           ...current,
-          ...created,
-          status: publish ? 'published' : created.status,
+          ...updateRes.data,
+          status: publish ? 'published' : (updateRes.data.status ?? current.status),
         }));
-        setUsingLocalDraft(false);
-
-        if (String(created.id) !== String(id)) {
-          window.location.replace(`${config.basePath}/${created.id}`);
-        }
-      } else {
-        const updateRes = await eventService.update(id, payload);
-        if (publish) await eventService.publish(id);
-
-        if (updateRes.data) {
-          setEvent((current) => ({
-            ...current,
-            ...updateRes.data,
-            status: publish ? 'published' : (updateRes.data.status ?? current.status),
-          }));
-        } else if (publish) {
-          setEvent((current) => ({ ...current, status: 'published' }));
-        }
-
-        setUsingLocalDraft(false);
+      } else if (publish) {
+        setEvent((current) => ({ ...current, status: 'published' }));
       }
+
+      setUsingLocalDraft(false);
 
       if (invitationFingerprint(invitationRef.current) === savedSnapshot) {
         setDirty(false);
@@ -326,7 +335,11 @@ export default function InvitationManage({ variant = 'client' }) {
         pendingSyncRef.current = { publish: false };
       }
       return true;
-    } catch {
+    } catch (err) {
+      const message = err instanceof ApiError
+        ? err.message
+        : (err?.message || 'Could not save your changes.');
+      setSaveError(message);
       setSaveStatus('error');
       return false;
     } finally {
@@ -337,7 +350,7 @@ export default function InvitationManage({ variant = 'client' }) {
         syncToServer(pending);
       }
     }
-  }, [config.basePath, event, id, invitationFingerprint, persistLocalDraft, user?.id, usingLocalDraft]);
+  }, [event, id, invitationFingerprint, persistLocalDraft]);
 
   useEffect(() => {
     if (!readyToTrackChanges.current || !dirty || !event) return undefined;
@@ -441,7 +454,7 @@ export default function InvitationManage({ variant = 'client' }) {
 
       {usingLocalDraft && (
         <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.45)', background: 'rgba(212,175,55,0.08)' }}>
-          Showing your locally saved draft. Click Update Invitation to sync it to the server.
+          Could not reach the server — showing your locally saved draft. Click Update Invitation to sync your latest changes.
         </div>
       )}
 
@@ -471,7 +484,7 @@ export default function InvitationManage({ variant = 'client' }) {
 
       {saveStatus === 'error' && (
         <div className="card-widget" style={{ borderColor: 'rgba(220,53,69,0.35)', background: 'rgba(220,53,69,0.06)' }}>
-          Could not save your changes. Click Update Invitation to try again.
+          {saveError || 'Could not save your changes.'} Click Update Invitation to try again.
         </div>
       )}
 
