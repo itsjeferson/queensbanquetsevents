@@ -21,7 +21,6 @@ import WeddingContentFields from '../../components/invitation/WeddingContentFiel
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
 
-const INVITATION_ENTRY = '';
 const AUTO_SAVE_DELAY_MS = 600;
 
 function mapInvitationFromApi(invitation) {
@@ -89,7 +88,14 @@ function InvitationManagerList({ variant = 'client' }) {
               <span>
                 <Link to={`${config.basePath}/${row.id}`} className="action-btn">Edit</Link>
                 {row.status === 'published' && row.slug && (
-                  <a href={`${INVITATION_ENTRY}/invite/${row.slug}`} target="_blank" rel="noreferrer" className="action-btn">View</a>
+                  <a
+                    href={getInvitationShareUrl({ slug: row.slug, guestPreview: true })}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="action-btn"
+                  >
+                    View
+                  </a>
                 )}
               </span>
             );
@@ -193,7 +199,7 @@ export default function InvitationManage({ variant = 'client' }) {
 
   const shareUrl = useMemo(() => {
     if (!event) return '';
-    return getInvitationShareUrl({ slug: event.slug });
+    return getInvitationShareUrl({ slug: event.slug, guestPreview: true });
   }, [event]);
 
   const codeUrl = useMemo(() => {

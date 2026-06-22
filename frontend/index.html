@@ -11,12 +11,39 @@
     <div id="root"></div>
     <script>
       (function () {
+        if (location.hash && location.hash.length > 2) return;
+
+        var params = new URLSearchParams(location.search);
+        var open = params.get('open');
+        var code = params.get('code');
+
+        if (open) {
+          params.delete('open');
+          var tail = params.toString();
+          location.replace(
+            location.origin + '/#/invite/' + encodeURIComponent(open) + (tail ? '?' + tail : ''),
+          );
+          return;
+        }
+
+        if (code) {
+          params.delete('code');
+          var codeTail = params.toString();
+          location.replace(
+            location.origin + '/#/i/' + encodeURIComponent(code) + (codeTail ? '?' + codeTail : ''),
+          );
+          return;
+        }
+
         var path = location.pathname;
         var inviteMatch = path.match(/^\/(?:invite|invitation)\/([^/]+)\/?$/);
         var codeMatch = path.match(/^\/i\/([^/]+)\/?$/);
         var segment = inviteMatch ? inviteMatch[1] : codeMatch ? codeMatch[1] : null;
         if (!segment) return;
-        var hashPath = codeMatch ? '/#/i/' + decodeURIComponent(segment) : '/#/invite/' + decodeURIComponent(segment);
+
+        var hashPath = codeMatch
+          ? '/#/i/' + decodeURIComponent(segment)
+          : '/#/invite/' + decodeURIComponent(segment);
         location.replace(location.origin + hashPath + location.search);
       })();
     </script>

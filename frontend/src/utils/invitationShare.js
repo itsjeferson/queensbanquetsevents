@@ -6,22 +6,31 @@ export function getPublicSiteOrigin() {
   return '';
 }
 
-/** Path-only link (no hash) — works reliably in QR codes and phone cameras. */
-export function getInvitationSharePath({ slug, inviteCode } = {}) {
+/**
+ * Query-based paths survive phone QR scanners (hash fragments are often dropped).
+ * Example: /?open=Mark-She
+ */
+export function getInvitationSharePath({ slug, inviteCode, guestPreview = false } = {}) {
+  const params = new URLSearchParams();
+
   if (slug) {
-    return `/invite/${encodeURIComponent(slug)}`;
+    params.set('open', slug);
+  } else if (inviteCode) {
+    params.set('code', inviteCode);
+  } else {
+    return '';
   }
 
-  if (inviteCode) {
-    return `/i/${encodeURIComponent(inviteCode)}`;
+  if (guestPreview) {
+    params.set('guest', '1');
   }
 
-  return '';
+  return `/?${params.toString()}`;
 }
 
-export function getInvitationShareUrl({ slug, inviteCode } = {}) {
+export function getInvitationShareUrl(options = {}) {
   const origin = getPublicSiteOrigin();
-  const path = getInvitationSharePath({ slug, inviteCode });
+  const path = getInvitationSharePath(options);
 
   if (path) {
     return `${origin}${path}`;

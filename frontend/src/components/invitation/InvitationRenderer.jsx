@@ -63,7 +63,11 @@ export default function InvitationRenderer({ data, resetRsvpUnlock = false }) {
   const themeInput = extractInvitationThemeInput(rawInvitation);
   const invitation = normalizeInvitationContent({ ...rawInvitation, ...themeInput });
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
-  const shareUrl = getInvitationShareUrl({ slug: event?.slug, inviteCode: event?.invite_code });
+  const shareUrl = getInvitationShareUrl({
+    slug: event?.slug,
+    inviteCode: event?.invite_code,
+    guestPreview: true,
+  });
   const themedInvitation = { ...invitation, ...themeInput };
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const themeCss = buildInvitationThemeCss(themedInvitation);

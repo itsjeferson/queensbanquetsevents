@@ -4,9 +4,11 @@
   "framework": "vite",
   "installCommand": "npm install",
   "redirects": [
-    { "source": "/queens-banquet-events.html", "destination": "/", "permanent": false },
-    { "source": "/invite/:slug", "destination": "/#/invite/:slug", "permanent": false },
-    { "source": "/invitation/:slug", "destination": "/#/invite/:slug", "permanent": false },
-    { "source": "/i/:code", "destination": "/#/i/:code", "permanent": false }
+    { "source": "/queens-banquet-events.html", "destination": "/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/invite/:slug", "destination": "/index.html" },
+    { "source": "/invitation/:slug", "destination": "/index.html" },
+    { "source": "/i/:code", "destination": "/index.html" }
   ]
 }
