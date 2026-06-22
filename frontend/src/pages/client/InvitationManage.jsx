@@ -116,6 +116,17 @@ export default function InvitationManage({ variant = 'client' }) {
   const readyToTrackChanges = useRef(false);
   const autoSaveTimerRef = useRef(null);
   const savingRef = useRef(false);
+  const pendingSyncRef = useRef(null);
+  const invitationRef = useRef(invitation);
+
+  useEffect(() => {
+    invitationRef.current = invitation;
+  }, [invitation]);
+
+  const invitationFingerprint = useCallback(
+    (value) => JSON.stringify(prepareInvitationForApiSave(value)),
+    [],
+  );
 
   const markDirty = useCallback(() => {
     setDirty(true);
@@ -239,16 +250,23 @@ export default function InvitationManage({ variant = 'client' }) {
     };
     const previewData = buildInvitationPreviewData({
       event: normalizedEvent,
-      invitation,
+      invitation: invitationRef.current,
       guest_messages: [],
     });
 
     saveInvitationDraft(previewData);
     if (variant === 'client') saveClientPreviewSlug(user?.id, normalizedEvent?.slug);
-  }, [event, invitation, user?.id, variant]);
+  }, [event, user?.id, variant]);
 
   const syncToServer = useCallback(async ({ publish = false } = {}) => {
-    if (!event || savingRef.current) return false;
+    if (!event) return false;
+
+    if (savingRef.current) {
+      pendingSyncRef.current = {
+        publish: publish || pendingSyncRef.current?.publish,
+      };
+      return false;
+    }
 
     savingRef.current = true;
     setSaveStatus('saving');
@@ -257,12 +275,13 @@ export default function InvitationManage({ variant = 'client' }) {
       ...event,
       event_date: normalizeEventDateForApi(event.event_date),
     };
+    const savedSnapshot = invitationFingerprint(invitationRef.current);
     persistLocalDraft();
 
     const payload = {
       ...normalizedEvent,
       client_id: user?.id,
-      invitation: prepareInvitationForApiSave(invitation),
+      invitation: JSON.parse(savedSnapshot),
     };
 
     try {
@@ -278,39 +297,47 @@ export default function InvitationManage({ variant = 'client' }) {
           status: publish ? 'published' : created.status,
         }));
         setUsingLocalDraft(false);
-        setDirty(false);
-        setSaveStatus('saved');
 
         if (String(created.id) !== String(id)) {
           window.location.replace(`${config.basePath}/${created.id}`);
         }
-        return true;
+      } else {
+        const updateRes = await eventService.update(id, payload);
+        if (publish) await eventService.publish(id);
+
+        if (updateRes.data) {
+          setEvent((current) => ({
+            ...current,
+            ...updateRes.data,
+            status: publish ? 'published' : (updateRes.data.status ?? current.status),
+          }));
+        } else if (publish) {
+          setEvent((current) => ({ ...current, status: 'published' }));
+        }
+
+        setUsingLocalDraft(false);
       }
 
-      const updateRes = await eventService.update(id, payload);
-      if (publish) await eventService.publish(id);
-
-      if (updateRes.data) {
-        setEvent((current) => ({
-          ...current,
-          ...updateRes.data,
-          status: publish ? 'published' : (updateRes.data.status ?? current.status),
-        }));
-      } else if (publish) {
-        setEvent((current) => ({ ...current, status: 'published' }));
+      if (invitationFingerprint(invitationRef.current) === savedSnapshot) {
+        setDirty(false);
+        setSaveStatus('saved');
+      } else {
+        setSaveStatus('syncing');
+        pendingSyncRef.current = { publish: false };
       }
-
-      setUsingLocalDraft(false);
-      setDirty(false);
-      setSaveStatus('saved');
       return true;
     } catch {
       setSaveStatus('error');
       return false;
     } finally {
       savingRef.current = false;
+      const pending = pendingSyncRef.current;
+      pendingSyncRef.current = null;
+      if (pending) {
+        syncToServer(pending);
+      }
     }
-  }, [config.basePath, event, id, invitation, persistLocalDraft, user?.id, usingLocalDraft]);
+  }, [config.basePath, event, id, invitationFingerprint, persistLocalDraft, user?.id, usingLocalDraft]);
 
   useEffect(() => {
     if (!readyToTrackChanges.current || !dirty || !event) return undefined;

@@ -10,6 +10,7 @@ import { resolveInvitationThemeFields, extractInvitationThemeInput } from './inv
 
 export const STORAGE_PREFIX = 'invitation-draft';
 export const CLIENT_PREVIEW_KEY = 'client-latest-preview-slug';
+export const INVITATION_DRAFT_UPDATED_EVENT = 'invitation-draft-updated';
 
 const TYPE_DEMOS = {
   wedding: demoWeddingInvitation,
@@ -98,6 +99,12 @@ function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
       merged[field] = draftInvitation[field];
     }
   });
+
+  if (draftInvitation.entourage) {
+    merged.entourage = normalizeInvitationContent({
+      entourage: draftInvitation.entourage,
+    }).entourage;
+  }
 
   return merged;
 }
@@ -281,6 +288,19 @@ export function saveInvitationDraft({ event, invitation, guest_messages }) {
       // Skip local draft if storage quota is exceeded.
     }
   }
+
+  window.dispatchEvent(new CustomEvent(INVITATION_DRAFT_UPDATED_EVENT, {
+    detail: {
+      id: event.id ?? null,
+      slug: event.slug ?? null,
+      inviteCode: event.invite_code ?? null,
+    },
+  }));
+}
+
+export function isInvitationDraftStorageKey(key, slug) {
+  if (!key?.startsWith(STORAGE_PREFIX) || !slug) return false;
+  return key === `${STORAGE_PREFIX}-slug-${slug}`;
 }
 
 export function saveClientPreviewSlug(clientId, slug) {
