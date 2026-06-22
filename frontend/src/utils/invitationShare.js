@@ -8,17 +8,12 @@ export function getPublicSiteOrigin() {
 
 /** Guest-facing path — served by SPA and handled in index.html bootstrap. */
 export function getInvitationSharePath({ slug, inviteCode, guestPreview = false } = {}) {
-  const params = new URLSearchParams();
-  if (guestPreview) params.set('guest', '1');
-  const query = params.toString();
-  const suffix = query ? `?${query}` : '';
-
   if (slug) {
-    return `/invite/${encodeURIComponent(slug)}${suffix}`;
+    return `/invite/${encodeURIComponent(slug)}`;
   }
 
   if (inviteCode) {
-    return `/i/${encodeURIComponent(inviteCode)}${suffix}`;
+    return `/i/${encodeURIComponent(inviteCode)}`;
   }
 
   return '';

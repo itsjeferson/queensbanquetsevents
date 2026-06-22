@@ -58,7 +58,6 @@ export default function InvitationRenderer({
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
     inviteCode: event?.invite_code,
-    guestPreview: true,
   });
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const floralTheme = getFloralThemeColors(themedInvitation);
