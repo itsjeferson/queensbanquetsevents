@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Button from '../../components/common/Button/Button';
 import DataTable from '../../components/common/Table/DataTable';
 import Modal from '../../components/common/Modal/Modal';
+import Loader from '../../components/common/Loader/Loader';
 import { clientService } from '../../services/clientService';
 
 const emptyForm = {
@@ -149,7 +150,7 @@ export default function ClientManagement() {
       <div className="card-widget">
         <h3>List of Clients</h3>
         {loading ? (
-          <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>Loading clients...</p>
+          <Loader variant="inline" label="Loading clients..." />
         ) : clients.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>No clients found in the database yet.</p>
         ) : (

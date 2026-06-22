@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import Loader from '../../components/common/Loader/Loader';
 import StatCard from '../../components/common/Cards/StatCard';
 import DataTable from '../../components/common/Table/DataTable';
 import { useAuth } from '../../hooks/useAuth';
@@ -57,7 +57,7 @@ export default function ClientDashboard() {
         <p>Create, customize, share, and monitor your digital invitations.</p>
       </div>
       {loading ? (
-        <p style={{ color: 'var(--text-muted)' }}>Loading dashboard...</p>
+        <Loader variant="page" label="Loading dashboard..." />
       ) : (
         <>
           <div className="stats-grid">

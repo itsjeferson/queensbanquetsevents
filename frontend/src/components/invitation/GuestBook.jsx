@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { guestMessageService } from '../../services/invitationService';
+import { Spinner } from '../common/Loader/Loader';
 import FloralCornerFrame from './FloralCornerFrame';
 
 export default function GuestBook({ eventId, messages: initialMessages = [] }) {
@@ -41,7 +42,12 @@ export default function GuestBook({ eventId, messages: initialMessages = [] }) {
             <input required value={form.guest_name} onChange={(e) => setForm({ ...form, guest_name: e.target.value })} />
           </div>
           <button type="submit" className="btn btn-gold" disabled={loading}>
-            {loading ? 'Submitting...' : 'Submit'}
+            {loading ? (
+              <span className="btn-loading">
+                <Spinner size="sm" tone="light" />
+                <span>Submitting...</span>
+              </span>
+            ) : 'Submit'}
           </button>
         </form>
 

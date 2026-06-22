@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button/Button';
+import { Spinner } from '../../components/common/Loader/Loader';
 import { useAuth } from '../../hooks/useAuth';
 import { isAdminRole } from '../../utils/roles';
 
@@ -29,15 +30,20 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    setLoginError('');
+    setLoading(true);
     try {
       const user = await login(email.trim(), password);
       navigate(isAdminRole(user.role) ? '/admin/dashboard' : '/client/dashboard');
     } catch {
       setLoginError('Invalid email or password.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,7 +102,14 @@ export default function Login() {
             <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--gold-dark)', fontWeight: 500 }}>Forgot password?</Link>
           </div>
           {loginError && <p style={{ color: '#DC3545', fontSize: 13, marginBottom: 16 }}>{loginError}</p>}
-          <Button variant="gold" style={{ width: '100%', padding: 14 }} onClick={handleLogin}>Sign In</Button>
+          <Button variant="gold" style={{ width: '100%', padding: 14 }} onClick={handleLogin} disabled={loading}>
+            {loading ? (
+              <span className="btn-loading">
+                <Spinner size="sm" tone="light" />
+                <span>Signing in...</span>
+              </span>
+            ) : 'Sign In'}
+          </Button>
         </div>
       </div>
     </div>

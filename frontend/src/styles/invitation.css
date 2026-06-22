@@ -137,6 +137,16 @@
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
 }
 
+.inv-open-btn:disabled {
+  cursor: wait;
+  transform: none;
+  opacity: 0.92;
+}
+
+.inv-open-btn .btn-loading {
+  justify-content: center;
+}
+
 .inv-music-toggle {
   position: fixed;
   top: 18px;
@@ -2521,6 +2531,18 @@
 
 .inv-std-modern-actions .inv-std-modern-rsvp-btn--visible {
   pointer-events: auto;
+}
+
+.inv-std-modern-rsvp-btn--loading,
+.inv-std-modern-rsvp-btn:disabled {
+  cursor: wait;
+  opacity: 0.92;
+}
+
+.inv-std-modern-rsvp-btn .btn-loading {
+  justify-content: center;
+  letter-spacing: 0.08em;
+  font-size: 12px;
 }
 
 .inv-std-modern-confirm-btn:hover {

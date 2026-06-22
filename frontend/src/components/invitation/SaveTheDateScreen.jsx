@@ -8,9 +8,11 @@ import {
 } from '../../utils/saveTheDateFormat';
 import CoupleNameHeading from './CoupleNameHeading';
 import RSVPForm from './RSVPForm';
+import { Spinner } from '../common/Loader/Loader';
 
 const RSVP_BUTTON_DELAY_MIN_MS = 2000;
 const RSVP_BUTTON_DELAY_MAX_MS = 4000;
+const RSVP_CONFIRM_DELAY_MS = 800;
 
 function getRsvpButtonRevealDelay() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -20,9 +22,15 @@ function getRsvpButtonRevealDelay() {
   return RSVP_BUTTON_DELAY_MIN_MS + Math.floor(Math.random() * (range + 1));
 }
 
+function getRsvpConfirmDelay() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return prefersReducedMotion ? 200 : RSVP_CONFIRM_DELAY_MS;
+}
+
 export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) {
   const [showRsvpForm, setShowRsvpForm] = useState(false);
   const [showRsvpButton, setShowRsvpButton] = useState(false);
+  const [confirmingRsvp, setConfirmingRsvp] = useState(false);
   const [photoLayout, setPhotoLayout] = useState(getStdPhotoLayout());
   const coupleDisplay = getCoupleDisplayName(event, invitation);
   const dateLine = formatSaveTheDateCompact(event.event_date);
@@ -39,6 +47,15 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
   const handlePhotoLoad = (event) => {
     const { naturalWidth, naturalHeight } = event.currentTarget;
     setPhotoLayout(getStdPhotoLayout(naturalWidth, naturalHeight));
+  };
+
+  const handleConfirmRsvp = () => {
+    if (confirmingRsvp || !showRsvpButton) return;
+    setConfirmingRsvp(true);
+    window.setTimeout(() => {
+      setShowRsvpForm(true);
+      setConfirmingRsvp(false);
+    }, getRsvpConfirmDelay());
   };
 
   useEffect(() => {
@@ -114,13 +131,19 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
         >
           <button
             type="button"
-            className={`inv-std-modern-rsvp-btn${showRsvpButton ? ' inv-std-modern-rsvp-btn--visible' : ''}`}
-            onClick={() => setShowRsvpForm(true)}
-            disabled={!showRsvpButton}
+            className={`inv-std-modern-rsvp-btn${showRsvpButton ? ' inv-std-modern-rsvp-btn--visible' : ''}${confirmingRsvp ? ' inv-std-modern-rsvp-btn--loading' : ''}`}
+            onClick={handleConfirmRsvp}
+            disabled={!showRsvpButton || confirmingRsvp}
+            aria-busy={confirmingRsvp}
             aria-hidden={!showRsvpButton}
             tabIndex={showRsvpButton ? 0 : -1}
           >
-            CONFIRM RSVP
+            {confirmingRsvp ? (
+              <span className="btn-loading">
+                <Spinner size="sm" tone="dark" />
+                <span>Loading RSVP...</span>
+              </span>
+            ) : 'CONFIRM RSVP'}
           </button>
         </div>
       </div>

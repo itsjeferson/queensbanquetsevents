@@ -1,0 +1,135 @@
+@keyframes app-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes app-loader-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+.app-loader-spinner {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.app-loader-spinner--sm {
+  width: 18px;
+  height: 18px;
+}
+
+.app-loader-spinner--lg {
+  width: 64px;
+  height: 64px;
+}
+
+.app-loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-top-color: var(--gold);
+  border-right-color: rgba(212, 175, 55, 0.25);
+  animation: app-loader-spin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+}
+
+.app-loader-spinner--sm .app-loader-ring {
+  border-width: 2px;
+}
+
+.app-loader-ring--delay {
+  inset: 7px;
+  border-top-color: var(--gold-dark);
+  animation-duration: 1.25s;
+  animation-direction: reverse;
+}
+
+.app-loader-spinner--sm .app-loader-ring--delay {
+  inset: 4px;
+}
+
+.app-loader-spinner--light .app-loader-ring {
+  border-top-color: rgba(255, 255, 255, 0.95);
+  border-right-color: rgba(255, 255, 255, 0.3);
+}
+
+.app-loader-spinner--light .app-loader-ring--delay {
+  border-top-color: rgba(255, 255, 255, 0.65);
+}
+
+.app-loader-spinner--dark .app-loader-ring {
+  border-top-color: rgba(26, 26, 26, 0.9);
+  border-right-color: rgba(26, 26, 26, 0.2);
+}
+
+.app-loader-spinner--dark .app-loader-ring--delay {
+  border-top-color: rgba(26, 26, 26, 0.55);
+}
+
+.app-loader {
+  animation: fadeIn 0.35s ease;
+}
+
+.app-loader--page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 280px;
+  padding: 48px 24px;
+}
+
+.app-loader--fullscreen,
+.app-loader--invitation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 100vh;
+  padding: 32px 24px;
+}
+
+.app-loader--invitation {
+  background: var(--beige);
+}
+
+.app-loader--inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 16px;
+  color: var(--text-muted);
+}
+
+.app-loader-text {
+  margin: 0;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  animation: app-loader-pulse 2.2s ease-in-out infinite;
+}
+
+.app-loader--inline .app-loader-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  animation: none;
+}
+
+.app-loader--invitation .app-loader-text {
+  font-size: 20px;
+  color: var(--black);
+}
+
+.btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

@@ -23,13 +23,14 @@ import AdminGallery from '../pages/admin/Gallery';
 import AdminSettings from '../pages/admin/Settings';
 import ClientManagement from '../pages/admin/ClientManagement';
 
+import Loader from '../components/common/Loader/Loader';
 import PublicInvitation from '../pages/invitation/PublicInvitation';
 
 function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <p style={{ padding: 32, color: 'var(--text-muted)' }}>Loading session...</p>;
+    return <Loader variant="fullscreen" label="Loading session..." />;
   }
   if (!user) return <Navigate to="/login" replace />;
   const userIsAdmin = isAdminRole(user.role);

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Loader from '../../components/common/Loader/Loader';
 import { reportService } from '../../services/reportService';
 
 function CalendarWidget({ monthLabel, days, events, onPrev, onNext }) {
@@ -95,7 +96,7 @@ export default function AdminCalendar() {
         <p>View scheduled invitation events from the database.</p>
       </div>
       {loading ? (
-        <p style={{ color: 'var(--text-muted)' }}>Loading calendar...</p>
+        <Loader variant="page" label="Loading calendar..." />
       ) : (
         <CalendarWidget
           monthLabel={calendar.monthLabel}

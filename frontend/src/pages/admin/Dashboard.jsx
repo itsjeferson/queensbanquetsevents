@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import StatCard from '../../components/common/Cards/StatCard';
 import DataTable from '../../components/common/Table/DataTable';
+import Loader from '../../components/common/Loader/Loader';
 import { reportService } from '../../services/reportService';
 
 const emptyDashboard = {
@@ -29,7 +30,7 @@ export default function AdminDashboard() {
         <p>Queen&apos;s Banquet Digital Invitation Management System — overview and reports.</p>
       </div>
       {loading ? (
-        <p style={{ color: 'var(--text-muted)' }}>Loading dashboard...</p>
+        <Loader variant="page" label="Loading dashboard..." />
       ) : (
         <>
           <div className="stats-grid">

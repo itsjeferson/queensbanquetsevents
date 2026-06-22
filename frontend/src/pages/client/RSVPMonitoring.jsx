@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import StatCard from '../../components/common/Cards/StatCard';
 import DataTable from '../../components/common/Table/DataTable';
+import Loader from '../../components/common/Loader/Loader';
 import { useAuth } from '../../hooks/useAuth';
 import { eventService, rsvpService } from '../../services/invitationService';
 
@@ -84,7 +85,7 @@ export default function RSVPMonitoring() {
       )}
 
       {loading ? (
-        <p style={{ color: 'var(--text-muted)' }}>Loading RSVP data...</p>
+        <Loader variant="page" label="Loading RSVP data..." />
       ) : (
         <>
           <div className="stats-grid">

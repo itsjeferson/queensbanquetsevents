@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from '../../components/common/Table/DataTable';
+import Loader, { Spinner } from '../../components/common/Loader/Loader';
 import { eventService } from '../../services/invitationService';
 import { ApiError } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
@@ -49,13 +50,18 @@ function InvitationManagerList({ variant = 'client' }) {
   const { user } = useAuth();
   const config = MANAGE_CONFIG[variant];
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const statusBadge = { published: 'badge-green', draft: 'badge-gray', archived: 'badge-red' };
 
   useEffect(() => {
     const clientId = variant === 'admin' ? undefined : user?.id;
-    eventService.getAll(clientId).then((res) => {
-      if (res.data?.length) setEvents(res.data);
-    }).catch(() => {});
+    setLoading(true);
+    eventService.getAll(clientId)
+      .then((res) => {
+        if (res.data?.length) setEvents(res.data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [user?.id, variant]);
 
   return (
@@ -69,6 +75,9 @@ function InvitationManagerList({ variant = 'client' }) {
           <Link to={config.builderPath} className="btn btn-gold">+ Create Invitation</Link>
         )}
       </div>
+      {loading ? (
+        <Loader variant="page" label="Loading invitations..." />
+      ) : (
       <div className="card-widget">
         <DataTable
           columns={[
@@ -103,6 +112,7 @@ function InvitationManagerList({ variant = 'client' }) {
           }}
         />
       </div>
+      )}
     </>
   );
 }
@@ -413,7 +423,7 @@ export default function InvitationManage({ variant = 'client' }) {
       </div>
     );
   }
-  if (!event) return <p>Loading invitation...</p>;
+  if (!event) return <Loader variant="page" label="Loading invitation..." />;
 
   return (
     <>
@@ -429,7 +439,12 @@ export default function InvitationManage({ variant = 'client' }) {
             onClick={handleUpdateNow}
             disabled={saveStatus === 'saving' || !dirty}
           >
-            {saveStatus === 'saving' ? 'Saving...' : 'Update Invitation'}
+            {saveStatus === 'saving' ? (
+              <span className="btn-loading">
+                <Spinner size="sm" tone="light" />
+                <span>Saving...</span>
+              </span>
+            ) : 'Update Invitation'}
           </button>
           {event.status !== 'published' && (
             <button

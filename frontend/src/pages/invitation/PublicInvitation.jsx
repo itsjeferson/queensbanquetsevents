@@ -11,6 +11,7 @@ import {
   mergeInvitationPayloadWithDraft,
 } from '../../utils/invitationPreview';
 import { applyInvitationPageMeta, resetInvitationPageMeta } from '../../utils/invitationPageMeta';
+import Loader from '../../components/common/Loader/Loader';
 import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
@@ -104,11 +105,7 @@ export default function PublicInvitation() {
   }, [data, searchParams, setSearchParams]);
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--text-muted)' }}>Loading invitation...</p>
-      </div>
-    );
+    return <Loader variant="invitation" label="Loading invitation..." />;
   }
 
   if (!data) {

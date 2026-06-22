@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { rsvpService } from '../../services/invitationService';
+import { Spinner } from '../common/Loader/Loader';
 
 export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send', variant = 'default' }) {
   const [form, setForm] = useState({ name: '', attendance: 'yes' });
@@ -82,7 +83,12 @@ export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send
             </div>
           </div>
           <button type="submit" className="btn btn-gold btn-lg inv-std-modern-confirm-btn" style={{ width: '100%' }} disabled={loading}>
-            {loading ? 'Sending...' : submitLabel}
+            {loading ? (
+              <span className="btn-loading">
+                <Spinner size="sm" tone="light" />
+                <span>Sending...</span>
+              </span>
+            ) : submitLabel}
           </button>
         </form>
       )}

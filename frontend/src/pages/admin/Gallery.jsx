@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Button from '../../components/common/Button/Button';
+import Loader, { Spinner } from '../../components/common/Loader/Loader';
 import { galleryService } from '../../services/galleryService';
 import { getUploadUrl } from '../../utils/mediaUrl';
 
@@ -112,14 +113,19 @@ export default function AdminGallery() {
         </div>
         {error && <p style={{ color: '#DC3545', fontSize: 13, marginTop: 12 }}>{error}</p>}
         <Button variant="gold" style={{ marginTop: 16 }} disabled={uploading} onClick={() => fileInputRef.current?.click()}>
-          {uploading ? 'Uploading...' : 'Upload Photo'}
+          {uploading ? (
+            <span className="btn-loading">
+              <Spinner size="sm" tone="light" />
+              <span>Uploading...</span>
+            </span>
+          ) : 'Upload Photo'}
         </Button>
       </div>
 
       <div className="card-widget">
         <h3>Manage Gallery</h3>
         {loading ? (
-          <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>Loading gallery...</p>
+          <Loader variant="inline" label="Loading gallery..." />
         ) : items.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>No photos uploaded yet.</p>
         ) : (
