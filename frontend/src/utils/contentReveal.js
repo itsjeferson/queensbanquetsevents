@@ -6,7 +6,7 @@ export const CONTENT_REVEAL_SECTIONS = [
   { id: 'couple_initials', label: 'Couple Initials' },
   { id: 'invitation_message', label: 'Invitation Message' },
   { id: 'couple_showcase', label: 'Couple Showcase' },
-  { id: 'wedding_details', label: 'Wedding Details' },
+  { id: 'wedding_details', label: 'Location Details' },
   { id: 'countdown', label: 'Countdown' },
   { id: 'rsvp', label: 'RSVP' },
   { id: 'entourage', label: 'Entourage' },

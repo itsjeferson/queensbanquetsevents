@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-export default function RevealSection({ enabled = true, children, className = '' }) {
+export default function RevealSection({ enabled = true, children, className = '', onRevealed }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(!enabled);
+  const hasReportedReveal = useRef(false);
 
   useEffect(() => {
     if (!enabled) {
@@ -26,6 +27,12 @@ export default function RevealSection({ enabled = true, children, className = ''
     observer.observe(node);
     return () => observer.disconnect();
   }, [enabled]);
+
+  useEffect(() => {
+    if (!visible || !onRevealed || hasReportedReveal.current) return;
+    hasReportedReveal.current = true;
+    onRevealed();
+  }, [visible, onRevealed]);
 
   return (
     <div

@@ -65,7 +65,7 @@ export default function WeddingDetailsSection({ event, venue }) {
     <section className="inv-details-band" id="details">
       <div className="inv-details-card">
         <FloralCornerFrame className="inv-floral-frame-card">
-          <p className="inv-script-title inv-script-title-small">Wedding Details</p>
+          <p className="inv-script-title inv-script-title-small">Location Details</p>
           {dateLabel && <h2>{dateLabel}</h2>}
           <div className="inv-details-grid">
             {hasCeremony && <VenueCard label="Ceremony" venue={ceremony} />}

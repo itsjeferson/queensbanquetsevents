@@ -268,7 +268,7 @@ export default function WeddingContentFields({
       </div>
 
       <div className="card-widget">
-        <h3>Wedding Details</h3>
+        <h3>Location Details</h3>
         {['ceremony', 'reception'].map((type) => (
           <div key={type} style={{ marginBottom: 24, marginTop: type === 'ceremony' ? 20 : 0 }}>
             <h4 style={{ textTransform: 'capitalize', marginBottom: 12 }}>{type}</h4>

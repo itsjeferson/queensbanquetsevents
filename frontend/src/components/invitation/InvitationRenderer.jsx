@@ -89,6 +89,12 @@ export default function InvitationRenderer({
   const audioRef = useRef(null);
 
   useEffect(() => {
+    if (!saveTheDateActive && !forceSaveTheDateStage) {
+      setRsvpUnlockedState(false);
+      setOpened(false);
+      return;
+    }
+
     if (resetRsvpUnlock && saveTheDateActive) {
       clearRsvpUnlock(unlockContext);
       setRsvpUnlockedState(false);
@@ -99,7 +105,16 @@ export default function InvitationRenderer({
     const unlocked = saveTheDateActive && hasRsvpUnlocked(unlockContext);
     setRsvpUnlockedState(unlocked);
     if (unlocked) setOpened(true);
-  }, [event?.slug, event?.id, event?.invite_code, routeIdentifier, saveTheDateActive, resetRsvpUnlock, unlockContext]);
+  }, [
+    event?.slug,
+    event?.id,
+    event?.invite_code,
+    routeIdentifier,
+    saveTheDateActive,
+    forceSaveTheDateStage,
+    resetRsvpUnlock,
+    unlockContext,
+  ]);
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;

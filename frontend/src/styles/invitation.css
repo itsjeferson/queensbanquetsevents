@@ -451,6 +451,18 @@
   margin-bottom: 12px;
 }
 
+.inv-countdown-follow {
+  margin: 20px auto 0;
+  max-width: 320px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.92);
+  font-style: italic;
+}
+
 .inv-countdown {
   display: grid;
   grid-template-columns: repeat(4, minmax(90px, 1fr));

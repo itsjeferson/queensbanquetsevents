@@ -17,7 +17,7 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
-import { normalizeInvitationContent, prepareInvitationForApiSave, isSaveTheDateActive } from '../../utils/invitationContent';
+import { normalizeInvitationContent, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
@@ -212,7 +212,7 @@ export default function InvitationManage({ variant = 'client' }) {
     if (!event) return '';
     return getInvitationShareUrl({
       slug: event.slug,
-      saveTheDateEnabled: isSaveTheDateActive(invitation),
+      saveTheDateEnabled: Boolean(invitation.save_the_date_enabled),
     });
   }, [event, invitation]);
 
@@ -408,7 +408,7 @@ export default function InvitationManage({ variant = 'client' }) {
   const handlePreviewInvitation = () => {
     persistLocalDraft();
     window.open(
-      openInvitationPreview(event.slug, { saveTheDateEnabled: isSaveTheDateActive(invitation) }),
+      openInvitationPreview(event.slug, { saveTheDateEnabled: Boolean(invitation.save_the_date_enabled) }),
       '_blank',
       'noopener,noreferrer',
     );

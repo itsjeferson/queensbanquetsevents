@@ -10,7 +10,7 @@ export default function EventDetailsSection({ event, venue, dressCode, program }
     <>
       <section className="inv-details-band" id="details">
         <div className="inv-details-card">
-          <p className="inv-script-title">Wedding Details</p>
+          <p className="inv-script-title">Location Details</p>
           <h2>{date}</h2>
           {dressCode && <p className="inv-muted">Dress Code: <strong>{dressCode}</strong></p>}
 
