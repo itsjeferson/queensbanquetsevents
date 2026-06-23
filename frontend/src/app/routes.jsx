@@ -55,6 +55,7 @@ export default function AppRoutes() {
       </Route>
 
       <Route path="/invitation/:slug" element={<PublicInvitation />} />
+      <Route path="/savethedate/:slug" element={<PublicInvitation />} />
       <Route path="/invite/:slug" element={<PublicInvitation />} />
       <Route path="/i/:code" element={<PublicInvitation />} />
 

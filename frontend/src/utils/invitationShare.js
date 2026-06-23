@@ -6,9 +6,20 @@ export function getPublicSiteOrigin() {
   return '';
 }
 
-/** Guest-facing path — served by SPA and handled in index.html bootstrap. */
-export function getInvitationSharePath({ slug, inviteCode, guestPreview = false } = {}) {
+export function getSaveTheDateSharePath(slug) {
+  if (!slug) return '';
+  return `/savethedate/${encodeURIComponent(slug)}`;
+}
+
+export function getInvitationSharePath({
+  slug,
+  inviteCode,
+  saveTheDateEnabled = false,
+} = {}) {
   if (slug) {
+    if (saveTheDateEnabled) {
+      return getSaveTheDateSharePath(slug);
+    }
     return `/invite/${encodeURIComponent(slug)}`;
   }
 

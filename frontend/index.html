@@ -30,6 +30,12 @@
           return;
         }
 
+        var stdMatch = path.match(/^\/savethedate\/([^/]+)\/?$/);
+        if (stdMatch) {
+          go('/#/savethedate/' + decodeURIComponent(stdMatch[1]));
+          return;
+        }
+
         var inviteMatch = path.match(/^\/(?:invite|invitation)\/([^/]+)\/?$/);
         if (inviteMatch) {
           go('/#/invite/' + decodeURIComponent(inviteMatch[1]));

@@ -210,8 +210,11 @@ export default function InvitationManage({ variant = 'client' }) {
 
   const shareUrl = useMemo(() => {
     if (!event) return '';
-    return getInvitationShareUrl({ slug: event.slug, guestPreview: true });
-  }, [event]);
+    return getInvitationShareUrl({
+      slug: event.slug,
+      saveTheDateEnabled: Boolean(invitation.save_the_date_enabled),
+    });
+  }, [event, invitation.save_the_date_enabled]);
 
   const codeUrl = useMemo(() => {
     if (!event) return '';

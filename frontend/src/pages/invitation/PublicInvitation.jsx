@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
 import {
@@ -10,13 +10,21 @@ import {
   mergeInvitationPayloadWithDraft,
 } from '../../utils/invitationPreview';
 import { applyInvitationPageMeta, resetInvitationPageMeta } from '../../utils/invitationPageMeta';
+import { hasRsvpUnlocked } from '../../utils/rsvpUnlock';
 import Loader from '../../components/common/Loader/Loader';
 import '../../styles/invitation.css';
 
+function isSaveTheDatePath(pathname = '') {
+  return pathname.includes('/savethedate/');
+}
+
 export default function PublicInvitation() {
   const { slug, code } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isOwnerPreview = searchParams.get('guest') === '1';
+  const isSaveTheDateRoute = isSaveTheDatePath(location.pathname);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,6 +74,47 @@ export default function PublicInvitation() {
     }
   }, [draftKey, identifier, isOwnerPreview, lookupByCode]);
 
+  const routeDecision = useMemo(() => {
+    if (loading || !data?.event || lookupByCode) return 'ready';
+
+    const saveTheDateEnabled = Boolean(data.invitation.save_the_date_enabled);
+    const eventSlug = data.event.slug || slug;
+    const unlocked = saveTheDateEnabled && hasRsvpUnlocked({
+      ...data.event,
+      routeIdentifier,
+      slug: eventSlug,
+    });
+
+    if (!saveTheDateEnabled && isSaveTheDateRoute) return 'to-invite';
+    if (saveTheDateEnabled && !unlocked && !isSaveTheDateRoute && !isOwnerPreview) return 'to-std';
+    if (saveTheDateEnabled && unlocked && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
+    return 'ready';
+  }, [
+    data,
+    isOwnerPreview,
+    isSaveTheDateRoute,
+    loading,
+    lookupByCode,
+    routeIdentifier,
+    slug,
+  ]);
+
+  useEffect(() => {
+    if (routeDecision === 'ready' || !data?.event) return;
+
+    const eventSlug = data.event.slug || slug;
+    const search = location.search || '';
+
+    if (routeDecision === 'to-invite') {
+      navigate(`/invite/${encodeURIComponent(eventSlug)}${search}`, { replace: true });
+      return;
+    }
+
+    if (routeDecision === 'to-std') {
+      navigate(`/savethedate/${encodeURIComponent(eventSlug)}${search}`, { replace: true });
+    }
+  }, [data?.event, location.search, navigate, routeDecision, slug]);
+
   useEffect(() => {
     loadInvitation({ showLoading: true });
     return () => resetInvitationPageMeta();
@@ -99,7 +148,13 @@ export default function PublicInvitation() {
     };
   }, [identifier, loadInvitation, lookupByCode]);
 
-  if (loading) {
+  const handleGuestUnlock = useCallback(() => {
+    const eventSlug = data?.event?.slug || slug;
+    if (!eventSlug) return;
+    navigate(`/invite/${encodeURIComponent(eventSlug)}${location.search || ''}`, { replace: true });
+  }, [data?.event?.slug, location.search, navigate, slug]);
+
+  if (loading || routeDecision !== 'ready') {
     return <Loader variant="invitation" label="Loading invitation..." />;
   }
 
@@ -116,6 +171,7 @@ export default function PublicInvitation() {
     <InvitationRenderer
       data={data}
       routeIdentifier={routeIdentifier}
+      onGuestUnlock={handleGuestUnlock}
     />
   );
 }

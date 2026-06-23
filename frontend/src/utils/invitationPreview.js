@@ -353,18 +353,19 @@ export function getClientPreviewSlug(clientId) {
   return localStorage.getItem(CLIENT_PREVIEW_KEY);
 }
 
-export function getPreviewPath(slug, { guestPreview = true } = {}) {
+export function getPreviewPath(slug, { guestPreview = true, saveTheDateEnabled = false } = {}) {
   const params = new URLSearchParams();
   if (guestPreview) params.set('guest', '1');
   const query = params.toString();
-  return query
-    ? `/invite/${encodeURIComponent(slug)}?${query}`
+  const basePath = saveTheDateEnabled
+    ? `/savethedate/${encodeURIComponent(slug)}`
     : `/invite/${encodeURIComponent(slug)}`;
+  return query ? `${basePath}?${query}` : basePath;
 }
 
 export function openInvitationPreview(slug, { saveTheDateEnabled = false } = {}) {
   if (saveTheDateEnabled) {
     armRsvpPreviewReset(slug);
   }
-  return getPreviewPath(slug);
+  return getPreviewPath(slug, { saveTheDateEnabled });
 }

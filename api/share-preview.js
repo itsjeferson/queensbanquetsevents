@@ -33,9 +33,12 @@ function pickImage(invitation) {
   return typeof image === 'string' && image.startsWith('http') ? image : '';
 }
 
-function buildInvitePath(slug, code, guest) {
+function buildInvitePath(slug, code, guest, saveTheDateEnabled = false) {
   const guestQuery = guest ? '?guest=1' : '';
-  if (slug) return `/invite/${encodeURIComponent(slug)}${guestQuery}`;
+  if (slug) {
+    const segment = saveTheDateEnabled ? 'savethedate' : 'invite';
+    return `/${segment}/${encodeURIComponent(slug)}${guestQuery}`;
+  }
   if (code) return `/i/${encodeURIComponent(code)}${guestQuery}`;
   return '/';
 }
@@ -48,8 +51,6 @@ module.exports = async function handler(req, res) {
   const siteUrl = (process.env.VITE_PUBLIC_SITE_URL || 'https://queensbanquetsevents.vercel.app').replace(/\/$/, '');
   const apiUrl = (process.env.VITE_API_URL || process.env.API_URL || 'https://queens-banquet-api.onrender.com').replace(/\/$/, '');
 
-  const invitePath = buildInvitePath(slug, code, guest);
-  const inviteUrl = `${siteUrl}${invitePath}`;
   const shareUrl = slug
     ? `${siteUrl}/share/${encodeURIComponent(slug)}${guest ? '?guest=1' : ''}`
     : code
@@ -59,6 +60,7 @@ module.exports = async function handler(req, res) {
   let title = 'Wedding Invitation';
   let description = "You're invited to celebrate with us.";
   let image = '';
+  let saveTheDateEnabled = false;
 
   try {
     const endpoint = slug
@@ -76,11 +78,15 @@ module.exports = async function handler(req, res) {
         title = pickCoupleName(event, invitation);
         description = pickDescription(event, invitation, title);
         image = pickImage(invitation);
+        saveTheDateEnabled = Boolean(invitation?.save_the_date_enabled);
       }
     }
   } catch {
     // Fall back to generic preview copy.
   }
+
+  const invitePath = buildInvitePath(slug, code, guest, saveTheDateEnabled);
+  const inviteUrl = `${siteUrl}${invitePath}`;
 
   const userAgent = req.headers['user-agent'] || '';
 

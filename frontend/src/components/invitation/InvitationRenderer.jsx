@@ -36,6 +36,7 @@ const TYPE_LABELS = {
 export default function InvitationRenderer({
   data,
   routeIdentifier = '',
+  onGuestUnlock,
 }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
   const themeInput = extractInvitationThemeInput(rawInvitation);
@@ -117,6 +118,7 @@ export default function InvitationRenderer({
     setRsvpUnlocked(unlockContext, { name, attendance });
     setRsvpUnlockedState(true);
     setOpened(true);
+    onGuestUnlock?.();
     startMusic();
     setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 200);
   };
