@@ -154,6 +154,11 @@ export default function InvitationRenderer({
   const showCover = !stdGateActive && !opened;
   const showInvitation = stdGateActive ? rsvpUnlocked && opened : opened;
 
+  useEffect(() => {
+    document.documentElement.classList.add('invitation-scroll');
+    return () => document.documentElement.classList.remove('invitation-scroll');
+  }, []);
+
   return (
     <>
       {!showSaveTheDate && <style>{themeCss}</style>}

@@ -2075,17 +2075,37 @@
   }
 }
 
-/* Gradual reveal */
-.inv-reveal-section {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.75s ease, transform 0.75s ease;
-  will-change: opacity, transform;
+/* AOS scroll animations on invitation sections */
+.invitation-page [data-aos] {
+  pointer-events: auto;
 }
 
-.inv-reveal-section.inv-reveal-visible {
-  opacity: 1;
-  transform: translateY(0);
+.invitation-page [data-aos].aos-animate {
+  will-change: auto;
+}
+
+/* Hide scrollbars on public invitation pages while keeping scroll enabled */
+html.invitation-scroll,
+html.invitation-scroll body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.invitation-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.invitation-preview-frame {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.invitation-preview-frame::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Guest experience settings (client dashboard) */
