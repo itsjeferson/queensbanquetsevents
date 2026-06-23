@@ -1,4 +1,3 @@
-import { parseEventDate } from '../../utils/eventDate';
 import FloralCornerFrame from './FloralCornerFrame';
 
 function hasVenueContent(venue = {}) {
@@ -43,30 +42,19 @@ function VenueCard({ label, venue }) {
   );
 }
 
-export default function WeddingDetailsSection({ event, venue }) {
-  const parsed = parseEventDate(event.event_date);
-  const dateLabel = parsed
-    ? parsed.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    })
-    : '';
-
+export default function WeddingDetailsSection({ venue }) {
   const ceremony = venue?.ceremony;
   const reception = venue?.reception;
   const hasCeremony = hasVenueContent(ceremony);
   const hasReception = hasVenueContent(reception);
 
-  if (!dateLabel && !hasCeremony && !hasReception) return null;
+  if (!hasCeremony && !hasReception) return null;
 
   return (
     <section className="inv-details-band" id="details">
       <div className="inv-details-card">
         <FloralCornerFrame className="inv-floral-frame-card">
           <p className="inv-script-title inv-script-title-small">Location Details</p>
-          {dateLabel && <h2>{dateLabel}</h2>}
           <div className="inv-details-grid">
             {hasCeremony && <VenueCard label="Ceremony" venue={ceremony} />}
             {hasReception && <VenueCard label="Reception" venue={reception} />}
