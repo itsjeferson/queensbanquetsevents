@@ -56,17 +56,16 @@ export default function InvitationRenderer({
   };
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
   const coupleName = getCoupleDisplayName(event, invitation);
+  const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
     inviteCode: event?.invite_code,
-    saveTheDateEnabled,
+    saveTheDateEnabled: saveTheDateEnabled || forceSaveTheDateStage,
   });
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const floralTheme = getFloralThemeColors(themedInvitation);
   const themeCss = buildInvitationThemeCss(themedInvitation);
   const themeId = themeInput.color_motif || 'classic-gold';
-
-  const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
   const revealOptions = { hideRsvp: saveTheDateEnabled };
   const sectionOrder = resolveInvitationSectionOrder(invitation, revealOptions);
