@@ -95,7 +95,7 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
                     onChange={() => setForm({ ...form, attendance: 'yes' })}
                   />
                   <span className="inv-std-classic-option-box" aria-hidden="true" />
-                  <span>Yes, I will attend</span>
+                  <span className="inv-std-classic-option-text">Yes, I will attend</span>
                 </label>
                 <label className="inv-std-classic-option">
                   <input
@@ -106,7 +106,7 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
                     onChange={() => setForm({ ...form, attendance: 'no' })}
                   />
                   <span className="inv-std-classic-option-box" aria-hidden="true" />
-                  <span>Sorry, I will not be able to attend</span>
+                  <span className="inv-std-classic-option-text">Sorry, I will not be able to attend</span>
                 </label>
               </fieldset>
 
