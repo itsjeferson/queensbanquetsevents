@@ -36,6 +36,7 @@ const TYPE_LABELS = {
 export default function InvitationRenderer({
   data,
   routeIdentifier = '',
+  forceSaveTheDateStage = false,
   onGuestUnlock,
 }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
@@ -58,6 +59,7 @@ export default function InvitationRenderer({
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
     inviteCode: event?.invite_code,
+    saveTheDateEnabled,
   });
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const floralTheme = getFloralThemeColors(themedInvitation);
@@ -133,9 +135,10 @@ export default function InvitationRenderer({
     }
   };
 
-  const showSaveTheDate = saveTheDateEnabled && !rsvpUnlocked;
-  const showCover = !saveTheDateEnabled && !opened;
-  const showInvitation = saveTheDateEnabled ? rsvpUnlocked && opened : opened;
+  const stdGateActive = saveTheDateEnabled || forceSaveTheDateStage;
+  const showSaveTheDate = stdGateActive && !rsvpUnlocked;
+  const showCover = !stdGateActive && !opened;
+  const showInvitation = stdGateActive ? rsvpUnlocked && opened : opened;
 
   return (
     <>

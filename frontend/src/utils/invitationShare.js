@@ -59,6 +59,18 @@ export function getInvitationShareUrl(options = {}) {
   return origin || '';
 }
 
+export function getGuestShareUrl({ slug, inviteCode, saveTheDateEnabled = false } = {}) {
+  return getInvitationShareUrl({ slug, inviteCode, saveTheDateEnabled });
+}
+
+/** Preferred link for Messenger/social — direct Save the Date URL when STD is enabled. */
+export function getSocialShareUrl({ slug, inviteCode, saveTheDateEnabled = false } = {}) {
+  if (saveTheDateEnabled && slug) {
+    return getInvitationShareUrl({ slug, saveTheDateEnabled: true });
+  }
+  return getInvitationPreviewShareUrl({ slug, inviteCode });
+}
+
 export function getInvitationPreviewShareUrl(options = {}) {
   const origin = getPublicSiteOrigin();
   const path = getInvitationPreviewSharePath(options);

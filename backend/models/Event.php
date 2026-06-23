@@ -27,7 +27,7 @@ class Event
     public static function findBySlug(string $slug): ?array
     {
         $pdo = getConnection();
-        $stmt = $pdo->prepare('SELECT * FROM events WHERE slug = ? AND status = ?');
+        $stmt = $pdo->prepare('SELECT * FROM events WHERE LOWER(slug) = LOWER(?) AND status = ?');
         $stmt->execute([$slug, 'published']);
         return $stmt->fetch() ?: null;
     }
@@ -35,7 +35,7 @@ class Event
     public static function findBySlugAny(string $slug): ?array
     {
         $pdo = getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM events WHERE slug = ? AND status != 'archived'");
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE LOWER(slug) = LOWER(?) AND status != 'archived'");
         $stmt->execute([$slug]);
         return $stmt->fetch() ?: null;
     }
