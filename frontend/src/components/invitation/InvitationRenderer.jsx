@@ -16,7 +16,12 @@ import {
   getInvitationThemeStyles,
   resolveInvitationThemeFields,
 } from '../../utils/invitationTheme';
-import { hasRsvpUnlocked, setRsvpUnlocked, clearRsvpUnlock } from '../../utils/rsvpUnlock';
+import {
+  hasRsvpUnlocked,
+  setRsvpUnlocked,
+  clearRsvpUnlock,
+  consumeRsvpPreviewReset,
+} from '../../utils/rsvpUnlock';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
 import '../../styles/invitation.css';
 
@@ -28,16 +33,9 @@ const TYPE_LABELS = {
   corporate: { together: 'You Are Invited', invite: 'Join Us For This Special Event' },
 };
 
-function isRsvpUnlocked(event, saveTheDateEnabled) {
-  if (!saveTheDateEnabled) return true;
-  return hasRsvpUnlocked(event);
-}
-
 export default function InvitationRenderer({
   data,
-  resetRsvpUnlock = false,
   routeIdentifier = '',
-  onRsvpUnlock,
 }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
   const themeInput = extractInvitationThemeInput(rawInvitation);
@@ -74,13 +72,16 @@ export default function InvitationRenderer({
     [event, routeIdentifier],
   );
 
+  const [resetRsvpUnlock] = useState(() => consumeRsvpPreviewReset(unlockContext));
+
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
     if (resetRsvpUnlock && saveTheDateEnabled) return false;
-    return isRsvpUnlocked(unlockContext, saveTheDateEnabled);
+    return saveTheDateEnabled && hasRsvpUnlocked(unlockContext);
   });
   const [opened, setOpened] = useState(() => {
     if (resetRsvpUnlock && saveTheDateEnabled) return false;
-    return saveTheDateEnabled && isRsvpUnlocked(unlockContext, saveTheDateEnabled);
+    if (!saveTheDateEnabled) return false;
+    return hasRsvpUnlocked(unlockContext);
   });
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
@@ -93,10 +94,10 @@ export default function InvitationRenderer({
       return;
     }
 
-    const unlocked = isRsvpUnlocked(unlockContext, saveTheDateEnabled);
+    const unlocked = saveTheDateEnabled && hasRsvpUnlocked(unlockContext);
     setRsvpUnlockedState(unlocked);
-    if (saveTheDateEnabled && unlocked) setOpened(true);
-  }, [event?.slug, event?.id, event?.invite_code, routeIdentifier, saveTheDateEnabled, resetRsvpUnlock]);
+    if (unlocked) setOpened(true);
+  }, [event?.slug, event?.id, event?.invite_code, routeIdentifier, saveTheDateEnabled, resetRsvpUnlock, unlockContext]);
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;
@@ -116,7 +117,6 @@ export default function InvitationRenderer({
     setRsvpUnlocked(unlockContext, { name, attendance });
     setRsvpUnlockedState(true);
     setOpened(true);
-    onRsvpUnlock?.();
     startMusic();
     setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 200);
   };
@@ -132,8 +132,8 @@ export default function InvitationRenderer({
   };
 
   const showSaveTheDate = saveTheDateEnabled && !rsvpUnlocked;
-  const showCover = !showSaveTheDate && !opened;
-  const showInvitation = opened && !showSaveTheDate;
+  const showCover = !saveTheDateEnabled && !opened;
+  const showInvitation = saveTheDateEnabled ? rsvpUnlocked && opened : opened;
 
   return (
     <>

@@ -3,6 +3,7 @@ import {
   demoDebutInvitation,
   demoBirthdayInvitation,
 } from '../data/demoInvitation';
+import { armRsvpPreviewReset } from './rsvpUnlock';
 import { stripLargeDataUrls } from './mediaUpload';
 import { normalizeEventDate } from './eventDate';
 import { normalizeInvitationContent } from './invitationContent';
@@ -352,17 +353,18 @@ export function getClientPreviewSlug(clientId) {
   return localStorage.getItem(CLIENT_PREVIEW_KEY);
 }
 
-export function getPreviewPath(slug, { guestPreview = true, resetRsvp = false } = {}) {
+export function getPreviewPath(slug, { guestPreview = true } = {}) {
   const params = new URLSearchParams();
   if (guestPreview) params.set('guest', '1');
-  if (resetRsvp) params.set('reset', '1');
-  return `/invite/${encodeURIComponent(slug)}?${params.toString()}`;
+  const query = params.toString();
+  return query
+    ? `/invite/${encodeURIComponent(slug)}?${query}`
+    : `/invite/${encodeURIComponent(slug)}`;
 }
 
-export function clearResetSearchParam(searchParams, setSearchParams) {
-  if (searchParams.get('reset') !== '1') return;
-
-  const next = new URLSearchParams(searchParams);
-  next.delete('reset');
-  setSearchParams(next, { replace: true });
+export function openInvitationPreview(slug, { saveTheDateEnabled = false } = {}) {
+  if (saveTheDateEnabled) {
+    armRsvpPreviewReset(slug);
+  }
+  return getPreviewPath(slug);
 }

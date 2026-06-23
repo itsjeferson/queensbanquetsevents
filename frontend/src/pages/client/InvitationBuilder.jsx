@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import {
   buildInvitationPreviewData,
   getPreviewPath,
+  openInvitationPreview,
   saveClientPreviewSlug,
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
@@ -336,7 +337,7 @@ export default function InvitationBuilder() {
                   const slug = form.slug || slugFromEventName(form.event_name);
                   persistInvitationPreview(null, slug);
                   window.open(
-                    getPreviewPath(slug, { resetRsvp: Boolean(form.invitation.save_the_date_enabled) }),
+                    openInvitationPreview(slug, { saveTheDateEnabled: Boolean(form.invitation.save_the_date_enabled) }),
                     '_blank',
                     'noopener,noreferrer',
                   );

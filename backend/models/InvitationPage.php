@@ -235,6 +235,16 @@ class InvitationPage
             $normalized['story'] = $story;
         }
 
+        if (empty($story['std_location']) && !empty($existing['std_location'])) {
+            $story['std_location'] = $existing['std_location'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['std_message']) && !empty($existing['std_message'])) {
+            $story['std_message'] = $existing['std_message'];
+            $normalized['story'] = $story;
+        }
+
         $existingStory = is_array($existing['story'] ?? null) ? $existing['story'] : [];
         $existingPalette = $existing['palette_colors'] ?? ($existingStory['palette_colors'] ?? null);
         if (empty($story['palette_colors']) && !empty($existingPalette) && is_array($existingPalette)) {

@@ -9,6 +9,7 @@ import QRShare from '../../components/invitation/QRShare';
 import InvitationPreviewModal from '../../components/invitation/InvitationPreviewModal';
 import {
   getPreviewPath,
+  openInvitationPreview,
   getClientPreviewSlug,
   getLocalInvitationDraft,
   buildInvitationPreviewData,
@@ -404,7 +405,7 @@ export default function InvitationManage({ variant = 'client' }) {
   const handlePreviewInvitation = () => {
     persistLocalDraft();
     window.open(
-      getPreviewPath(event.slug, { resetRsvp: Boolean(invitation.save_the_date_enabled) }),
+      openInvitationPreview(event.slug, { saveTheDateEnabled: Boolean(invitation.save_the_date_enabled) }),
       '_blank',
       'noopener,noreferrer',
     );

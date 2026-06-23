@@ -4,7 +4,6 @@ import InvitationRenderer from '../../components/invitation/InvitationRenderer';
 import { invitationService } from '../../services/invitationService';
 import {
   buildInvitationPreviewData,
-  clearResetSearchParam,
   getLocalInvitationDraft,
   INVITATION_DRAFT_UPDATED_EVENT,
   isInvitationDraftStorageKey,
@@ -16,8 +15,8 @@ import '../../styles/invitation.css';
 
 export default function PublicInvitation() {
   const { slug, code } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const resetRsvpUnlock = searchParams.get('reset') === '1';
+  const [searchParams] = useSearchParams();
+  const isOwnerPreview = searchParams.get('guest') === '1';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,10 +33,11 @@ export default function PublicInvitation() {
     if (!identifier) return;
     if (showLoading) setLoading(true);
 
-    const draft = getLocalInvitationDraft(draftKey);
+    const draft = isOwnerPreview ? getLocalInvitationDraft(draftKey) : null;
 
     const applyPayload = (payload) => {
-      setData(buildInvitationPreviewData(mergeInvitationPayloadWithDraft(payload, draft)));
+      const merged = draft ? mergeInvitationPayloadWithDraft(payload, draft) : payload;
+      setData(buildInvitationPreviewData(merged));
     };
 
     try {
@@ -64,7 +64,7 @@ export default function PublicInvitation() {
     } finally {
       if (showLoading) setLoading(false);
     }
-  }, [draftKey, identifier, lookupByCode]);
+  }, [draftKey, identifier, isOwnerPreview, lookupByCode]);
 
   useEffect(() => {
     loadInvitation({ showLoading: true });
@@ -99,11 +99,6 @@ export default function PublicInvitation() {
     };
   }, [identifier, loadInvitation, lookupByCode]);
 
-  useEffect(() => {
-    if (!data || searchParams.get('reset') !== '1') return;
-    clearResetSearchParam(searchParams, setSearchParams);
-  }, [data, searchParams, setSearchParams]);
-
   if (loading) {
     return <Loader variant="invitation" label="Loading invitation..." />;
   }
@@ -120,9 +115,7 @@ export default function PublicInvitation() {
   return (
     <InvitationRenderer
       data={data}
-      resetRsvpUnlock={resetRsvpUnlock}
       routeIdentifier={routeIdentifier}
-      onRsvpUnlock={() => clearResetSearchParam(searchParams, setSearchParams)}
     />
   );
 }

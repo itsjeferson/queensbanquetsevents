@@ -1,12 +1,18 @@
 const STORAGE_PREFIX = 'qb_rsvp_unlock_';
+const PREVIEW_RESET_PREFIX = 'qb_rsvp_preview_reset_';
 
 function storageKey(slugOrId) {
   return `${STORAGE_PREFIX}${String(slugOrId || '').trim()}`;
 }
 
-function getUnlockStorage() {
+function getSessionStorage() {
   if (typeof window === 'undefined') return null;
   return window.sessionStorage;
+}
+
+function getPersistentStorage() {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage;
 }
 
 export function getUnlockKeys(eventOrKey) {
@@ -23,18 +29,43 @@ export function getUnlockKeys(eventOrKey) {
   return [String(eventOrKey).trim()].filter(Boolean);
 }
 
-function readUnlockRecord(key) {
-  const storage = getUnlockStorage();
-  if (!storage) return null;
-
+function parseUnlockRecord(raw) {
+  if (!raw) return null;
   try {
-    const raw = storage.getItem(storageKey(key));
-    if (!raw) return null;
     const parsed = JSON.parse(raw);
     return parsed?.unlocked ? parsed : null;
   } catch {
     return null;
   }
+}
+
+/** Guest RSVP unlock is stored in localStorage so refresh keeps them on the invitation. */
+function readUnlockRecord(key) {
+  const storages = [getPersistentStorage(), getSessionStorage()].filter(Boolean);
+
+  for (const storage of storages) {
+    try {
+      const record = parseUnlockRecord(storage.getItem(storageKey(key)));
+      if (record) return record;
+    } catch {
+      // ignore
+    }
+  }
+
+  return null;
+}
+
+function writeUnlockRecord(key, payload) {
+  const json = JSON.stringify(payload);
+  const storages = [getPersistentStorage(), getSessionStorage()].filter(Boolean);
+
+  storages.forEach((storage) => {
+    try {
+      storage.setItem(storageKey(key), json);
+    } catch {
+      // ignore quota / private mode
+    }
+  });
 }
 
 export function hasRsvpUnlocked(eventOrKey) {
@@ -54,36 +85,59 @@ export function getRsvpUnlockRecord(eventOrKey) {
 }
 
 export function setRsvpUnlocked(eventOrKey, { name = '', attendance = 'yes' } = {}) {
-  const storage = getUnlockStorage();
   const keys = getUnlockKeys(eventOrKey);
-  if (!storage || !keys.length) return;
+  if (!keys.length) return;
 
-  const payload = JSON.stringify({
+  const payload = {
     unlocked: true,
     name,
     attendance,
     at: new Date().toISOString(),
-  });
+  };
 
-  keys.forEach((key) => {
-    try {
-      storage.setItem(storageKey(key), payload);
-      // Clear legacy per-device unlock so shared links always start at STD for others.
-      localStorage.removeItem(storageKey(key));
-    } catch {
-      // ignore quota / private mode
-    }
-  });
+  keys.forEach((key) => writeUnlockRecord(key, payload));
 }
 
 export function clearRsvpUnlock(eventOrKey) {
-  const storage = getUnlockStorage();
+  const storages = [getPersistentStorage(), getSessionStorage()].filter(Boolean);
+
+  getUnlockKeys(eventOrKey).forEach((key) => {
+    const itemKey = storageKey(key);
+    storages.forEach((storage) => {
+      try {
+        storage.removeItem(itemKey);
+      } catch {
+        // ignore
+      }
+    });
+  });
+}
+
+/** One-shot flag so owner preview tabs reopen at Save the Date without a URL param. */
+export function armRsvpPreviewReset(eventOrKey) {
+  const storage = getSessionStorage();
+  if (!storage) return;
+
   getUnlockKeys(eventOrKey).forEach((key) => {
     try {
-      storage?.removeItem(storageKey(key));
-      localStorage.removeItem(storageKey(key));
+      storage.setItem(`${PREVIEW_RESET_PREFIX}${key}`, '1');
     } catch {
       // ignore
     }
   });
+}
+
+export function consumeRsvpPreviewReset(eventOrKey) {
+  const storage = getSessionStorage();
+  if (!storage) return false;
+
+  let consumed = false;
+  getUnlockKeys(eventOrKey).forEach((key) => {
+    const flagKey = `${PREVIEW_RESET_PREFIX}${key}`;
+    if (storage.getItem(flagKey) !== '1') return;
+    storage.removeItem(flagKey);
+    consumed = true;
+  });
+
+  return consumed;
 }
