@@ -10,6 +10,7 @@ import {
   mergeInvitationPayloadWithDraft,
 } from '../../utils/invitationPreview';
 import { applyInvitationPageMeta, resetInvitationPageMeta } from '../../utils/invitationPageMeta';
+import { isSaveTheDateActive } from '../../utils/invitationContent';
 import { hasRsvpUnlocked } from '../../utils/rsvpUnlock';
 import Loader from '../../components/common/Loader/Loader';
 import '../../styles/invitation.css';
@@ -77,14 +78,14 @@ export default function PublicInvitation() {
   const routeDecision = useMemo(() => {
     if (loading || !data?.event || lookupByCode) return 'ready';
 
-    const saveTheDateEnabled = Boolean(data.invitation.save_the_date_enabled);
+    const saveTheDateActive = isSaveTheDateActive(data.invitation);
     const eventSlug = data.event.slug || slug;
     const unlocked = hasRsvpUnlocked({
       ...data.event,
       routeIdentifier,
       slug: eventSlug,
     });
-    const stdActive = saveTheDateEnabled || isSaveTheDateRoute;
+    const stdActive = saveTheDateActive || isSaveTheDateRoute;
 
     if (stdActive && unlocked && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
     if (stdActive && !unlocked && !isSaveTheDateRoute && !isOwnerPreview) return 'to-std';

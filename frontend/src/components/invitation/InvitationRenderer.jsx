@@ -3,7 +3,7 @@ import CoverScreen from './CoverScreen';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import InvitationMainContent from './InvitationMainContent';
 import { FloralThemeProvider } from './FloralThemeContext';
-import { normalizeInvitationContent, getCoupleDisplayName } from '../../utils/invitationContent';
+import { normalizeInvitationContent, getCoupleDisplayName, isSaveTheDateActive } from '../../utils/invitationContent';
 import {
   getVisibleContentRevealOrder,
   resolveInvitationSectionOrder,
@@ -56,18 +56,18 @@ export default function InvitationRenderer({
   };
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
   const coupleName = getCoupleDisplayName(event, invitation);
-  const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
+  const saveTheDateActive = isSaveTheDateActive(invitation);
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
     inviteCode: event?.invite_code,
-    saveTheDateEnabled: saveTheDateEnabled || forceSaveTheDateStage,
+    saveTheDateEnabled: saveTheDateActive || forceSaveTheDateStage,
   });
   const themeStyles = getInvitationThemeStyles(themedInvitation);
   const floralTheme = getFloralThemeColors(themedInvitation);
   const themeCss = buildInvitationThemeCss(themedInvitation);
   const themeId = themeInput.color_motif || 'classic-gold';
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
-  const revealOptions = { hideRsvp: saveTheDateEnabled };
+  const revealOptions = { hideRsvp: saveTheDateActive };
   const sectionOrder = resolveInvitationSectionOrder(invitation, revealOptions);
   const unlockContext = useMemo(
     () => (routeIdentifier ? { ...event, routeIdentifier } : event),
@@ -77,29 +77,29 @@ export default function InvitationRenderer({
   const [resetRsvpUnlock] = useState(() => consumeRsvpPreviewReset(unlockContext));
 
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
-    if (resetRsvpUnlock && saveTheDateEnabled) return false;
-    return saveTheDateEnabled && hasRsvpUnlocked(unlockContext);
+    if (resetRsvpUnlock && saveTheDateActive) return false;
+    return saveTheDateActive && hasRsvpUnlocked(unlockContext);
   });
   const [opened, setOpened] = useState(() => {
-    if (resetRsvpUnlock && saveTheDateEnabled) return false;
-    if (!saveTheDateEnabled) return false;
+    if (resetRsvpUnlock && saveTheDateActive) return false;
+    if (!saveTheDateActive) return false;
     return hasRsvpUnlocked(unlockContext);
   });
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
-    if (resetRsvpUnlock && saveTheDateEnabled) {
+    if (resetRsvpUnlock && saveTheDateActive) {
       clearRsvpUnlock(unlockContext);
       setRsvpUnlockedState(false);
       setOpened(false);
       return;
     }
 
-    const unlocked = saveTheDateEnabled && hasRsvpUnlocked(unlockContext);
+    const unlocked = saveTheDateActive && hasRsvpUnlocked(unlockContext);
     setRsvpUnlockedState(unlocked);
     if (unlocked) setOpened(true);
-  }, [event?.slug, event?.id, event?.invite_code, routeIdentifier, saveTheDateEnabled, resetRsvpUnlock, unlockContext]);
+  }, [event?.slug, event?.id, event?.invite_code, routeIdentifier, saveTheDateActive, resetRsvpUnlock, unlockContext]);
 
   const startMusic = () => {
     if (!invitation.music_url || !audioRef.current) return;
@@ -134,7 +134,7 @@ export default function InvitationRenderer({
     }
   };
 
-  const stdGateActive = saveTheDateEnabled || forceSaveTheDateStage;
+  const stdGateActive = saveTheDateActive || forceSaveTheDateStage;
   const showSaveTheDate = stdGateActive && !rsvpUnlocked;
   const showCover = !stdGateActive && !opened;
   const showInvitation = stdGateActive ? rsvpUnlocked && opened : opened;
@@ -178,7 +178,7 @@ export default function InvitationRenderer({
             coupleName={coupleName}
             shareUrl={shareUrl}
             guestMessages={guestMessages}
-            saveTheDateEnabled={saveTheDateEnabled}
+            saveTheDateEnabled={saveTheDateActive}
             sectionOrder={sectionOrder}
             gradualReveal={gradualReveal}
           />

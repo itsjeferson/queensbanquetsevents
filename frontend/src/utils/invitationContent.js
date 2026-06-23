@@ -306,6 +306,15 @@ export function normalizeInvitationContent(invitation = {}) {
   };
 }
 
+/** True when guests should enter via Save the Date (published flag or configured STD content). */
+export function isSaveTheDateActive(invitation = {}) {
+  if (Boolean(invitation.save_the_date_enabled)) return true;
+  if (invitation.content_reveal_mode === 'gradual') return true;
+  const photo = String(invitation.std_photo || invitation.std_cover_image || '').trim();
+  const message = String(invitation.std_message || '').trim();
+  return Boolean(photo || message);
+}
+
 export function getCoupleDisplayName(event, invitation) {
   return invitation.couple_display_name?.trim() || event?.event_name?.trim() || 'Our Wedding';
 }

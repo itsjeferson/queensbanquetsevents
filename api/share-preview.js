@@ -33,6 +33,15 @@ function pickImage(invitation) {
   return typeof image === 'string' && image.startsWith('http') ? image : '';
 }
 
+function isSaveTheDateActive(invitation) {
+  if (!invitation) return false;
+  if (invitation.save_the_date_enabled) return true;
+  if (invitation.content_reveal_mode === 'gradual') return true;
+  const photo = String(invitation.std_photo || invitation.std_cover_image || '').trim();
+  const message = String(invitation.std_message || '').trim();
+  return Boolean(photo || message);
+}
+
 function buildInvitePath(slug, code, guest, saveTheDateEnabled = false) {
   const guestQuery = guest ? '?guest=1' : '';
   if (slug) {
@@ -78,7 +87,7 @@ module.exports = async function handler(req, res) {
         title = pickCoupleName(event, invitation);
         description = pickDescription(event, invitation, title);
         image = pickImage(invitation);
-        saveTheDateEnabled = Boolean(invitation?.save_the_date_enabled);
+        saveTheDateEnabled = isSaveTheDateActive(invitation);
       }
     }
   } catch {
