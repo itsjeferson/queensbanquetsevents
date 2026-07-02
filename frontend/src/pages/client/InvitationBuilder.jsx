@@ -23,7 +23,7 @@ const EVENT_TYPES = [
   { value: 'corporate', label: 'Corporate', icon: '🏢' },
 ];
 
-const STEPS = ['Event Info', 'Content', 'Publish'];
+const STEPS = ['Event Info', 'Content', 'Submit'];
 
 export default function InvitationBuilder() {
   const { user } = useAuth();
@@ -119,7 +119,7 @@ export default function InvitationBuilder() {
     slug: form.slug || slugFromEventName(form.event_name),
   };
 
-  const persistInvitationPreview = (eventId, slug) => {
+  const persistInvitationPreview = (eventId, slug, status = eventId ? 'pending_approval' : 'draft') => {
     const previewData = buildInvitationPreviewData({
       event: {
         id: eventId ?? undefined,
@@ -127,7 +127,7 @@ export default function InvitationBuilder() {
         event_type: form.event_type,
         event_date: form.event_date,
         slug,
-        status: eventId ? 'published' : 'draft',
+        status,
       },
       invitation: { template_id: form.template_id, ...form.invitation },
     });
@@ -170,8 +170,9 @@ export default function InvitationBuilder() {
         throw new Error('The server did not return an event ID. Please try again.');
       }
 
-      persistInvitationPreview(eventId, slug);
-      await eventService.publish(eventId);
+      persistInvitationPreview(eventId, slug, 'draft');
+      await eventService.requestPublish(eventId);
+      persistInvitationPreview(eventId, slug, 'pending_approval');
       navigate(`/client/invitation-manage/${eventId}`);
     } catch (err) {
       persistInvitationPreview(null, slug);
@@ -274,7 +275,10 @@ export default function InvitationBuilder() {
 
         {step === 2 && (
           <>
-            <h3>Ready to Publish</h3>
+            <h3>Ready to Submit for Approval</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: -8, marginBottom: 16 }}>
+              Your invitation will be saved and sent to the admin for review. It goes live once approved.
+            </p>
             <InvitationExperienceSettings
               invitation={form.invitation}
               onChange={(patch) => updateInvitation(patch)}
@@ -289,7 +293,7 @@ export default function InvitationBuilder() {
             </div>
             {!hasEventDate && (
               <p style={{ fontSize: 13, color: '#DC3545', marginTop: 12 }}>
-                Go back to Event Info and select an event date before publishing.
+                Go back to Event Info and select an event date before submitting.
               </p>
             )}
             {publishError && (
@@ -300,7 +304,7 @@ export default function InvitationBuilder() {
             <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
               <button type="button" className="btn btn-outline" onClick={() => setStep(1)} disabled={publishing}>Back</button>
               <button type="button" className="btn btn-gold" onClick={handlePublish} disabled={!hasEventDate || publishing}>
-                {publishing ? 'Publishing...' : 'Save & Publish'}
+                {publishing ? 'Submitting...' : 'Save & Submit for Approval'}
               </button>
               {publishError && (
                 <button type="button" className="btn btn-outline" onClick={() => navigate('/client/invitation-manage')}>
@@ -345,7 +349,7 @@ export default function InvitationBuilder() {
               >
                 Preview Invitation
               </button>
-              <button type="button" className="btn btn-gold" onClick={() => setStep(2)}>Next: Publish</button>
+              <button type="button" className="btn btn-gold" onClick={() => setStep(2)}>Next: Review & Submit</button>
             </div>
           </div>
         </>
