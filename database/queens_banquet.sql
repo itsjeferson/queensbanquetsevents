@@ -80,7 +80,7 @@ CREATE TABLE events (
     event_date TIMESTAMP NOT NULL,
     slug VARCHAR(100) UNIQUE,
     invite_code VARCHAR(10) UNIQUE,
-    status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+    status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'pending_approval', 'published', 'archived')),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
