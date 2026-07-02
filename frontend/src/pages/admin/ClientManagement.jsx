@@ -137,7 +137,7 @@ export default function ClientManagement() {
 
   return (
     <>
-      <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1>Client Management</h1>
           <p>Create client accounts and manage access to the client portal.</p>
