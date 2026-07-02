@@ -43,8 +43,11 @@ export default function PanelNavbar({
         </button>
       )}
       <div className="panel-navbar-brand">
-        <span className="panel-navbar-name">Queen&apos;s Banquet</span>
-        <span className="panel-navbar-tagline">Events Management</span>
+        <img src="/assets/images/logo.png" alt="Queen's Banquet Events" className="panel-navbar-logo" />
+        <span className="panel-navbar-brand-text">
+          <span className="panel-navbar-name">Queen&apos;s Banquet</span>
+          <span className="panel-navbar-tagline">Events Management</span>
+        </span>
       </div>
       {onOpenNotifications && (
         <div className="panel-navbar-actions">
