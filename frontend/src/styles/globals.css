@@ -25,7 +25,9 @@ button { cursor: pointer; font-family: 'Poppins', sans-serif; }
   align-items: center;
   justify-content: flex-start;
   gap: 16px;
-  padding: 0 48px;
+  /* Left inset matches the sidebar's own content padding (16px) so the
+     brand logo lines up directly above the sidebar nav icons/avatar below it. */
+  padding: 0 48px 0 16px;
 }
 .panel-navbar-menu {
   display: none;
@@ -299,6 +301,7 @@ textarea { resize: vertical; min-height: 120px; }
   flex-shrink: 0;
   position: fixed;
   top: var(--nav-h);
+  left: 0;
   bottom: 0;
   overflow-y: auto;
 }
