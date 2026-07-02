@@ -27,9 +27,10 @@ function CalendarWidget({ monthLabel, days, events, onPrev, onNext }) {
                 justifyContent: 'center',
                 borderRadius: 8,
                 fontSize: 14,
-                background: day.today ? 'var(--gold)' : day.booked ? 'rgba(212,175,55,0.15)' : day.empty ? 'transparent' : 'var(--cream)',
-                color: day.today ? 'white' : 'var(--black)',
+                background: day.today ? 'var(--gold)' : day.booked ? 'var(--danger-bg)' : day.empty ? 'transparent' : 'var(--ivory)',
+                color: day.today ? 'var(--black)' : day.booked ? 'var(--danger)' : 'var(--black)',
                 fontWeight: day.today || day.booked ? 600 : 400,
+                boxShadow: day.today ? 'inset 0 0 0 2px var(--gold-dark)' : 'none',
               }}
             >
               {day.num || ''}

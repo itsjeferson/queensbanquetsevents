@@ -1,10 +1,9 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import { adminRoleLabel, isAdminRole } from '../../../utils/roles';
+import { adminRoleLabel } from '../../../utils/roles';
 
 export default function Sidebar({ items, footerItem, isOpen = false, onClose, onNavigate }) {
   const { user } = useAuth();
-  const userIsAdmin = isAdminRole(user?.role);
 
   return (
     <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
@@ -16,7 +15,7 @@ export default function Sidebar({ items, footerItem, isOpen = false, onClose, on
           </button>
         )}
       </div>
-      <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--border-soft)', marginBottom: 16 }}>
+      <div style={{ padding: '0 16px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div
             className="profile-avatar"
@@ -24,14 +23,14 @@ export default function Sidebar({ items, footerItem, isOpen = false, onClose, on
               width: 44,
               height: 44,
               fontSize: 18,
-              background: userIsAdmin ? 'var(--black)' : undefined,
+              flexShrink: 0,
             }}
           >
             {user?.role === 'super_admin' ? '★' : (user?.initials || 'U')}
           </div>
           <div>
-            <strong style={{ fontSize: 14, display: 'block' }}>{user?.name || 'User'}</strong>
-            <span style={{ fontSize: 12, color: userIsAdmin ? 'var(--gold-dark)' : 'var(--text-muted)' }}>
+            <strong style={{ fontSize: 14, display: 'block', color: 'var(--text-inverse)' }}>{user?.name || 'User'}</strong>
+            <span style={{ fontSize: 12, color: 'var(--gold-light)' }}>
               {adminRoleLabel(user?.role)}
             </span>
           </div>
