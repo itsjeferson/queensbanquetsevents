@@ -27,6 +27,7 @@ export default function AdminLayout() {
   const navigate = useNavigate();
 
   const handleSignOut = () => {
+    if (!window.confirm('Are you sure you want to log out?')) return;
     logout();
     navigate('/login');
   };

@@ -78,6 +78,9 @@ export default function ClientManagement() {
       setError('Password must be at least 6 characters.');
       return;
     }
+    if (!window.confirm(`Create a new client account for ${form.firstName} ${form.lastName} (${form.email})?`)) {
+      return;
+    }
 
     try {
       await clientService.create({
