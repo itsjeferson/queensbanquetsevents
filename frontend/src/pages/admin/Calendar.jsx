@@ -41,7 +41,7 @@ function CalendarWidget({ monthLabel, days, events, onPrev, onNext }) {
       <div className="card-widget">
         <h3>Upcoming Events</h3>
         {events.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>No events scheduled for this month.</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>No upcoming published events yet.</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 8 }}>
             {events.map((event) => (

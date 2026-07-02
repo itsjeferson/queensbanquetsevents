@@ -241,6 +241,26 @@ class Report
         }
         $bookedDays = array_values(array_unique($bookedDays));
 
+        // "Upcoming Events" is a standalone look-ahead list — it should always
+        // surface the next confirmed events from today onward, independent of
+        // whichever month the calendar grid above happens to be browsing.
+        $upcomingStmt = $pdo->prepare(
+            "SELECT e.id, e.event_name, e.event_type, e.event_date, e.status,
+                    CONCAT(u.first_name, ' ', u.last_name) AS client_name,
+                    it.template_name,
+                    (SELECT COUNT(*) FROM guests g WHERE g.event_id = e.id) AS guest_count
+             FROM events e
+             JOIN users u ON e.client_id = u.id
+             LEFT JOIN invitation_pages ip ON ip.event_id = e.id
+             LEFT JOIN invitation_templates it ON ip.template_id = it.id
+             WHERE e.status = 'published'
+               AND e.event_date >= CURRENT_DATE
+             ORDER BY e.event_date ASC
+             LIMIT 10"
+        );
+        $upcomingStmt->execute();
+        $upcomingRows = $upcomingStmt->fetchAll();
+
         $colors = [
             'wedding' => '#B47B36',
             'debut' => '#DC3545',
@@ -257,12 +277,12 @@ class Report
             return [
                 'id' => (int) $row['id'],
                 'title' => ucfirst($row['event_type']) . ' — ' . $firstName,
-                'details' => $date->format('M j') . ' • ' . ($row['template_name'] ?: 'Custom') . ' • ' . (int) $row['guest_count'] . ' guests',
+                'details' => $date->format('M j, Y') . ' • ' . ($row['template_name'] ?: 'Custom') . ' • ' . (int) $row['guest_count'] . ' guests',
                 'coordinator' => $clientName,
                 'color' => $colors[$row['event_type']] ?? '#B47B36',
                 'event_name' => $row['event_name'],
             ];
-        }, $events);
+        }, $upcomingRows);
 
         $firstDay = (int) date('w', strtotime($start));
         $daysInMonth = (int) date('t', strtotime($start));
