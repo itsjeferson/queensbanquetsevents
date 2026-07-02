@@ -215,6 +215,9 @@ class Report
         $pdo = getConnection();
         $start = sprintf('%04d-%02d-01', $year, $month);
 
+        // Only published invitations represent a confirmed event date —
+        // drafts haven't been confirmed by the client yet, so they should
+        // not occupy a slot on the calendar.
         $stmt = $pdo->prepare(
             "SELECT e.id, e.event_name, e.event_type, e.event_date, e.status,
                     CONCAT(u.first_name, ' ', u.last_name) AS client_name,
@@ -224,7 +227,7 @@ class Report
              JOIN users u ON e.client_id = u.id
              LEFT JOIN invitation_pages ip ON ip.event_id = e.id
              LEFT JOIN invitation_templates it ON ip.template_id = it.id
-             WHERE e.status != 'archived'
+             WHERE e.status = 'published'
                AND EXTRACT(YEAR FROM e.event_date) = ?
                AND EXTRACT(MONTH FROM e.event_date) = ?
              ORDER BY e.event_date ASC"
