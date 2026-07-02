@@ -25,7 +25,7 @@ export default function ClientDashboard() {
   const [dashboard, setDashboard] = useState(emptyDashboard);
   const [previewSlug, setPreviewSlug] = useState(null);
   const [loading, setLoading] = useState(true);
-  const statusBadge = { Published: 'badge-green', Draft: 'badge-gray', Archived: 'badge-red' };
+  const statusBadge = { Published: 'badge-green', Draft: 'badge-gray', Archived: 'badge-red', 'Pending Approval': 'badge-blue' };
 
   useEffect(() => {
     if (!user?.id) {

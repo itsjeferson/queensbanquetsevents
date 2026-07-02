@@ -3,6 +3,12 @@ require_once __DIR__ . '/../config/database.php';
 
 class Report
 {
+    private static function formatStatusLabel(string $status): string
+    {
+        if ($status === 'pending_approval') return 'Pending Approval';
+        return ucfirst($status);
+    }
+
     public static function adminDashboard(): array
     {
         $pdo = getConnection();
@@ -96,7 +102,7 @@ class Report
                     'event' => $row['event_name'],
                     'date' => date('M j, Y', strtotime($row['event_date'])),
                     'template' => $row['template_name'] ?: '—',
-                    'status' => ucfirst($row['status']),
+                    'status' => self::formatStatusLabel($row['status']),
                 ];
             }, $recentInvitations),
             'rsvpByCategory' => $rsvpByCategory,
@@ -192,7 +198,7 @@ class Report
                     'event' => $row['event_name'],
                     'date' => date('M j, Y', strtotime($row['event_date'])),
                     'template' => $row['template_name'] ?: '—',
-                    'status' => ucfirst($row['status']),
+                    'status' => self::formatStatusLabel($row['status']),
                     'slug' => $row['slug'],
                 ];
             }, $invitations),

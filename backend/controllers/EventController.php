@@ -77,6 +77,38 @@ class EventController
         sendResponse(['success' => true, 'message' => 'Invitation published']);
     }
 
+    // Client-facing: submit the invitation for admin review instead of publishing directly.
+    public function requestPublish(int $id): void
+    {
+        $event = Event::find($id);
+        if (!$event) sendError('Event not found', 404);
+        if ($event['status'] === 'published') sendError('This invitation is already published', 409);
+        if ($event['status'] === 'pending_approval') sendError('This invitation is already awaiting admin approval', 409);
+        Event::requestPublish($id);
+        sendResponse(['success' => true, 'message' => 'Publish request sent to the admin for approval']);
+    }
+
+    // Admin-facing: approve a client's pending publish request.
+    public function approvePublish(int $id): void
+    {
+        $event = Event::find($id);
+        if (!$event) sendError('Event not found', 404);
+        if ($event['status'] !== 'pending_approval') sendError('This invitation has no pending publish request', 409);
+        Event::approvePublish($id);
+        InvitationPage::markPublished($id);
+        sendResponse(['success' => true, 'message' => 'Invitation approved and published']);
+    }
+
+    // Admin-facing: decline a client's pending publish request, sending it back to draft.
+    public function declinePublish(int $id): void
+    {
+        $event = Event::find($id);
+        if (!$event) sendError('Event not found', 404);
+        if ($event['status'] !== 'pending_approval') sendError('This invitation has no pending publish request', 409);
+        Event::declinePublish($id);
+        sendResponse(['success' => true, 'message' => 'Publish request declined']);
+    }
+
     public function destroy(int $id): void
     {
         Event::delete($id);

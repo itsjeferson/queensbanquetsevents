@@ -14,7 +14,7 @@ const emptyDashboard = {
 export default function AdminDashboard() {
   const [dashboard, setDashboard] = useState(emptyDashboard);
   const [loading, setLoading] = useState(true);
-  const statusBadge = { Published: 'badge-green', Draft: 'badge-gray', Archived: 'badge-red' };
+  const statusBadge = { Published: 'badge-green', Draft: 'badge-gray', Archived: 'badge-red', 'Pending Approval': 'badge-blue' };
 
   useEffect(() => {
     reportService.getAdminDashboard()

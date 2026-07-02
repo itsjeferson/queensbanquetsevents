@@ -89,6 +89,28 @@ class Event
         $stmt->execute(['published', $id]);
     }
 
+    // Client submits their invitation for admin review instead of publishing directly.
+    public static function requestPublish(int $id): void
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare('UPDATE events SET status = ? WHERE id = ?');
+        $stmt->execute(['pending_approval', $id]);
+    }
+
+    // Admin approves a pending request — same end state as a direct publish.
+    public static function approvePublish(int $id): void
+    {
+        self::publish($id);
+    }
+
+    // Admin declines a pending request, sending it back to draft for the client to revise.
+    public static function declinePublish(int $id): void
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare('UPDATE events SET status = ? WHERE id = ?');
+        $stmt->execute(['draft', $id]);
+    }
+
     public static function delete(int $id): void
     {
         $pdo = getConnection();

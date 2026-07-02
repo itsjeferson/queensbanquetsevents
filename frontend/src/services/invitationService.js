@@ -12,6 +12,9 @@ export const eventService = {
   create: (data) => api.post('/events', data),
   update: (id, data) => api.put(`/events/${id}`, data),
   publish: (id) => api.post(`/events/${id}/publish`),
+  requestPublish: (id) => api.post(`/events/${id}/request-publish`),
+  approvePublish: (id) => api.post(`/events/${id}/approve`),
+  declinePublish: (id) => api.post(`/events/${id}/decline`),
   delete: (id) => api.delete(`/events/${id}`),
 };
 

@@ -14,6 +14,12 @@ switch ($method) {
     case 'POST':
         if ($id && $sub === 'publish') {
             $controller->publish($id);
+        } elseif ($id && $sub === 'request-publish') {
+            $controller->requestPublish($id);
+        } elseif ($id && $sub === 'approve') {
+            $controller->approvePublish($id);
+        } elseif ($id && $sub === 'decline') {
+            $controller->declinePublish($id);
         } else {
             $controller->store(getJsonInput());
         }

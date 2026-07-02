@@ -3,6 +3,7 @@ import StatCard from '../../components/common/Cards/StatCard';
 import DataTable from '../../components/common/Table/DataTable';
 import Loader, { Spinner } from '../../components/common/Loader/Loader';
 import { eventService, rsvpService } from '../../services/invitationService';
+import { eventStatusMeta } from '../../utils/eventStatus';
 
 export default function AdminRsvpMonitoring() {
   const [events, setEvents] = useState([]);
@@ -60,7 +61,7 @@ export default function AdminRsvpMonitoring() {
             renderCell={(key, row) => {
               if (key === 'client') return `${row.first_name || ''} ${row.last_name || ''}`.trim() || '—';
               if (key === 'event_type') return <span className="badge badge-gold">{row.event_type}</span>;
-              if (key === 'status') return <span className={`badge ${row.status === 'published' ? 'badge-green' : 'badge-gray'}`}>{row.status}</span>;
+              if (key === 'status') return <span className={`badge ${eventStatusMeta(row.status).badge}`}>{eventStatusMeta(row.status).label}</span>;
               if (key === 'actions') {
                 const isLoadingRow = loadingRsvps && selectedEvent === row.id;
                 return (

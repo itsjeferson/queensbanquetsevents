@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import DataTable from '../../components/common/Table/DataTable';
 import Loader, { Spinner } from '../../components/common/Loader/Loader';
+import ConfirmDialog from '../../components/common/ConfirmDialog/ConfirmDialog';
+import Toast from '../../components/common/Toast/Toast';
 import { eventService } from '../../services/invitationService';
 import { ApiError } from '../../services/api';
 import { useAuth } from '../../hooks/useAuth';
@@ -19,6 +21,7 @@ import {
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
 import { normalizeInvitationContent, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
+import { eventStatusMeta as statusMeta } from '../../utils/eventStatus';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
@@ -52,18 +55,57 @@ function InvitationManagerList({ variant = 'client' }) {
   const config = MANAGE_CONFIG[variant];
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const statusBadge = { published: 'badge-green', draft: 'badge-gray', archived: 'badge-red' };
+  const [reviewTarget, setReviewTarget] = useState(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const toastTimerRef = useRef(null);
 
-  useEffect(() => {
+  const loadEvents = useCallback(() => {
     const clientId = variant === 'admin' ? undefined : user?.id;
     setLoading(true);
     eventService.getAll(clientId)
       .then((res) => {
-        if (res.data?.length) setEvents(res.data);
+        setEvents(res.data || []);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user?.id, variant]);
+
+  useEffect(() => {
+    loadEvents();
+  }, [loadEvents]);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(''), 3200);
+  };
+
+  useEffect(() => () => {
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+  }, []);
+
+  const confirmReview = async () => {
+    if (!reviewTarget) return;
+    const { id, action } = reviewTarget;
+    setReviewLoading(true);
+    try {
+      if (action === 'approve') {
+        await eventService.approvePublish(id);
+        showToast('Invitation approved and published.');
+      } else {
+        await eventService.declinePublish(id);
+        showToast('Publish request declined.');
+      }
+      setReviewTarget(null);
+      loadEvents();
+    } catch {
+      showToast('Could not complete that action. Please try again.');
+      setReviewTarget(null);
+    } finally {
+      setReviewLoading(false);
+    }
+  };
 
   return (
     <>
@@ -93,7 +135,7 @@ function InvitationManagerList({ variant = 'client' }) {
             if (key === 'event_name') return <strong>{row.event_name}</strong>;
             if (key === 'event_type') return <span className="badge badge-gold">{row.event_type}</span>;
             if (key === 'event_date') return new Date(row.event_date).toLocaleDateString();
-            if (key === 'status') return <span className={`badge ${statusBadge[row.status] || 'badge-gray'}`}>{row.status}</span>;
+            if (key === 'status') return <span className={`badge ${statusMeta(row.status).badge}`}>{statusMeta(row.status).label}</span>;
             if (key === 'actions') return (
               <span>
                 <Link to={`${config.basePath}/${row.id}`} className="action-btn">Edit</Link>
@@ -107,6 +149,24 @@ function InvitationManagerList({ variant = 'client' }) {
                     View
                   </a>
                 )}
+                {variant === 'admin' && row.status === 'pending_approval' && (
+                  <>
+                    <button
+                      type="button"
+                      className="action-btn"
+                      onClick={() => setReviewTarget({ id: row.id, action: 'approve', eventName: row.event_name })}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      className="action-btn danger"
+                      onClick={() => setReviewTarget({ id: row.id, action: 'decline', eventName: row.event_name })}
+                    >
+                      Decline
+                    </button>
+                  </>
+                )}
               </span>
             );
             return row[key];
@@ -114,6 +174,25 @@ function InvitationManagerList({ variant = 'client' }) {
         />
       </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!reviewTarget}
+        title={reviewTarget?.action === 'approve' ? 'Approve & Publish' : 'Decline Publish Request'}
+        message={
+          reviewTarget?.action === 'approve'
+            ? `Approve "${reviewTarget?.eventName}" and make it live for guests?`
+            : `Decline the publish request for "${reviewTarget?.eventName}"? It will go back to draft for the client to revise.`
+        }
+        confirmLabel={reviewTarget?.action === 'approve' ? 'Approve' : 'Decline'}
+        cancelLabel="Cancel"
+        tone={reviewTarget?.action === 'decline' ? 'danger' : 'default'}
+        loadingLabel={reviewTarget?.action === 'approve' ? 'Approving...' : 'Declining...'}
+        loading={reviewLoading}
+        onConfirm={confirmReview}
+        onCancel={() => setReviewTarget(null)}
+      />
+
+      <Toast show={!!toastMessage} message={toastMessage} />
     </>
   );
 }
@@ -137,12 +216,27 @@ export default function InvitationManage({ variant = 'client' }) {
   const savingRef = useRef(false);
   const pendingSyncRef = useRef(null);
   const invitationRef = useRef(invitation);
-  const saveToastTimerRef = useRef(null);
-  const [showSaveToast, setShowSaveToast] = useState(false);
+  const toastTimerRef = useRef(null);
+  const [toastMessage, setToastMessage] = useState('');
+  const [publishConfirmOpen, setPublishConfirmOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [approveConfirmOpen, setApproveConfirmOpen] = useState(false);
+  const [declineConfirmOpen, setDeclineConfirmOpen] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
 
   useEffect(() => {
     invitationRef.current = invitation;
   }, [invitation]);
+
+  const showToast = useCallback((message) => {
+    setToastMessage(message);
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(''), 3500);
+  }, []);
+
+  useEffect(() => () => {
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+  }, []);
 
   const invitationFingerprint = useCallback(
     (value) => JSON.stringify(prepareInvitationForApiSave(value)),
@@ -306,12 +400,13 @@ export default function InvitationManage({ variant = 'client' }) {
     if (variant === 'client') saveClientPreviewSlug(user?.id, normalizedEvent?.slug);
   }, [event, user?.id, variant]);
 
-  const syncToServer = useCallback(async ({ publish = false } = {}) => {
+  const syncToServer = useCallback(async ({ publish = false, publishMode = 'direct' } = {}) => {
     if (!event) return false;
 
     if (savingRef.current) {
       pendingSyncRef.current = {
         publish: publish || pendingSyncRef.current?.publish,
+        publishMode: publish ? publishMode : (pendingSyncRef.current?.publishMode || 'direct'),
       };
       return false;
     }
@@ -335,16 +430,24 @@ export default function InvitationManage({ variant = 'client' }) {
 
     try {
       const updateRes = await eventService.update(id, payload);
-      if (publish) await eventService.publish(id);
+      if (publish) {
+        if (publishMode === 'request') {
+          await eventService.requestPublish(id);
+        } else {
+          await eventService.publish(id);
+        }
+      }
+
+      const publishedStatus = publishMode === 'request' ? 'pending_approval' : 'published';
 
       if (updateRes.data) {
         setEvent((current) => ({
           ...current,
           ...updateRes.data,
-          status: publish ? 'published' : (updateRes.data.status ?? current.status),
+          status: publish ? publishedStatus : (updateRes.data.status ?? current.status),
         }));
       } else if (publish) {
-        setEvent((current) => ({ ...current, status: 'published' }));
+        setEvent((current) => ({ ...current, status: publishedStatus }));
       }
 
       setUsingLocalDraft(false);
@@ -394,21 +497,11 @@ export default function InvitationManage({ variant = 'client' }) {
   useEffect(() => {
     if (saveStatus !== 'saved') return undefined;
 
-    setShowSaveToast(true);
-    if (saveToastTimerRef.current) {
-      window.clearTimeout(saveToastTimerRef.current);
-    }
-    saveToastTimerRef.current = window.setTimeout(() => {
-      setShowSaveToast(false);
-      setSaveStatus('idle');
-    }, 3500);
+    showToast('Your changes have been saved.');
+    const resetTimer = window.setTimeout(() => setSaveStatus('idle'), 3500);
 
-    return () => {
-      if (saveToastTimerRef.current) {
-        window.clearTimeout(saveToastTimerRef.current);
-      }
-    };
-  }, [saveStatus]);
+    return () => window.clearTimeout(resetTimer);
+  }, [saveStatus, showToast]);
 
   const handleUpdateNow = () => {
     if (autoSaveTimerRef.current) {
@@ -418,12 +511,51 @@ export default function InvitationManage({ variant = 'client' }) {
     syncToServer({ publish: false });
   };
 
-  const handlePublish = () => {
+  const confirmPublish = async () => {
     if (autoSaveTimerRef.current) {
       window.clearTimeout(autoSaveTimerRef.current);
     }
+    setPublishing(true);
     persistLocalDraft();
-    syncToServer({ publish: true });
+    const publishMode = variant === 'admin' ? 'direct' : 'request';
+    const ok = await syncToServer({ publish: true, publishMode });
+    setPublishing(false);
+    setPublishConfirmOpen(false);
+    if (ok) {
+      showToast(
+        publishMode === 'request'
+          ? 'Publish request sent to the admin for review.'
+          : 'Invitation published successfully.',
+      );
+    }
+  };
+
+  const confirmApprove = async () => {
+    setReviewLoading(true);
+    try {
+      await eventService.approvePublish(id);
+      setEvent((current) => ({ ...current, status: 'published' }));
+      showToast('Invitation approved and published.');
+      setApproveConfirmOpen(false);
+    } catch {
+      setSaveError('Could not approve this invitation. Please try again.');
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const confirmDecline = async () => {
+    setReviewLoading(true);
+    try {
+      await eventService.declinePublish(id);
+      setEvent((current) => ({ ...current, status: 'draft' }));
+      showToast('Publish request declined.');
+      setDeclineConfirmOpen(false);
+    } catch {
+      setSaveError('Could not decline this invitation. Please try again.');
+    } finally {
+      setReviewLoading(false);
+    }
   };
 
   const handlePreviewInvitation = () => {
@@ -455,7 +587,7 @@ export default function InvitationManage({ variant = 'client' }) {
       <div className="dash-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <h1>{event.event_name}</h1>
-          <p>{event.event_type} - {new Date(event.event_date).toLocaleDateString()} - <span className={`badge ${event.status === 'published' ? 'badge-green' : 'badge-gray'}`}>{event.status}</span></p>
+          <p>{event.event_type} - {new Date(event.event_date).toLocaleDateString()} - <span className={`badge ${statusMeta(event.status).badge}`}>{statusMeta(event.status).label}</span></p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <button
@@ -471,15 +603,21 @@ export default function InvitationManage({ variant = 'client' }) {
               </span>
             ) : 'Update Invitation'}
           </button>
-          {event.status !== 'published' && (
+          {event.status === 'draft' && (
             <button
               type="button"
               className="btn btn-outline"
-              onClick={handlePublish}
+              onClick={() => setPublishConfirmOpen(true)}
               disabled={saveStatus === 'saving'}
             >
-              Publish
+              {variant === 'admin' ? 'Publish' : 'Request Publish'}
             </button>
+          )}
+          {event.status === 'pending_approval' && variant === 'admin' && (
+            <>
+              <button type="button" className="btn btn-gold" onClick={() => setApproveConfirmOpen(true)}>Approve</button>
+              <button type="button" className="btn btn-outline" onClick={() => setDeclineConfirmOpen(true)}>Decline</button>
+            </>
           )}
           {variant === 'admin' && (
             <button type="button" className="btn btn-outline" onClick={() => setPreviewOpen(true)}>Preview Invitation</button>
@@ -491,6 +629,14 @@ export default function InvitationManage({ variant = 'client' }) {
           )}
         </div>
       </div>
+
+      {event.status === 'pending_approval' && (
+        <div className="card-widget" style={{ borderColor: 'rgba(57,90,128,0.35)', background: 'rgba(57,90,128,0.08)' }}>
+          {variant === 'admin'
+            ? 'This invitation is awaiting your approval before it can go live. Review the content below, then Approve or Decline using the buttons above.'
+            : "Your publish request has been submitted and is awaiting admin approval. You'll see it marked Published here once it's approved."}
+        </div>
+      )}
 
       {fileError && (
         <div className="card-widget" style={{ borderColor: 'rgba(220,53,69,0.35)', background: 'rgba(220,53,69,0.06)' }}>
@@ -595,12 +741,48 @@ export default function InvitationManage({ variant = 'client' }) {
         }}
       />
 
-      {showSaveToast && (
-        <div className="inv-save-toast" role="status" aria-live="polite">
-          <span className="inv-save-toast-icon" aria-hidden="true">✓</span>
-          <span>Your changes have been saved.</span>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={publishConfirmOpen}
+        title={variant === 'admin' ? 'Publish Invitation' : 'Request Publish'}
+        message={
+          variant === 'admin'
+            ? `Publish "${event.event_name}" and make it live for guests?`
+            : `Send "${event.event_name}" to the admin for approval? It will go live once approved.`
+        }
+        confirmLabel={variant === 'admin' ? 'Publish' : 'Send Request'}
+        cancelLabel="Cancel"
+        loadingLabel={variant === 'admin' ? 'Publishing...' : 'Sending...'}
+        loading={publishing}
+        onConfirm={confirmPublish}
+        onCancel={() => setPublishConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={approveConfirmOpen}
+        title="Approve & Publish"
+        message={`Approve "${event.event_name}" and make it live for guests?`}
+        confirmLabel="Approve"
+        cancelLabel="Cancel"
+        loadingLabel="Approving..."
+        loading={reviewLoading}
+        onConfirm={confirmApprove}
+        onCancel={() => setApproveConfirmOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={declineConfirmOpen}
+        title="Decline Publish Request"
+        message={`Decline the publish request for "${event.event_name}"? It will go back to draft for the client to revise.`}
+        confirmLabel="Decline"
+        cancelLabel="Cancel"
+        tone="danger"
+        loadingLabel="Declining..."
+        loading={reviewLoading}
+        onConfirm={confirmDecline}
+        onCancel={() => setDeclineConfirmOpen(false)}
+      />
+
+      <Toast show={!!toastMessage} message={toastMessage} />
     </>
   );
 }
