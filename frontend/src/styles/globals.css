@@ -23,7 +23,7 @@ button { cursor: pointer; font-family: 'Poppins', sans-serif; }
   border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 16px;
   padding: 0 48px;
 }
@@ -66,6 +66,8 @@ body.sidebar-open {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex-shrink: 1;
 }
 .panel-navbar-logo {
   width: 44px;
@@ -80,6 +82,7 @@ body.sidebar-open {
   flex-direction: column;
   gap: 2px;
   line-height: 1.1;
+  min-width: 0;
 }
 .panel-navbar-name {
   font-family: 'Playfair Display', serif;
@@ -87,6 +90,9 @@ body.sidebar-open {
   font-weight: 700;
   color: var(--black);
   letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .panel-navbar-tagline {
   font-size: 10.5px;
@@ -94,6 +100,9 @@ body.sidebar-open {
   letter-spacing: 1.4px;
   text-transform: uppercase;
   color: var(--gold-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; letter-spacing: 0.5px; border: 1.5px solid transparent; transition: all 0.25s; }
 .btn-outline { border-color: var(--black); color: var(--black); background: transparent; }
@@ -283,7 +292,7 @@ textarea { resize: vertical; min-height: 120px; }
 /* DASHBOARD */
 .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-h); }
 .sidebar {
-  width: var(--sidebar-w);
+  width: min(var(--sidebar-w), 82vw);
   background: var(--black);
   border-right: none;
   padding: 28px 0;
