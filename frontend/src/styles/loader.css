@@ -107,8 +107,8 @@
 
 .app-loader-text {
   margin: 0;
-  font-family: 'Playfair Display', serif;
-  font-size: 18px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.02em;
@@ -116,14 +116,10 @@
 }
 
 .app-loader--inline .app-loader-text {
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 400;
   animation: none;
 }
 
 .app-loader--invitation .app-loader-text {
-  font-size: 20px;
   color: var(--black);
 }
 

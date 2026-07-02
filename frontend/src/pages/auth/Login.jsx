@@ -51,7 +51,7 @@ export default function Login() {
     <div className="auth-page">
       <div className="auth-visual">
         <div style={{ position: 'relative' }}>
-          <div className="section-tag" style={{ color: 'var(--gold)' }}>Queen&apos;s Banquet</div>
+          <img src="/assets/images/logo.png" alt="Queen's Banquet Events" className="auth-visual-logo" />
           <h2>Sign in to <br />Your Account</h2>
           <p>Create, customize, and share digital invitations with RSVP monitoring.</p>
           <div style={{ marginTop: 48, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -71,8 +71,11 @@ export default function Login() {
       <div className="auth-form-wrap">
         <div className="auth-form-inner">
           <div className="auth-brand">
-            <div className="auth-brand-name">Queen&apos;s Banquet</div>
-            <div className="auth-brand-tagline">Events Management</div>
+            <img src="/assets/images/logo.png" alt="Queen's Banquet Events" className="auth-brand-logo" />
+            <div>
+              <div className="auth-brand-name">Queen&apos;s Banquet</div>
+              <div className="auth-brand-tagline">Events Management</div>
+            </div>
           </div>
           <h3>Sign In</h3>
           <div className="form-group"><label>Email Address</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" /></div>
