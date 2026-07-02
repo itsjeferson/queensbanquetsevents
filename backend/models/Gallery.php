@@ -22,6 +22,15 @@ class Gallery
         return dbLastInsertId($pdo, 'gallery');
     }
 
+    public static function find(int $id): ?array
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare('SELECT * FROM gallery WHERE id = ?');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
     public static function delete(int $id): void
     {
         $pdo = getConnection();

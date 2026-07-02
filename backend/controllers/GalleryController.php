@@ -30,6 +30,10 @@ class GalleryController
     public function destroy(int $id): void
     {
         requireAdmin();
+        $item = Gallery::find($id);
+        if (!$item) sendError('Image not found', 404);
+
+        deleteUploadedFile($item['image_path'] ?? null);
         Gallery::delete($id);
         sendResponse(['success' => true, 'message' => 'Image deleted']);
     }
