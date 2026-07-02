@@ -93,9 +93,12 @@ function InvitationManagerList({ variant = 'client' }) {
       if (action === 'approve') {
         await eventService.approvePublish(id);
         showToast('Invitation approved and published.');
-      } else {
+      } else if (action === 'decline') {
         await eventService.declinePublish(id);
         showToast('Publish request declined.');
+      } else if (action === 'delete') {
+        await eventService.delete(id);
+        showToast('Invitation deleted.');
       }
       setReviewTarget(null);
       loadEvents();
@@ -105,6 +108,30 @@ function InvitationManagerList({ variant = 'client' }) {
     } finally {
       setReviewLoading(false);
     }
+  };
+
+  const REVIEW_META = {
+    approve: {
+      title: 'Approve & Publish',
+      message: (name) => `Approve "${name}" and make it live for guests?`,
+      confirmLabel: 'Approve',
+      loadingLabel: 'Approving...',
+      tone: 'default',
+    },
+    decline: {
+      title: 'Decline Publish Request',
+      message: (name) => `Decline the publish request for "${name}"? It will go back to draft for the client to revise.`,
+      confirmLabel: 'Decline',
+      loadingLabel: 'Declining...',
+      tone: 'danger',
+    },
+    delete: {
+      title: 'Delete Invitation',
+      message: (name) => `Delete "${name}"? Its public link will stop working and it will be removed from this list. This can't be undone from here.`,
+      confirmLabel: 'Delete',
+      loadingLabel: 'Deleting...',
+      tone: 'danger',
+    },
   };
 
   return (
@@ -167,6 +194,13 @@ function InvitationManagerList({ variant = 'client' }) {
                     </button>
                   </>
                 )}
+                <button
+                  type="button"
+                  className="action-btn danger"
+                  onClick={() => setReviewTarget({ id: row.id, action: 'delete', eventName: row.event_name })}
+                >
+                  Delete
+                </button>
               </span>
             );
             return row[key];
@@ -177,16 +211,12 @@ function InvitationManagerList({ variant = 'client' }) {
 
       <ConfirmDialog
         isOpen={!!reviewTarget}
-        title={reviewTarget?.action === 'approve' ? 'Approve & Publish' : 'Decline Publish Request'}
-        message={
-          reviewTarget?.action === 'approve'
-            ? `Approve "${reviewTarget?.eventName}" and make it live for guests?`
-            : `Decline the publish request for "${reviewTarget?.eventName}"? It will go back to draft for the client to revise.`
-        }
-        confirmLabel={reviewTarget?.action === 'approve' ? 'Approve' : 'Decline'}
+        title={reviewTarget ? REVIEW_META[reviewTarget.action].title : ''}
+        message={reviewTarget ? REVIEW_META[reviewTarget.action].message(reviewTarget.eventName) : ''}
+        confirmLabel={reviewTarget ? REVIEW_META[reviewTarget.action].confirmLabel : ''}
         cancelLabel="Cancel"
-        tone={reviewTarget?.action === 'decline' ? 'danger' : 'default'}
-        loadingLabel={reviewTarget?.action === 'approve' ? 'Approving...' : 'Declining...'}
+        tone={reviewTarget ? REVIEW_META[reviewTarget.action].tone : 'default'}
+        loadingLabel={reviewTarget ? REVIEW_META[reviewTarget.action].loadingLabel : ''}
         loading={reviewLoading}
         onConfirm={confirmReview}
         onCancel={() => setReviewTarget(null)}

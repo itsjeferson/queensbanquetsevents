@@ -8,11 +8,15 @@ class Event
     {
         $pdo = getConnection();
         if ($clientId) {
-            $stmt = $pdo->prepare('SELECT e.*, u.first_name, u.last_name FROM events e JOIN users u ON e.client_id = u.id WHERE e.client_id = ? ORDER BY e.event_date DESC');
+            $stmt = $pdo->prepare(
+                "SELECT e.*, u.first_name, u.last_name FROM events e JOIN users u ON e.client_id = u.id
+                 WHERE e.client_id = ? AND e.status != 'archived' ORDER BY e.event_date DESC"
+            );
             $stmt->execute([$clientId]);
             return $stmt->fetchAll();
         }
-        $sql = 'SELECT e.*, u.first_name, u.last_name FROM events e JOIN users u ON e.client_id = u.id ORDER BY e.event_date DESC';
+        $sql = "SELECT e.*, u.first_name, u.last_name FROM events e JOIN users u ON e.client_id = u.id
+                WHERE e.status != 'archived' ORDER BY e.event_date DESC";
         return $pdo->query($sql)->fetchAll();
     }
 
