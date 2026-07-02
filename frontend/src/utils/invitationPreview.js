@@ -93,7 +93,7 @@ function hasAttireDetails(attire, dressCode) {
 
 function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo'];
+  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo', 'floral_design_enabled'];
 
   fields.forEach((field) => {
     if (draftInvitation[field] !== undefined && draftInvitation[field] !== null) {

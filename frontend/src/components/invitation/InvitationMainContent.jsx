@@ -16,32 +16,49 @@ import GuestBook from './GuestBook';
 import QRShare from './QRShare';
 import InvitationFooter from './InvitationFooter';
 import FloralCornerFrame from './FloralCornerFrame';
-import useInvitationAos from '../../hooks/useInvitationAos';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 function SectionShell({
   sectionId,
   floral,
   scrollAnimation,
-  aosDelay = 0,
   children,
 }) {
+  const shellRef = useRef(null);
   const content = floral ? (
     <FloralCornerFrame className="inv-floral-frame-section">{children}</FloralCornerFrame>
   ) : children;
 
-  if (!scrollAnimation) {
-    return <div className={`inv-section-shell inv-section-${sectionId}`}>{content}</div>;
-  }
+  useEffect(() => {
+    if (!scrollAnimation) return undefined;
+
+    const node = shellRef.current;
+    if (!node) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        node.classList.add('inv-scroll-reveal-visible');
+        document.dispatchEvent(new CustomEvent('aos:in', { detail: node }));
+        observer.disconnect();
+      },
+      { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [scrollAnimation, sectionId]);
+
+  const classes = [
+    'inv-section-shell',
+    `inv-section-${sectionId}`,
+    scrollAnimation ? 'inv-scroll-reveal' : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div
-      className={`inv-section-shell inv-section-${sectionId}`}
-      data-aos="fade-up"
-      data-aos-duration="650"
-      data-aos-easing="ease-out-cubic"
-      data-aos-offset="100"
-      data-aos-delay={aosDelay}
+      ref={scrollAnimation ? shellRef : undefined}
+      className={classes}
       data-section-id={sectionId}
     >
       {content}
@@ -60,44 +77,43 @@ export function renderInvitationSection(sectionId, ctx) {
     gradualReveal,
     animateHero,
     scrollAnimation,
-    aosDelay,
     showFollowMessage,
   } = ctx;
 
   switch (sectionId) {
     case 'hero':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <OpenedHeroSection event={event} invitation={invitation} animateHero={animateHero} />
         </SectionShell>
       );
     case 'quote_primary':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <QuoteBlock quote={invitation.quote} source={invitation.quote_source} compact />
         </SectionShell>
       );
     case 'story_intro':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <StoryIntroSection story={invitation.story} showMessages={false} />
         </SectionShell>
       );
     case 'quote_secondary':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <QuoteBlock quote={invitation.secondary_quote} compact />
         </SectionShell>
       );
     case 'couple_initials':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <CoupleInitialsSection event={event} invitation={invitation} />
         </SectionShell>
       );
     case 'invitation_message':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <StoryIntroSection
             showTitleImage={false}
             invitationMessage={invitation.story.invitation_message || invitation.invitation_message}
@@ -107,19 +123,19 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'couple_showcase':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <CoupleShowcaseSection groom={invitation.groom_profile} bride={invitation.bride_profile} />
         </SectionShell>
       );
     case 'wedding_details':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <WeddingDetailsSection event={event} venue={invitation.venue} />
         </SectionShell>
       );
     case 'countdown':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <section className="inv-countdown-band" id="countdown">
             {invitation.gallery?.[2]?.image && <img src={invitation.gallery[2].image} alt="" />}
             <div className="inv-countdown-overlay">
@@ -135,19 +151,19 @@ export function renderInvitationSection(sectionId, ctx) {
     case 'rsvp':
       if (saveTheDateEnabled) return null;
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <RSVPForm eventId={event.id} note={invitation.rsvp_note} />
         </SectionShell>
       );
     case 'entourage':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <EntourageFullSection entourage={invitation.entourage} />
         </SectionShell>
       );
     case 'attire':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <AttireGuideSection
             attire={invitation.attire}
             dressCode={invitation.dress_code}
@@ -157,43 +173,43 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'program':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <TimelineSection program={invitation.program} />
         </SectionShell>
       );
     case 'gift_registry':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <GiftRegistry registry={invitation.gift_registry} />
         </SectionShell>
       );
     case 'faqs':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <FaqSection faqs={invitation.faqs} />
         </SectionShell>
       );
     case 'gallery':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <HappyMomentsSlideshow gallery={invitation.gallery} />
         </SectionShell>
       );
     case 'guest_book':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <GuestBook eventId={event.id} messages={guestMessages} />
         </SectionShell>
       );
     case 'qr_share':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <QRShare url={shareUrl} enabled={invitation.qr_enabled} />
         </SectionShell>
       );
     case 'footer':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation} aosDelay={aosDelay}>
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <InvitationFooter eventName={coupleName} shareUrl={shareUrl} />
         </SectionShell>
       );
@@ -222,8 +238,6 @@ export default function InvitationMainContent({
     gradualReveal,
     animateHero: true,
   };
-
-  useInvitationAos([sectionOrder.join('|'), gradualReveal, saveTheDateEnabled]);
 
   const trackableSectionIds = useMemo(
     () => sectionOrder.filter((id) => !(id === 'rsvp' && saveTheDateEnabled)),
@@ -271,7 +285,6 @@ export default function InvitationMainContent({
           gradualReveal,
           animateHero: gradualReveal && index === 0,
           scrollAnimation: !skipScrollAnimation,
-          aosDelay: skipScrollAnimation ? 0 : Math.min(index * 40, 160),
           showFollowMessage: sectionId === 'countdown' && showFollowMessage,
         });
         if (!section) return null;

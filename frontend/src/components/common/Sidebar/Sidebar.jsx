@@ -55,6 +55,9 @@ export default function Sidebar({ items, footerItem, isOpen = false, onClose, on
                 </span>
               )}
               {item.title}
+              {item.badge > 0 && (
+                <span className="sidebar-badge">{item.badge > 99 ? '99+' : item.badge}</span>
+              )}
             </NavLink>
           )
         ))}

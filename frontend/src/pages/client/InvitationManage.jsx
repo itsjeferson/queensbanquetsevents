@@ -137,6 +137,8 @@ export default function InvitationManage({ variant = 'client' }) {
   const savingRef = useRef(false);
   const pendingSyncRef = useRef(null);
   const invitationRef = useRef(invitation);
+  const saveToastTimerRef = useRef(null);
+  const [showSaveToast, setShowSaveToast] = useState(false);
 
   useEffect(() => {
     invitationRef.current = invitation;
@@ -389,6 +391,25 @@ export default function InvitationManage({ variant = 'client' }) {
     };
   }, [dirty, event, invitation, persistLocalDraft, syncToServer]);
 
+  useEffect(() => {
+    if (saveStatus !== 'saved') return undefined;
+
+    setShowSaveToast(true);
+    if (saveToastTimerRef.current) {
+      window.clearTimeout(saveToastTimerRef.current);
+    }
+    saveToastTimerRef.current = window.setTimeout(() => {
+      setShowSaveToast(false);
+      setSaveStatus('idle');
+    }, 3500);
+
+    return () => {
+      if (saveToastTimerRef.current) {
+        window.clearTimeout(saveToastTimerRef.current);
+      }
+    };
+  }, [saveStatus]);
+
   const handleUpdateNow = () => {
     if (autoSaveTimerRef.current) {
       window.clearTimeout(autoSaveTimerRef.current);
@@ -495,12 +516,6 @@ export default function InvitationManage({ variant = 'client' }) {
         </div>
       )}
 
-      {saveStatus === 'saved' && (
-        <div className="card-widget" style={{ borderColor: 'rgba(40,167,69,0.35)', background: 'rgba(40,167,69,0.06)' }}>
-          All changes saved. Preview updates instantly — server sync complete.
-        </div>
-      )}
-
       {saveStatus === 'unsaved' && (
         <div className="card-widget" style={{ borderColor: 'rgba(212,175,55,0.35)', background: 'rgba(212,175,55,0.06)' }}>
           Editing...
@@ -579,6 +594,13 @@ export default function InvitationManage({ variant = 'client' }) {
           guest_messages: [],
         }}
       />
+
+      {showSaveToast && (
+        <div className="inv-save-toast" role="status" aria-live="polite">
+          <span className="inv-save-toast-icon" aria-hidden="true">✓</span>
+          <span>Your changes have been saved.</span>
+        </div>
+      )}
     </>
   );
 }

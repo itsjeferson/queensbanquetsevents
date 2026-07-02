@@ -19,7 +19,7 @@ export default function InvitationPreviewModal({ open, onClose, data, title = 'I
           </button>
         </div>
         <div className="invitation-preview-frame">
-          <InvitationRenderer data={previewData} />
+          <InvitationRenderer data={previewData} previewMode />
         </div>
       </div>
     </div>

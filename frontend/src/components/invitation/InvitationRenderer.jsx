@@ -3,7 +3,12 @@ import CoverScreen from './CoverScreen';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import InvitationMainContent from './InvitationMainContent';
 import { FloralThemeProvider } from './FloralThemeContext';
-import { normalizeInvitationContent, getCoupleDisplayName, isSaveTheDateActive } from '../../utils/invitationContent';
+import {
+  normalizeInvitationContent,
+  getCoupleDisplayName,
+  isSaveTheDateActive,
+  isFloralDesignEnabled,
+} from '../../utils/invitationContent';
 import {
   getVisibleContentRevealOrder,
   resolveInvitationSectionOrder,
@@ -37,6 +42,7 @@ export default function InvitationRenderer({
   data,
   routeIdentifier = '',
   forceSaveTheDateStage = false,
+  previewMode = false,
   onGuestUnlock,
 }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
@@ -63,7 +69,10 @@ export default function InvitationRenderer({
     saveTheDateEnabled: saveTheDateActive || forceSaveTheDateStage,
   });
   const themeStyles = getInvitationThemeStyles(themedInvitation);
-  const floralTheme = getFloralThemeColors(themedInvitation);
+  const floralTheme = {
+    ...getFloralThemeColors(themedInvitation),
+    enabled: isFloralDesignEnabled(invitation),
+  };
   const themeCss = buildInvitationThemeCss(themedInvitation);
   const themeId = themeInput.color_motif || 'classic-gold';
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
@@ -75,13 +84,15 @@ export default function InvitationRenderer({
   );
 
   const [resetRsvpUnlock] = useState(() => consumeRsvpPreviewReset(unlockContext));
+  const skipStoredUnlock = previewMode || resetRsvpUnlock;
 
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
-    if (resetRsvpUnlock && saveTheDateActive) return false;
+    if ((saveTheDateActive || forceSaveTheDateStage) && skipStoredUnlock) return false;
+    if (!saveTheDateActive && !forceSaveTheDateStage) return false;
     return saveTheDateActive && hasRsvpUnlocked(unlockContext);
   });
   const [opened, setOpened] = useState(() => {
-    if (resetRsvpUnlock && saveTheDateActive) return false;
+    if ((saveTheDateActive || forceSaveTheDateStage) && skipStoredUnlock) return false;
     if (!saveTheDateActive) return false;
     return hasRsvpUnlocked(unlockContext);
   });
@@ -90,6 +101,12 @@ export default function InvitationRenderer({
 
   useEffect(() => {
     if (!saveTheDateActive && !forceSaveTheDateStage) {
+      setRsvpUnlockedState(false);
+      setOpened(false);
+      return;
+    }
+
+    if (previewMode) {
       setRsvpUnlockedState(false);
       setOpened(false);
       return;
@@ -112,6 +129,7 @@ export default function InvitationRenderer({
     routeIdentifier,
     saveTheDateActive,
     forceSaveTheDateStage,
+    previewMode,
     resetRsvpUnlock,
     unlockContext,
   ]);

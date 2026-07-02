@@ -14,6 +14,7 @@ import InvitationBuilder from '../pages/client/InvitationBuilder';
 import RSVPMonitoring from '../pages/client/RSVPMonitoring';
 import ClientNotifications from '../pages/client/Notifications';
 import ClientSettings from '../pages/client/Settings';
+import { NOTIFICATIONS_ENABLED } from '../config/features';
 
 import AdminDashboard from '../pages/admin/Dashboard';
 import AdminRsvpMonitoring from '../pages/admin/AdminRsvpMonitoring';
@@ -74,7 +75,14 @@ export default function AppRoutes() {
         <Route path="invitation-builder" element={<InvitationBuilder />} />
         <Route path="rsvp-monitoring" element={<RSVPMonitoring />} />
         <Route path="rsvp-monitoring/:eventId" element={<RSVPMonitoring />} />
-        <Route path="notifications" element={<ClientNotifications />} />
+        <Route
+          path="notifications"
+          element={
+            NOTIFICATIONS_ENABLED
+              ? <ClientNotifications />
+              : <Navigate to="/client/dashboard" replace />
+          }
+        />
         <Route path="settings" element={<ClientSettings />} />
       </Route>
 

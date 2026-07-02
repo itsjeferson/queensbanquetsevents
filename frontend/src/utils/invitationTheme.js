@@ -3,6 +3,7 @@ import { normalizeColorToHex } from './colorInput';
 export const PALETTE_COLOR_COUNT = 6;
 export const ATTIRE_COLOR_COUNT = 4;
 export const PALETTE_DEFAULT_COLOR = '#FFFFFF';
+export const ATTIRE_SWATCH_DEFAULT = PALETTE_DEFAULT_COLOR;
 
 export const PALETTE_COLOR_LABELS = [
   'Headings',
@@ -186,12 +187,6 @@ export function applyMotifToInvitation(invitation, motifId) {
     background_color: palette[1],
     secondary_color: palette[2],
     palette_colors: palette,
-    attire: {
-      ...(invitation.attire || {}),
-      ladies_colors: [...motif.accent_colors],
-      gentlemen_colors: [...motif.accent_colors],
-      color_baseline: [...motif.accent_colors],
-    },
   };
 }
 
@@ -216,28 +211,17 @@ export function applyCustomPaletteColors(invitation = {}, colors = []) {
   };
 }
 
-export function getAttireColorBaseline(invitation = {}) {
-  const stored = invitation.attire?.color_baseline;
-  if (Array.isArray(stored) && stored.filter(Boolean).length >= ATTIRE_COLOR_COUNT) {
-    return stored.slice(0, ATTIRE_COLOR_COUNT).map((color) => normalizeColorToHex(color));
-  }
-
-  const motifId = invitation.color_motif || 'classic-gold';
-  const motif = getMotifById(motifId);
-  return motif.accent_colors.slice(0, ATTIRE_COLOR_COUNT).map((color) => normalizeColorToHex(color));
-}
-
-/** Only colors the client changed from the saved baseline should appear on the invitation. */
-export function getCustomizedAttireColors(colors = [], invitation = {}) {
+/** Only non-default swatch colors appear on the public invitation. */
+export function getCustomizedAttireColors(colors = []) {
   if (!Array.isArray(colors)) return [];
 
-  const baseline = getAttireColorBaseline(invitation);
   return colors
     .slice(0, ATTIRE_COLOR_COUNT)
-    .filter((color, index) => {
+    .filter((color) => {
       if (!color?.trim()) return false;
-      return normalizeColorToHex(color) !== normalizeColorToHex(baseline[index] || '');
-    });
+      return normalizeColorToHex(color) !== normalizeColorToHex(ATTIRE_SWATCH_DEFAULT);
+    })
+    .map((color) => normalizeColorToHex(color));
 }
 
 export function getInvitationTheme(invitation = {}) {

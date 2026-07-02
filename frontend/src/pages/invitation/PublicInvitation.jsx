@@ -80,15 +80,17 @@ export default function PublicInvitation() {
 
     const saveTheDateActive = isSaveTheDateActive(data.invitation);
     const eventSlug = data.event.slug || slug;
-    const unlocked = hasRsvpUnlocked({
-      ...data.event,
-      routeIdentifier,
-      slug: eventSlug,
-    });
+    const unlocked = isOwnerPreview
+      ? false
+      : hasRsvpUnlocked({
+        ...data.event,
+        routeIdentifier,
+        slug: eventSlug,
+      });
 
     if (!saveTheDateActive && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
     if (saveTheDateActive && unlocked && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
-    if (saveTheDateActive && !unlocked && !isSaveTheDateRoute && !isOwnerPreview) return 'to-std';
+    if (saveTheDateActive && !unlocked && !isSaveTheDateRoute) return 'to-std';
     return 'ready';
   }, [
     data,
@@ -173,6 +175,7 @@ export default function PublicInvitation() {
       data={data}
       routeIdentifier={routeIdentifier}
       forceSaveTheDateStage={isSaveTheDateRoute && isSaveTheDateActive(data.invitation)}
+      previewMode={isOwnerPreview}
       onGuestUnlock={handleGuestUnlock}
     />
   );

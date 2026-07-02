@@ -3,7 +3,13 @@ import { Outlet } from 'react-router-dom';
 import PanelNavbar from '../components/common/Navbar/PanelNavbar';
 import Sidebar from '../components/common/Sidebar/Sidebar';
 
-export default function DashboardShell({ navItems, footerItem }) {
+export default function DashboardShell({
+  navItems,
+  footerItem,
+  unreadCount = 0,
+  onOpenNotifications,
+  notificationPanel = null,
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -23,7 +29,12 @@ export default function DashboardShell({ navItems, footerItem }) {
 
   return (
     <>
-      <PanelNavbar onMenuToggle={toggleSidebar} menuOpen={sidebarOpen} />
+      <PanelNavbar
+        onMenuToggle={toggleSidebar}
+        menuOpen={sidebarOpen}
+        unreadCount={unreadCount}
+        onOpenNotifications={onOpenNotifications}
+      />
       <button
         type="button"
         className={`sidebar-backdrop${sidebarOpen ? ' visible' : ''}`}
@@ -42,6 +53,7 @@ export default function DashboardShell({ navItems, footerItem }) {
           <Outlet />
         </main>
       </div>
+      {notificationPanel}
     </>
   );
 }

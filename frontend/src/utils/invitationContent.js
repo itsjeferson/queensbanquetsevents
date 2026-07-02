@@ -41,8 +41,10 @@ export const defaultAttire = () => ({
   male_primary_sponsors: '',
   ladies: '',
   gentlemen: '',
-  ladies_colors: ['#F4EEE7', '#D4AF37', '#C27691', '#8B4513'],
-  gentlemen_colors: ['#F4EEE7', '#D4AF37', '#C27691', '#8B4513'],
+  female_primary_sponsors_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+  male_primary_sponsors_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+  ladies_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+  gentlemen_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
   reminders: '',
 });
 
@@ -110,6 +112,7 @@ export const defaultWeddingInvitationContent = {
   std_location: '',
   content_reveal_mode: 'full',
   content_reveal_order: [],
+  floral_design_enabled: true,
 };
 
 function asList(value) {
@@ -302,8 +305,14 @@ export function normalizeInvitationContent(invitation = {}) {
     content_reveal_order: Array.isArray(invitation.content_reveal_order)
       ? invitation.content_reveal_order
       : [],
+    floral_design_enabled: invitation.floral_design_enabled !== false,
     ...resolveInvitationThemeFields(themeInput),
   };
+}
+
+/** True when corner floral ornaments should appear on invitation sections. */
+export function isFloralDesignEnabled(invitation = {}) {
+  return invitation.floral_design_enabled !== false;
 }
 
 /** True only when the client explicitly enabled Save the Date first. */

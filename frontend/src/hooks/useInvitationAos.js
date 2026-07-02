@@ -3,12 +3,14 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 const AOS_OPTIONS = {
-  duration: 650,
+  duration: 420,
   easing: 'ease-out-cubic',
   once: true,
-  offset: 100,
+  offset: 60,
   mirror: false,
   anchorPlacement: 'top-bottom',
+  throttleDelay: 50,
+  debounceDelay: 50,
 };
 
 let initialized = false;

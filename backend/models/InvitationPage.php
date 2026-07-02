@@ -126,6 +126,7 @@ class InvitationPage
             'std_location' => $story['std_location'] ?? '',
             'content_reveal_mode' => ($story['content_reveal_mode'] ?? 'full') === 'gradual' ? 'gradual' : 'full',
             'content_reveal_order' => is_array($story['content_reveal_order'] ?? null) ? $story['content_reveal_order'] : [],
+            'floral_design_enabled' => ($story['floral_design_enabled'] ?? true) !== false,
             'published_at' => $row['published_at'] ?? null,
         ];
     }
@@ -177,6 +178,11 @@ class InvitationPage
             : 'full';
         if (isset($data['content_reveal_order']) && is_array($data['content_reveal_order'])) {
             $story['content_reveal_order'] = array_values(array_slice($data['content_reveal_order'], 0, 20));
+        }
+        if (array_key_exists('floral_design_enabled', $data)) {
+            $story['floral_design_enabled'] = (bool) $data['floral_design_enabled'];
+        } elseif (!array_key_exists('floral_design_enabled', $story)) {
+            $story['floral_design_enabled'] = true;
         }
 
         return [

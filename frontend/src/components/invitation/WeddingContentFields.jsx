@@ -2,6 +2,7 @@ import MediaField from '../common/MediaField/MediaField';
 import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
 import { MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
 import { defaultAttire, defaultEntourage } from '../../utils/invitationContent';
+import { ATTIRE_SWATCH_DEFAULT } from '../../utils/invitationTheme';
 import EntourageNameListEditor from './EntourageNameListEditor';
 import InvitationMotifPicker from './InvitationMotifPicker';
 
@@ -418,41 +419,65 @@ export default function WeddingContentFields({
 
       <div className="card-widget">
         <h3>What To Wear</h3>
+        <p className="form-help" style={{ marginTop: 12 }}>
+          Color swatches default to white. Only colors you change from white will appear on the invitation.
+        </p>
         <div className="form-group" style={{ marginTop: 20 }}>
           <label>Dress Code</label>
           <input value={invitation.dress_code || ''} onChange={(e) => onInvitationChange({ dress_code: e.target.value })} />
         </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label>Female Primary Sponsors</label>
-            <textarea value={attire.female_primary_sponsors || ''} onChange={(e) => onAttireChange('female_primary_sponsors', e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label>Male Primary Sponsors</label>
-            <textarea value={attire.male_primary_sponsors || ''} onChange={(e) => onAttireChange('male_primary_sponsors', e.target.value)} />
-          </div>
-        </div>
+
         <div className="form-group">
-          <label>Guests — Ladies</label>
+          <label>Female Primary Sponsors</label>
+          <textarea value={attire.female_primary_sponsors || ''} onChange={(e) => onAttireChange('female_primary_sponsors', e.target.value)} />
+        </div>
+        <ColorSwatchPicker
+          colors={attire.female_primary_sponsors_colors}
+          onChange={(colors) => onAttireChange('female_primary_sponsors_colors', colors)}
+          labelPrefix="Female Sponsor Color"
+          fallback={ATTIRE_SWATCH_DEFAULT}
+          count={4}
+        />
+
+        <div className="form-group" style={{ marginTop: 20 }}>
+          <label>Male Primary Sponsors</label>
+          <textarea value={attire.male_primary_sponsors || ''} onChange={(e) => onAttireChange('male_primary_sponsors', e.target.value)} />
+        </div>
+        <ColorSwatchPicker
+          colors={attire.male_primary_sponsors_colors}
+          onChange={(colors) => onAttireChange('male_primary_sponsors_colors', colors)}
+          labelPrefix="Male Sponsor Color"
+          fallback={ATTIRE_SWATCH_DEFAULT}
+          count={4}
+        />
+
+        <p className="inv-settings-field-label" style={{ marginTop: 28 }}>Guest</p>
+
+        <div className="form-group">
+          <label>Ladies</label>
           <textarea value={attire.ladies || ''} onChange={(e) => onAttireChange('ladies', e.target.value)} />
         </div>
         <ColorSwatchPicker
           colors={attire.ladies_colors}
           onChange={(colors) => onAttireChange('ladies_colors', colors)}
           labelPrefix="Ladies Color"
+          fallback={ATTIRE_SWATCH_DEFAULT}
           count={4}
         />
-        <div className="form-group">
-          <label>Guests — Gentlemen</label>
+
+        <div className="form-group" style={{ marginTop: 20 }}>
+          <label>Gentlemen</label>
           <textarea value={attire.gentlemen || ''} onChange={(e) => onAttireChange('gentlemen', e.target.value)} />
         </div>
         <ColorSwatchPicker
           colors={attire.gentlemen_colors}
           onChange={(colors) => onAttireChange('gentlemen_colors', colors)}
           labelPrefix="Gentlemen Color"
+          fallback={ATTIRE_SWATCH_DEFAULT}
           count={4}
         />
-        <div className="form-group">
+
+        <div className="form-group" style={{ marginTop: 20 }}>
           <label>Reminders</label>
           <textarea value={attire.reminders || ''} onChange={(e) => onAttireChange('reminders', e.target.value)} />
         </div>

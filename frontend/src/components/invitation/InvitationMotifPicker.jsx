@@ -30,6 +30,7 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
   };
   const previewStyles = getInvitationThemeStyles(previewTheme);
   const floralTheme = getFloralThemeColors(previewTheme);
+  const floralDesignEnabled = invitation.floral_design_enabled !== false;
   const selectedPrimary = previewTheme.primary_color;
 
   const handleSelectMotif = (motifId) => {
@@ -46,6 +47,36 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
       <p className="form-help" style={{ marginTop: 12 }}>
         Choose a palette for your invitation page. Save the Date uses a fixed look and is not affected by these colors.
       </p>
+
+      <div className="form-group" style={{ marginTop: 20 }}>
+        <span className="inv-settings-field-label">Flowers Design</span>
+        <div className="inv-settings-radio-group" role="radiogroup" aria-label="Flowers design">
+          <label className="inv-settings-radio">
+            <input
+              type="radio"
+              name="floral_design_enabled"
+              checked={floralDesignEnabled}
+              onChange={() => onInvitationChange({ floral_design_enabled: true })}
+            />
+            <span>
+              <strong>Yes, show flowers</strong>
+              <small>Show corner floral ornaments on invitation sections.</small>
+            </span>
+          </label>
+          <label className="inv-settings-radio">
+            <input
+              type="radio"
+              name="floral_design_enabled"
+              checked={!floralDesignEnabled}
+              onChange={() => onInvitationChange({ floral_design_enabled: false })}
+            />
+            <span>
+              <strong>No, keep it clean</strong>
+              <small>Keep sections clean without floral corner decorations.</small>
+            </span>
+          </label>
+        </div>
+      </div>
 
       <div className="inv-motif-grid">
         {INVITATION_MOTIFS.map((motif) => (
@@ -82,9 +113,11 @@ export default function InvitationMotifPicker({ invitation, onInvitationChange }
         className="invitation-page inv-motif-live-preview"
         style={previewStyles}
       >
-        <div className="inv-motif-floral-preview" aria-hidden="true">
-          <StdCornerOrnament className="inv-motif-floral-sample" floralTheme={floralTheme} />
-        </div>
+        {floralDesignEnabled && (
+          <div className="inv-motif-floral-preview" aria-hidden="true">
+            <StdCornerOrnament className="inv-motif-floral-sample" floralTheme={floralTheme} />
+          </div>
+        )}
         <p className="inv-section-tag">Preview</p>
         <p className="inv-script-title inv-script-title-small">Your Wedding Heading</p>
         <div className="inv-divider" />
