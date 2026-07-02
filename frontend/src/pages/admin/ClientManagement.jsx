@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from '../../components/common/Button/Button';
 import DataTable from '../../components/common/Table/DataTable';
 import Modal from '../../components/common/Modal/Modal';
+import ConfirmDialog from '../../components/common/ConfirmDialog/ConfirmDialog';
 import Loader from '../../components/common/Loader/Loader';
+import Toast from '../../components/common/Toast/Toast';
 import { clientService } from '../../services/clientService';
 
 const emptyForm = {
@@ -33,6 +35,22 @@ export default function ClientManagement() {
   const [editingId, setEditingId] = useState(null);
   const [createdCredentials, setCreatedCredentials] = useState(null);
   const [error, setError] = useState('');
+  const [confirmAddOpen, setConfirmAddOpen] = useState(false);
+  const [confirmArchiveId, setConfirmArchiveId] = useState(null);
+  const [creatingClient, setCreatingClient] = useState(false);
+  const [archivingClient, setArchivingClient] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const toastTimerRef = useRef(null);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(''), 3200);
+  };
+
+  useEffect(() => () => {
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+  }, []);
 
   const loadClients = () => {
     setLoading(true);
@@ -67,7 +85,7 @@ export default function ClientManagement() {
     setEditOpen(true);
   };
 
-  const handleAdd = async (e) => {
+  const handleAdd = (e) => {
     e.preventDefault();
     setError('');
     if (form.password !== form.confirmPassword) {
@@ -78,10 +96,11 @@ export default function ClientManagement() {
       setError('Password must be at least 6 characters.');
       return;
     }
-    if (!window.confirm(`Create a new client account for ${form.firstName} ${form.lastName} (${form.email})?`)) {
-      return;
-    }
+    setConfirmAddOpen(true);
+  };
 
+  const confirmCreateClient = async () => {
+    setCreatingClient(true);
     try {
       await clientService.create({
         firstName: form.firstName,
@@ -91,12 +110,17 @@ export default function ClientManagement() {
         password: form.password,
       });
       setCreatedCredentials({ email: form.email, password: form.password });
+      setConfirmAddOpen(false);
       setAddOpen(false);
       setCredentialsOpen(true);
       setForm(emptyForm);
       loadClients();
+      showToast('Client account created successfully.');
     } catch {
+      setConfirmAddOpen(false);
       setError('Could not create client. Email may already be in use.');
+    } finally {
+      setCreatingClient(false);
     }
   };
 
@@ -128,13 +152,19 @@ export default function ClientManagement() {
     }
   };
 
-  const handleArchive = async (id) => {
-    if (!window.confirm('Archive this client? They will no longer be able to sign in.')) return;
+  const confirmArchiveClient = async () => {
+    const id = confirmArchiveId;
+    setArchivingClient(true);
     try {
       await clientService.archive(id);
+      setConfirmArchiveId(null);
       loadClients();
+      showToast('Client account archived.');
     } catch {
+      setConfirmArchiveId(null);
       setError('Could not archive client.');
+    } finally {
+      setArchivingClient(false);
     }
   };
 
@@ -173,7 +203,7 @@ export default function ClientManagement() {
               <span>
                 <button type="button" className="action-btn" onClick={() => openEdit(row)}>Update</button>
                 {row.status === 'active' && (
-                  <button type="button" className="action-btn danger" onClick={() => handleArchive(row.id)}>Archive</button>
+                  <button type="button" className="action-btn danger" onClick={() => setConfirmArchiveId(row.id)}>Archive</button>
                 )}
               </span>
             );
@@ -280,6 +310,33 @@ export default function ClientManagement() {
         )}
         <Button variant="gold" style={{ width: '100%', padding: 14 }} onClick={() => setCredentialsOpen(false)}>Done</Button>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={confirmAddOpen}
+        title="Create Client Account"
+        message={`Create a new client account for ${form.firstName} ${form.lastName} (${form.email})?`}
+        confirmLabel="Confirm"
+        cancelLabel="Cancel"
+        loadingLabel="Creating..."
+        loading={creatingClient}
+        onConfirm={confirmCreateClient}
+        onCancel={() => setConfirmAddOpen(false)}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmArchiveId !== null}
+        title="Archive Client"
+        message="Archive this client? They will no longer be able to sign in."
+        confirmLabel="Archive"
+        cancelLabel="Cancel"
+        tone="danger"
+        loadingLabel="Archiving..."
+        loading={archivingClient}
+        onConfirm={confirmArchiveClient}
+        onCancel={() => setConfirmArchiveId(null)}
+      />
+
+      <Toast show={!!toastMessage} message={toastMessage} />
     </>
   );
 }

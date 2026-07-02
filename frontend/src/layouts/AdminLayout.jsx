@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ConfirmDialog from '../components/common/ConfirmDialog/ConfirmDialog';
 import {
   CalendarIcon,
   ClientsIcon,
@@ -25,22 +27,39 @@ const adminNav = [
 export default function AdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const handleSignOut = () => {
-    if (!window.confirm('Are you sure you want to log out?')) return;
-    logout();
-    navigate('/login');
+  const confirmSignOut = () => {
+    setLoggingOut(true);
+    window.setTimeout(() => {
+      logout();
+      navigate('/login');
+    }, 600);
   };
 
   return (
-    <DashboardShell
-      navItems={adminNav}
-      footerItem={
-        <button type="button" className="sidebar-item" onClick={handleSignOut}>
-          <span className="icon sidebar-icon"><LogoutIcon /></span>
-          Logout
-        </button>
-      }
-    />
+    <>
+      <DashboardShell
+        navItems={adminNav}
+        footerItem={
+          <button type="button" className="sidebar-item" onClick={() => setLogoutConfirmOpen(true)}>
+            <span className="icon sidebar-icon"><LogoutIcon /></span>
+            Logout
+          </button>
+        }
+      />
+      <ConfirmDialog
+        isOpen={logoutConfirmOpen}
+        title="Logout Confirmation"
+        message="Are you sure you want to do logout?"
+        confirmLabel="Confirm"
+        cancelLabel="Cancel"
+        loadingLabel="Logging out..."
+        loading={loggingOut}
+        onConfirm={confirmSignOut}
+        onCancel={() => setLogoutConfirmOpen(false)}
+      />
+    </>
   );
 }
