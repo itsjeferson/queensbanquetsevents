@@ -38,13 +38,24 @@ export const api = {
   delete: (endpoint) => request(endpoint, { method: 'DELETE' }),
   upload: async (endpoint, formData) => {
     const token = authStorage.getToken();
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    });
+    let response;
+
+    try {
+      response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+    } catch {
+      throw new ApiError('Could not reach the server. Check your connection and try again.', 0);
+    }
+
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new ApiError(data.message || 'Upload failed', response.status, data);
+    if (!response.ok) {
+      const message = data.message
+        || (response.status === 404 ? 'Upload route not found on server.' : 'Upload failed');
+      throw new ApiError(message, response.status, data);
+    }
     return data;
   },
 };

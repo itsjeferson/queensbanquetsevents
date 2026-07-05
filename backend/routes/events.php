@@ -1,18 +1,23 @@
 <?php
 require_once __DIR__ . '/../controllers/EventController.php';
+require_once __DIR__ . '/../controllers/MediaController.php';
 require_once __DIR__ . '/../helpers/response.php';
 
 $controller = new EventController();
+$mediaController = new MediaController();
 $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($parts[1]) && is_numeric($parts[1]) ? (int) $parts[1] : null;
 $sub = $parts[2] ?? null;
+$action = $parts[1] ?? null;
 
 switch ($method) {
     case 'GET':
         $id ? $controller->show($id) : $controller->index();
         break;
     case 'POST':
-        if ($id && $sub === 'publish') {
+        if ($action === 'upload') {
+            $mediaController->uploadInvitationMedia();
+        } elseif ($id && $sub === 'publish') {
             $controller->publish($id);
         } elseif ($id && $sub === 'request-publish') {
             $controller->requestPublish($id);

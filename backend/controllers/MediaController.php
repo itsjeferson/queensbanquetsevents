@@ -10,21 +10,27 @@ class MediaController
         requireAuth();
 
         if (empty($_FILES['file'])) {
-            sendError('File required', 422);
+            sendError('File required. Make sure you are logged in and selected a file.', 422);
         }
 
         $file = $_FILES['file'];
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            sendError('Upload failed', 422);
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            sendError(describeUploadFailure($file, 'events'), 422);
         }
 
         if (!$this->isAllowedMediaType($file)) {
-            sendError('Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4, WebM, MP3, or WAV.', 422);
+            $ext = strtolower(pathinfo($file['name'] ?? '', PATHINFO_EXTENSION));
+            sendError(
+                'Unsupported file type'
+                . ($ext !== '' ? " ({$ext})" : '')
+                . '. Use JPG, PNG, WEBP, GIF, MP4, WebM, MP3, WAV, or M4A.',
+                422
+            );
         }
 
         $path = handleUpload($file, 'events');
         if (!$path) {
-            sendError('Upload failed', 500);
+            sendError(describeUploadFailure($file, 'events'), 500);
         }
 
         sendResponse([
@@ -53,13 +59,23 @@ class MediaController
             'image/webp',
             'video/mp4',
             'video/webm',
+            'video/quicktime',
             'audio/mpeg',
+            'audio/mp3',
             'audio/wav',
             'audio/ogg',
             'audio/mp4',
             'audio/x-wav',
+            'audio/x-m4a',
+            'application/ogg',
+            'application/octet-stream',
         ];
 
-        return in_array($mime, $allowedMimes, true);
+        if (in_array($mime, $allowedMimes, true)) {
+            return true;
+        }
+
+        // Windows and some browsers report generic MIME types even for valid files.
+        return in_array($ext, $allowedExtensions, true);
     }
 }

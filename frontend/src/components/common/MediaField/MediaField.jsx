@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Spinner } from '../Loader/Loader';
-import { isYouTubeUrl } from '../../../utils/mediaUrl';
+import { isYouTubeUrl, resolveMediaUrl } from '../../../utils/mediaUrl';
 import {
   getMediaFieldDisplay,
   isDataUrl,
@@ -20,12 +20,17 @@ export default function MediaField({
   urlLabel = 'Image URL',
   rejectYouTube = false,
 }) {
+  const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
   const hasUploadedFile = isDataUrl(value);
-  const hasRemoteUrl = typeof value === 'string'
-    && (value.startsWith('http://') || value.startsWith('https://'));
+  const hasRemoteUrl = typeof value === 'string' && Boolean(value.trim());
 
   const clearValue = () => {
+    setUploadError('');
+    setUploadSuccess('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
     if (onClear) {
       onClear();
       return;
@@ -34,9 +39,13 @@ export default function MediaField({
   };
 
   const handleUrlChange = (nextValue) => {
+    setUploadError('');
+    setUploadSuccess('');
     onChange(nextValue);
     if (rejectYouTube && isYouTubeUrl(nextValue)) {
-      onError?.('YouTube links cannot play here. Use a direct MP3, MP4, or WebM file link instead.');
+      const message = 'YouTube links cannot play here. Use a direct MP3, MP4, or WebM file link instead.';
+      setUploadError(message);
+      onError?.(message);
       return;
     }
     onError?.('');
@@ -45,18 +54,26 @@ export default function MediaField({
   const handleFile = async (file) => {
     if (!file) return;
     setUploading(true);
+    setUploadError('');
+    setUploadSuccess('');
     try {
       const url = await uploadInvitationMediaFile(file, maxSizeMb);
       onChange(url);
       onError?.('');
+      setUploadSuccess(`Uploaded ${file.name}`);
     } catch (err) {
-      onError?.(err.message || 'Could not upload file.');
+      const message = err.message || 'Could not upload file.';
+      setUploadError(message);
+      onError?.(message);
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const previewUrl = hasRemoteUrl ? value : '';
+  const previewUrl = hasRemoteUrl && !isDataUrl(value) && accept?.startsWith('image')
+    ? resolveMediaUrl(value)
+    : '';
 
   return (
     <div className="form-group media-field">
@@ -96,9 +113,22 @@ export default function MediaField({
             <Spinner size="sm" />
           </span>
         ) : (
-          <input type="file" accept={accept} onChange={(e) => handleFile(e.target.files?.[0])} />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={accept}
+            onChange={(e) => handleFile(e.target.files?.[0])}
+          />
         )}
       </div>
+
+      {uploadError && (
+        <p className="media-field-error" role="alert">{uploadError}</p>
+      )}
+
+      {uploadSuccess && !uploadError && (
+        <p className="media-field-success">{uploadSuccess}</p>
+      )}
 
       {hasUploadedFile && (
         <button type="button" className="media-field-url-toggle" onClick={clearValue} disabled={uploading}>
@@ -106,7 +136,7 @@ export default function MediaField({
         </button>
       )}
 
-      {previewUrl && accept?.startsWith('image') && (
+      {previewUrl && (
         <div className="media-field-preview">
           <img src={previewUrl} alt="" />
         </div>

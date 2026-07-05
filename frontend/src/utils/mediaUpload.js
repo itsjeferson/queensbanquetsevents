@@ -1,4 +1,6 @@
 import { mediaService } from '../services/mediaService';
+import { ApiError } from '../services/api';
+import { resolveMediaUrl } from './mediaUrl';
 
 export const MAX_AUDIO_SIZE_MB = 8;
 export const MAX_IMAGE_SIZE_MB = 5;
@@ -82,12 +84,29 @@ export async function uploadInvitationMediaFile(file, maxSizeMb) {
     throw new Error(`File is too large. Please use a file under ${maxSizeMb} MB or paste a direct URL instead.`);
   }
 
-  const response = await mediaService.uploadInvitationMedia(file);
-  const url = response?.data?.url || response?.data?.path;
-  if (!url) {
-    throw new Error('Upload succeeded but no file URL was returned.');
+  try {
+    const response = await mediaService.uploadInvitationMedia(file);
+    const rawUrl = response?.data?.url || response?.data?.path;
+    const url = resolveMediaUrl(rawUrl) || rawUrl;
+    if (!url) {
+      throw new Error('Upload succeeded but no file URL was returned.');
+    }
+    return url;
+  } catch (err) {
+    if (err instanceof ApiError) {
+      if (err.status === 401) {
+        throw new Error('Please log in again to upload files.');
+      }
+      if (err.status === 404) {
+        throw new Error('File upload is not available on the server yet. Redeploy the API, or paste a direct file URL instead.');
+      }
+      throw new Error(err.message || 'Upload failed.');
+    }
+    if (err?.message?.includes('Failed to fetch') || err?.name === 'TypeError') {
+      throw new Error('Could not reach the server. Check your connection and try again.');
+    }
+    throw err;
   }
-  return url;
 }
 
 /** Venue photos may be larger than other fields but must stay under API limits. */

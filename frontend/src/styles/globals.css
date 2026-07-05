@@ -197,6 +197,18 @@ body.sidebar-open {
   max-height: 180px;
   object-fit: cover;
 }
+.media-field-error {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b42318;
+}
+.media-field-success {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1f7a3f;
+}
 .color-input-row {
   display: flex;
   align-items: center;
