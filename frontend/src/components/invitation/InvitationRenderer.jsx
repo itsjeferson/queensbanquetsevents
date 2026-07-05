@@ -23,8 +23,9 @@ import {
 } from '../../utils/invitationTheme';
 import {
   hasRsvpUnlocked,
+  hasInvitationOpened,
   setRsvpUnlocked,
-  clearRsvpUnlock,
+  setInvitationOpened,
   consumeRsvpPreviewReset,
 } from '../../utils/rsvpUnlock';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
@@ -88,18 +89,22 @@ export default function InvitationRenderer({
     [event, routeIdentifier],
   );
 
-  const [resetRsvpUnlock] = useState(() => consumeRsvpPreviewReset(unlockContext));
+  const [resetRsvpUnlock] = useState(() => (
+    previewMode ? consumeRsvpPreviewReset(unlockContext) : false
+  ));
   const skipStoredUnlock = previewMode || resetRsvpUnlock;
   const [previewSessionUnlocked, setPreviewSessionUnlocked] = useState(false);
+  const storedUnlock = !skipStoredUnlock && saveTheDateActive && hasRsvpUnlocked(unlockContext);
+  const storedOpened = storedUnlock && hasInvitationOpened(unlockContext);
 
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
     if ((saveTheDateActive || forceSaveTheDateStage) && skipStoredUnlock) return false;
     if (!saveTheDateActive && !forceSaveTheDateStage) return false;
-    return saveTheDateActive && hasRsvpUnlocked(unlockContext);
+    return storedUnlock;
   });
   const [opened, setOpened] = useState(() => {
     if ((saveTheDateActive || forceSaveTheDateStage) && skipStoredUnlock) return false;
-    return false;
+    return storedOpened;
   });
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
@@ -119,15 +124,9 @@ export default function InvitationRenderer({
       return;
     }
 
-    if (resetRsvpUnlock && saveTheDateActive) {
-      clearRsvpUnlock(unlockContext);
-      setRsvpUnlockedState(false);
-      setOpened(false);
-      return;
-    }
-
     const unlocked = saveTheDateActive && hasRsvpUnlocked(unlockContext);
     setRsvpUnlockedState(unlocked);
+    setOpened(unlocked && hasInvitationOpened(unlockContext));
   }, [
     event?.slug,
     event?.id,
@@ -151,6 +150,9 @@ export default function InvitationRenderer({
 
   const scrollToContent = () => {
     setOpened(true);
+    if (!previewMode && saveTheDateActive) {
+      setInvitationOpened(unlockContext);
+    }
     startMusic();
     setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 120);
   };

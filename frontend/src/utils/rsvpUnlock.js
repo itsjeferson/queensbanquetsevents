@@ -39,6 +39,19 @@ function parseUnlockRecord(raw) {
   }
 }
 
+function mergeUnlockRecord(key, patch) {
+  const current = readUnlockRecord(key) || {};
+  writeUnlockRecord(key, {
+    unlocked: true,
+    opened: false,
+    name: '',
+    attendance: 'yes',
+    at: new Date().toISOString(),
+    ...current,
+    ...patch,
+  });
+}
+
 /** Guest RSVP unlock is stored in localStorage so refresh keeps them on the invitation. */
 function readUnlockRecord(key) {
   const storages = [getPersistentStorage(), getSessionStorage()].filter(Boolean);
@@ -75,6 +88,13 @@ export function hasRsvpUnlocked(eventOrKey) {
   return keys.some((key) => Boolean(readUnlockRecord(key)));
 }
 
+export function hasInvitationOpened(eventOrKey) {
+  const keys = getUnlockKeys(eventOrKey);
+  if (!keys.length) return false;
+
+  return keys.some((key) => Boolean(readUnlockRecord(key)?.opened));
+}
+
 export function getRsvpUnlockRecord(eventOrKey) {
   const keys = getUnlockKeys(eventOrKey);
   for (const key of keys) {
@@ -88,14 +108,24 @@ export function setRsvpUnlocked(eventOrKey, { name = '', attendance = 'yes' } = 
   const keys = getUnlockKeys(eventOrKey);
   if (!keys.length) return;
 
-  const payload = {
+  keys.forEach((key) => mergeUnlockRecord(key, {
     unlocked: true,
+    opened: false,
     name,
     attendance,
     at: new Date().toISOString(),
-  };
+  }));
+}
 
-  keys.forEach((key) => writeUnlockRecord(key, payload));
+export function setInvitationOpened(eventOrKey) {
+  const keys = getUnlockKeys(eventOrKey);
+  if (!keys.length) return;
+
+  keys.forEach((key) => mergeUnlockRecord(key, {
+    unlocked: true,
+    opened: true,
+    openedAt: new Date().toISOString(),
+  }));
 }
 
 export function clearRsvpUnlock(eventOrKey) {

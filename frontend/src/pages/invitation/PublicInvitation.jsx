@@ -76,17 +76,26 @@ export default function PublicInvitation() {
   }, [draftKey, identifier, isOwnerPreview, lookupByCode]);
 
   const routeDecision = useMemo(() => {
-    if (loading || !data?.event || lookupByCode) return 'ready';
+    if (lookupByCode) return 'ready';
 
-    const saveTheDateActive = isSaveTheDateActive(data.invitation);
-    const eventSlug = data.event.slug || slug;
-    const unlocked = isOwnerPreview
-      ? false
-      : hasRsvpUnlocked({
+    const unlockLookup = data?.event
+      ? {
         ...data.event,
         routeIdentifier,
-        slug: eventSlug,
-      });
+        slug: data.event.slug || slug,
+      }
+      : { routeIdentifier, slug: identifier };
+
+    const unlocked = isOwnerPreview
+      ? false
+      : hasRsvpUnlocked(unlockLookup);
+
+    if (loading || !data?.event) {
+      if (unlocked && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
+      return 'ready';
+    }
+
+    const saveTheDateActive = isSaveTheDateActive(data.invitation);
 
     if (!saveTheDateActive && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
     if (saveTheDateActive && unlocked && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
@@ -94,6 +103,7 @@ export default function PublicInvitation() {
     return 'ready';
   }, [
     data,
+    identifier,
     isOwnerPreview,
     isSaveTheDateRoute,
     loading,
