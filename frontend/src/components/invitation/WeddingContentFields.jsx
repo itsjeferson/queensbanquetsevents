@@ -82,15 +82,33 @@ export default function WeddingContentFields({
             />
           </div>
         </div>
-        <MediaField
-          label="Opening Hero Photo (shown after opening invitation)"
-          value={invitation.opening_hero_image || ''}
-          onChange={(value) => onInvitationChange({ opening_hero_image: value })}
-          placeholder="https://..."
-          accept="image/*"
-          maxSizeMb={MAX_IMAGE_SIZE_MB}
-          onError={onFileError}
-        />
+
+        <div className="cover-hero-photos">
+          <h4 className="card-subheading">Photos</h4>
+          <p className="form-help">
+            Cover photo appears before guests open the invitation. Hero photo appears on the full-width banner after opening.
+          </p>
+          <MediaField
+            label="Cover Photo"
+            value={invitation.cover_image || ''}
+            onChange={(value) => onInvitationChange({ cover_image: value })}
+            placeholder="https://..."
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={onFileError}
+            urlHint="Shown on the cover screen. Paste a URL or upload a file."
+          />
+          <MediaField
+            label="Opening Hero Photo"
+            value={invitation.opening_hero_image || ''}
+            onChange={(value) => onInvitationChange({ opening_hero_image: value })}
+            placeholder="https://..."
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={onFileError}
+            urlHint="Shown full-width after guests open the invitation. Paste a URL or upload a file."
+          />
+        </div>
       </div>
 
       <div className="card-widget">
@@ -119,6 +137,7 @@ export default function WeddingContentFields({
           accept="image/*"
           maxSizeMb={MAX_IMAGE_SIZE_MB}
           onError={onFileError}
+          urlHint="Displayed full-width like the hero banner. Paste a URL or upload a file."
         />
         <div className="form-group">
           <label>Second Quote</label>
@@ -205,14 +224,9 @@ export default function WeddingContentFields({
       <div className="card-widget">
         <h3>Photos, Music & Video</h3>
         <div className="card-form-stack">
-          <MediaField
-            label="Cover Photo URL"
-            value={invitation.cover_image || ''}
-            onChange={(value) => onInvitationChange({ cover_image: value })}
-            accept="image/*"
-            maxSizeMb={MAX_IMAGE_SIZE_MB}
-            onError={onFileError}
-          />
+          <p className="form-help">
+            Cover and hero photos are managed in the Cover &amp; Hero section above.
+          </p>
           <MediaField
             label="Background Video URL"
             value={invitation.background_video || ''}

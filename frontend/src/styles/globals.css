@@ -585,6 +585,17 @@ textarea { resize: vertical; min-height: 120px; }
   padding-top: 20px;
   border-top: 1px solid var(--border-soft);
 }
+.cover-hero-photos {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cover-hero-photos .form-help {
+  margin: 0 0 12px;
+}
 .faq-item-fields {
   display: flex;
   flex-direction: column;
