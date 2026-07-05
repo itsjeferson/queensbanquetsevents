@@ -23,7 +23,14 @@ export function getMediaFieldDisplay(url) {
     const mb = getDataUrlSizeMb(url);
     return mb >= 0.1 ? `Uploaded file (${mb.toFixed(1)} MB)` : 'Uploaded file';
   }
-  return url;
+  try {
+    const pathname = new URL(url, 'http://local').pathname;
+    const filename = pathname.split('/').pop();
+    if (filename) return filename;
+  } catch {
+    // fall through
+  }
+  return 'Uploaded file';
 }
 
 export function readFileAsDataUrl(file, maxSizeMb) {

@@ -22,14 +22,18 @@ export default function MediaField({
   rejectYouTube = false,
   importToStorage = true,
   previewVariant = 'banner',
+  uploadOnly = false,
+  uploadHint = 'Upload a file from your device.',
 }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
   const hasUploadedFile = isDataUrl(value);
-  const hasRemoteUrl = typeof value === 'string' && Boolean(value.trim());
+  const hasStoredFile = typeof value === 'string' && Boolean(value.trim());
+  const hasRemoteUrl = hasStoredFile;
   const isImageField = accept?.startsWith('image');
+  const showUrlInput = !uploadOnly && !hasUploadedFile;
 
   const clearValue = () => {
     setUploadError('');
@@ -77,6 +81,25 @@ export default function MediaField({
 
   const handleFile = async (file) => {
     if (!file) return;
+
+    if (uploadOnly) {
+      const name = file.name.toLowerCase();
+      if (accept?.includes('.mp4') && !name.endsWith('.mp4')) {
+        const message = 'Please upload an MP4 file.';
+        setUploadError(message);
+        onError?.(message);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+      if (accept?.includes('.mp3') && !name.endsWith('.mp3')) {
+        const message = 'Please upload an MP3 file.';
+        setUploadError(message);
+        onError?.(message);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+    }
+
     setUploading(true);
     setUploadError('');
     setUploadSuccess('');
@@ -100,10 +123,10 @@ export default function MediaField({
     : '';
 
   return (
-    <div className={`form-group media-field${previewVariant ? ` media-field-${previewVariant}` : ''}`}>
+    <div className={`form-group media-field${previewVariant ? ` media-field-${previewVariant}` : ''}${uploadOnly ? ' media-field-upload-only' : ''}`}>
       <label>{label}</label>
 
-      {!hasUploadedFile && (
+      {showUrlInput && (
         <>
           <label className="media-field-url-label">{urlLabel}</label>
           <input
@@ -116,6 +139,15 @@ export default function MediaField({
           />
           {urlHint && <p className="media-field-hint">{urlHint}</p>}
         </>
+      )}
+
+      {uploadOnly && hasStoredFile && !hasUploadedFile && (
+        <div className="media-field-uploaded">
+          <input readOnly value={getMediaFieldDisplay(value)} />
+          <button type="button" className="action-btn" onClick={clearValue} disabled={uploading}>
+            Remove
+          </button>
+        </div>
       )}
 
       {hasUploadedFile && (
@@ -131,7 +163,9 @@ export default function MediaField({
         <span className="media-field-upload-label">
           {uploading
             ? 'Uploading...'
-            : (hasUploadedFile ? 'Replace with another file' : 'Or upload from device')}
+            : (uploadOnly
+              ? (hasStoredFile ? 'Replace file' : 'Choose file')
+              : (hasUploadedFile || hasStoredFile ? 'Replace with another file' : 'Or upload from device'))}
         </span>
         {uploading ? (
           <span className="media-field-uploading">
@@ -147,6 +181,10 @@ export default function MediaField({
         )}
       </div>
 
+      {uploadOnly && uploadHint && !hasStoredFile && (
+        <p className="media-field-hint">{uploadHint}</p>
+      )}
+
       {uploadError && (
         <p className="media-field-error" role="alert">{uploadError}</p>
       )}
@@ -155,7 +193,7 @@ export default function MediaField({
         <p className="media-field-success">{uploadSuccess}</p>
       )}
 
-      {hasUploadedFile && (
+      {!uploadOnly && hasUploadedFile && (
         <button type="button" className="media-field-url-toggle" onClick={clearValue} disabled={uploading}>
           Use image URL instead
         </button>

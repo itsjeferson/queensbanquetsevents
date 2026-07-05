@@ -232,26 +232,28 @@ export default function WeddingContentFields({
             Cover and hero photos are managed in the Cover &amp; Hero section above.
           </p>
           <MediaField
-            label="Background Video URL"
+            label="Background Video"
             value={invitation.background_video || ''}
             onChange={(value) => onInvitationChange({ background_video: value })}
-            accept="video/*"
+            accept=".mp4,video/mp4"
             maxSizeMb={MAX_VIDEO_SIZE_MB}
             onError={onFileError}
-            urlLabel="Video URL"
-            urlHint="Paste a direct link to an MP4 or WebM file, or upload a video below. YouTube links will not work."
-            rejectYouTube
+            uploadOnly
+            importToStorage={false}
+            previewVariant=""
+            uploadHint="Upload an MP4 file only. Links are not supported for background video."
           />
           <MediaField
-            label="Music URL"
+            label="Background Music"
             value={invitation.music_url || ''}
             onChange={(value) => onInvitationChange({ music_url: value })}
-            accept="audio/*"
+            accept=".mp3,audio/mpeg,audio/mp3"
             maxSizeMb={MAX_AUDIO_SIZE_MB}
             onError={onFileError}
-            urlLabel="Audio URL"
-            urlHint="Paste a direct link to an MP3 or other audio file, or upload below. YouTube links will not work."
-            rejectYouTube
+            uploadOnly
+            importToStorage={false}
+            previewVariant=""
+            uploadHint="Upload an MP3 file only. Links are not supported for background music."
           />
         </div>
       </div>
