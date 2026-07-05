@@ -1,3 +1,5 @@
+import { mediaService } from '../services/mediaService';
+
 export const MAX_AUDIO_SIZE_MB = 8;
 export const MAX_IMAGE_SIZE_MB = 5;
 export const MAX_VIDEO_SIZE_MB = 15;
@@ -67,7 +69,25 @@ export function stripLargeDataUrls(invitation, maxLength = 50000) {
 export function canPersistMediaUrl(value, maxLength) {
   if (typeof value !== 'string' || !value.trim()) return false;
   if (value.startsWith('http://') || value.startsWith('https://')) return true;
+  if (/^[a-z0-9_\-/]+\.(jpe?g|png|gif|webp|mp4|webm|mp3|wav|ogg|m4a)$/i.test(value.trim())) return true;
   return value.length <= maxLength;
+}
+
+export async function uploadInvitationMediaFile(file, maxSizeMb) {
+  if (!file) {
+    throw new Error('No file selected');
+  }
+
+  if (file.size > maxSizeMb * 1024 * 1024) {
+    throw new Error(`File is too large. Please use a file under ${maxSizeMb} MB or paste a direct URL instead.`);
+  }
+
+  const response = await mediaService.uploadInvitationMedia(file);
+  const url = response?.data?.url || response?.data?.path;
+  if (!url) {
+    throw new Error('Upload succeeded but no file URL was returned.');
+  }
+  return url;
 }
 
 /** Venue photos may be larger than other fields but must stay under API limits. */

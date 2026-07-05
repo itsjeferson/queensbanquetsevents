@@ -20,6 +20,7 @@ $routes = [
     'guest-messages' => 'routes/guest-messages.php',
     'notifications' => 'routes/notifications.php',
     'clients' => 'routes/clients.php',
+    'media' => 'routes/media.php',
 ];
 
 if (isset($routes[$resource])) {

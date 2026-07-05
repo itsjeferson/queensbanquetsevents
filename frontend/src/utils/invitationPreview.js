@@ -106,7 +106,19 @@ function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
 
 function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['save_the_date_enabled', 'std_message', 'std_cover_image', 'std_photo', 'std_location', 'content_reveal_mode', 'content_reveal_order'];
+  const fields = [
+    'save_the_date_enabled',
+    'std_message',
+    'std_cover_image',
+    'std_photo',
+    'std_location',
+    'content_reveal_mode',
+    'content_reveal_order',
+    'cover_image',
+    'opening_hero_image',
+    'background_video',
+    'music_url',
+  ];
 
   fields.forEach((field) => {
     if (field in draftInvitation) {

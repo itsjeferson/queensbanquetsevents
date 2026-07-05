@@ -30,6 +30,23 @@ function handleLocalUpload(array $file, string $subdir): ?string
     return null;
 }
 
+function getPublicUploadUrl(string $path): string
+{
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+        return $path;
+    }
+
+    $configured = rtrim(getenv('API_PUBLIC_URL') ?: '', '/');
+    if ($configured !== '') {
+        return $configured . '/uploads/' . ltrim(str_replace('\\', '/', $path), '/');
+    }
+
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    return $scheme . '://' . $host . '/uploads/' . ltrim(str_replace('\\', '/', $path), '/');
+}
+
 function deleteUploadedFile(?string $storedPath): void
 {
     if ($storedPath === null || $storedPath === '') {

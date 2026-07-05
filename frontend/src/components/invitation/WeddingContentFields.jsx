@@ -220,6 +220,9 @@ export default function WeddingContentFields({
             accept="video/*"
             maxSizeMb={MAX_VIDEO_SIZE_MB}
             onError={onFileError}
+            urlLabel="Video URL"
+            urlHint="Paste a direct link to an MP4 or WebM file, or upload a video below. YouTube links will not work."
+            rejectYouTube
           />
           <MediaField
             label="Music URL"
@@ -228,6 +231,9 @@ export default function WeddingContentFields({
             accept="audio/*"
             maxSizeMb={MAX_AUDIO_SIZE_MB}
             onError={onFileError}
+            urlLabel="Audio URL"
+            urlHint="Paste a direct link to an MP3 or other audio file, or upload below. YouTube links will not work."
+            rejectYouTube
           />
         </div>
       </div>

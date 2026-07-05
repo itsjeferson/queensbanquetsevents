@@ -1,7 +1,10 @@
+import { useState } from 'react';
+import { Spinner } from '../Loader/Loader';
+import { isYouTubeUrl } from '../../../utils/mediaUrl';
 import {
   getMediaFieldDisplay,
   isDataUrl,
-  readFileAsDataUrl,
+  uploadInvitationMediaFile,
 } from '../../../utils/mediaUpload';
 
 export default function MediaField({
@@ -15,7 +18,9 @@ export default function MediaField({
   onError,
   urlHint = 'Paste a direct link to an online image, or upload a file below.',
   urlLabel = 'Image URL',
+  rejectYouTube = false,
 }) {
+  const [uploading, setUploading] = useState(false);
   const hasUploadedFile = isDataUrl(value);
   const hasRemoteUrl = typeof value === 'string'
     && (value.startsWith('http://') || value.startsWith('https://'));
@@ -28,16 +33,30 @@ export default function MediaField({
     onChange('');
   };
 
+  const handleUrlChange = (nextValue) => {
+    onChange(nextValue);
+    if (rejectYouTube && isYouTubeUrl(nextValue)) {
+      onError?.('YouTube links cannot play here. Use a direct MP3, MP4, or WebM file link instead.');
+      return;
+    }
+    onError?.('');
+  };
+
   const handleFile = async (file) => {
     if (!file) return;
+    setUploading(true);
     try {
-      const dataUrl = await readFileAsDataUrl(file, maxSizeMb);
-      onChange(dataUrl);
+      const url = await uploadInvitationMediaFile(file, maxSizeMb);
+      onChange(url);
       onError?.('');
     } catch (err) {
       onError?.(err.message || 'Could not upload file.');
+    } finally {
+      setUploading(false);
     }
   };
+
+  const previewUrl = hasRemoteUrl ? value : '';
 
   return (
     <div className="form-group media-field">
@@ -49,8 +68,9 @@ export default function MediaField({
           <input
             type="url"
             value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => handleUrlChange(e.target.value)}
             placeholder={placeholder}
+            disabled={uploading}
           />
           {urlHint && <p className="media-field-hint">{urlHint}</p>}
         </>
@@ -59,7 +79,7 @@ export default function MediaField({
       {hasUploadedFile && (
         <div className="media-field-uploaded">
           <input readOnly value={getMediaFieldDisplay(value)} />
-          <button type="button" className="action-btn" onClick={clearValue}>
+          <button type="button" className="action-btn" onClick={clearValue} disabled={uploading}>
             Remove
           </button>
         </div>
@@ -67,20 +87,28 @@ export default function MediaField({
 
       <div className="media-field-upload">
         <span className="media-field-upload-label">
-          {hasUploadedFile ? 'Replace with another file' : 'Or upload from device'}
+          {uploading
+            ? 'Uploading...'
+            : (hasUploadedFile ? 'Replace with another file' : 'Or upload from device')}
         </span>
-        <input type="file" accept={accept} onChange={(e) => handleFile(e.target.files?.[0])} />
+        {uploading ? (
+          <span className="media-field-uploading">
+            <Spinner size="sm" />
+          </span>
+        ) : (
+          <input type="file" accept={accept} onChange={(e) => handleFile(e.target.files?.[0])} />
+        )}
       </div>
 
       {hasUploadedFile && (
-        <button type="button" className="media-field-url-toggle" onClick={clearValue}>
+        <button type="button" className="media-field-url-toggle" onClick={clearValue} disabled={uploading}>
           Use image URL instead
         </button>
       )}
 
-      {hasRemoteUrl && (
+      {previewUrl && accept?.startsWith('image') && (
         <div className="media-field-preview">
-          <img src={value} alt="" />
+          <img src={previewUrl} alt="" />
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { resolveInvitationThemeFields, extractInvitationThemeInput } from './invitationTheme';
 import { stripLargeDataUrls, canPersistMediaUrl, VENUE_IMAGE_SAVE_MAX_CHARS } from './mediaUpload';
+import { resolveMediaUrl } from './mediaUrl';
 
 export const defaultGroomProfile = () => ({
   name: '',
@@ -235,8 +236,20 @@ function cleanEntourageLists(entourage) {
 /** Strip embedded media blobs so text updates (entourage, etc.) can sync to the API. */
 export function prepareInvitationForApiSave(invitation) {
   if (!invitation) return invitation;
+
   const sourceVenue = invitation.venue || {};
   const stripped = stripLargeDataUrls(invitation);
+
+  const restoreField = (field, maxLength = 50000) => {
+    const value = invitation[field];
+    if (canPersistMediaUrl(value, maxLength)) {
+      stripped[field] = value;
+    }
+  };
+
+  ['cover_image', 'opening_hero_image', 'background_video', 'music_url'].forEach((field) => {
+    restoreField(field);
+  });
 
   stripped.venue = {
     ceremony: { ...(stripped.venue?.ceremony || {}) },
@@ -258,6 +271,39 @@ export function prepareInvitationForApiSave(invitation) {
     stripped.std_cover_image = stdPhoto;
   }
 
+  const storyImage = invitation.story?.image || invitation.story_image;
+  if (canPersistMediaUrl(storyImage, VENUE_IMAGE_SAVE_MAX_CHARS)) {
+    stripped.story = { ...(stripped.story || {}), image: storyImage };
+    stripped.story_image = storyImage;
+  }
+
+  if (canPersistMediaUrl(invitation.groom_profile?.photo, VENUE_IMAGE_SAVE_MAX_CHARS)) {
+    stripped.groom_profile = {
+      ...(stripped.groom_profile || {}),
+      ...(invitation.groom_profile || {}),
+      photo: invitation.groom_profile.photo,
+    };
+  }
+
+  if (canPersistMediaUrl(invitation.bride_profile?.photo, VENUE_IMAGE_SAVE_MAX_CHARS)) {
+    stripped.bride_profile = {
+      ...(stripped.bride_profile || {}),
+      ...(invitation.bride_profile || {}),
+      photo: invitation.bride_profile.photo,
+    };
+  }
+
+  const sourceGallery = Array.isArray(invitation.gallery) ? invitation.gallery : [];
+  stripped.gallery = sourceGallery.map((item, index) => {
+    const image = item?.image;
+    const fallback = stripped.gallery?.[index]?.image || '';
+    return {
+      ...(stripped.gallery?.[index] || {}),
+      ...item,
+      image: canPersistMediaUrl(image, VENUE_IMAGE_SAVE_MAX_CHARS) ? image : fallback,
+    };
+  });
+
   return {
     ...stripped,
     entourage: cleanEntourageLists(stripped.entourage),
@@ -268,36 +314,59 @@ export function normalizeInvitationContent(invitation = {}) {
   const story = invitation.story || {};
   const venue = invitation.venue || {};
   const themeInput = extractInvitationThemeInput(invitation);
+  const resolveMedia = (value) => resolveMediaUrl(value) || '';
 
   return {
     ...defaultWeddingInvitationContent,
     ...invitation,
     couple_display_name: invitation.couple_display_name || '',
-    opening_hero_image: invitation.opening_hero_image || '',
+    opening_hero_image: resolveMedia(invitation.opening_hero_image),
     couple_initials: invitation.couple_initials || '',
     secondary_quote: invitation.secondary_quote || '',
-    groom_profile: { ...defaultGroomProfile(), ...(invitation.groom_profile || story.groom_profile || {}) },
-    bride_profile: { ...defaultBrideProfile(), ...(invitation.bride_profile || story.bride_profile || {}) },
+    cover_image: resolveMedia(invitation.cover_image),
+    background_video: resolveMedia(invitation.background_video),
+    music_url: resolveMedia(invitation.music_url),
+    groom_profile: {
+      ...defaultGroomProfile(),
+      ...(invitation.groom_profile || {}),
+      photo: resolveMedia(invitation.groom_profile?.photo),
+    },
+    bride_profile: {
+      ...defaultBrideProfile(),
+      ...(invitation.bride_profile || {}),
+      photo: resolveMedia(invitation.bride_profile?.photo),
+    },
     story: {
       ...defaultWeddingInvitationContent.story,
       ...story,
-      image: story.image || invitation.story_image || '',
+      image: resolveMedia(story.image || invitation.story_image),
       invitation_message: story.invitation_message || invitation.invitation_message || '',
       acceptance_message: story.acceptance_message || invitation.acceptance_message || '',
     },
     venue: {
-      ceremony: { ...defaultVenueLocation(), ...(venue.ceremony || {}) },
-      reception: { ...defaultVenueLocation(), ...(venue.reception || {}) },
+      ceremony: {
+        ...defaultVenueLocation(),
+        ...(venue.ceremony || {}),
+        image: resolveMedia(venue.ceremony?.image),
+      },
+      reception: {
+        ...defaultVenueLocation(),
+        ...(venue.reception || {}),
+        image: resolveMedia(venue.reception?.image),
+      },
     },
     attire: { ...defaultAttire(), ...(invitation.attire || {}) },
     entourage: mergeEntourage(invitation.entourage),
     program: invitation.program?.length ? invitation.program : defaultWeddingProgram(),
-    gallery: Array.isArray(invitation.gallery) ? invitation.gallery : [],
+    gallery: (Array.isArray(invitation.gallery) ? invitation.gallery : []).map((item) => ({
+      ...item,
+      image: resolveMedia(item?.image),
+    })),
     faqs: Array.isArray(invitation.faqs) ? invitation.faqs : [],
     save_the_date_enabled: Boolean(invitation.save_the_date_enabled),
     std_message: invitation.std_message || '',
-    std_cover_image: invitation.std_cover_image || '',
-    std_photo: invitation.std_photo || invitation.std_cover_image || '',
+    std_cover_image: resolveMedia(invitation.std_cover_image),
+    std_photo: resolveMedia(invitation.std_photo || invitation.std_cover_image),
     std_location: invitation.std_location || '',
     content_reveal_mode: (invitation.content_reveal_mode ?? invitation.story?.content_reveal_mode) === 'gradual'
       ? 'gradual'

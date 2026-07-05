@@ -233,6 +233,28 @@ class InvitationPage
             $normalized['story'] = $story;
         }
 
+        if (empty($story['opening_hero_image']) && !empty($existing['opening_hero_image'])) {
+            $story['opening_hero_image'] = $existing['opening_hero_image'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['image']) && !empty($existing['story']['image'] ?? $existing['story_image'])) {
+            $story['image'] = $existing['story']['image'] ?? $existing['story_image'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['groom_profile']['photo']) && !empty($existing['groom_profile']['photo'] ?? null)) {
+            $story['groom_profile'] = is_array($story['groom_profile'] ?? null) ? $story['groom_profile'] : [];
+            $story['groom_profile']['photo'] = $existing['groom_profile']['photo'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['bride_profile']['photo']) && !empty($existing['bride_profile']['photo'] ?? null)) {
+            $story['bride_profile'] = is_array($story['bride_profile'] ?? null) ? $story['bride_profile'] : [];
+            $story['bride_profile']['photo'] = $existing['bride_profile']['photo'];
+            $normalized['story'] = $story;
+        }
+
         if (empty($story['std_photo']) && !empty($existing['std_photo'])) {
             $story['std_photo'] = $existing['std_photo'];
             $normalized['story'] = $story;
