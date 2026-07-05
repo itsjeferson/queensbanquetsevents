@@ -1,5 +1,6 @@
 import { parseEventDate } from '../../utils/eventDate';
 import { getCoupleDisplayName } from '../../utils/invitationContent';
+import { resolveMediaUrl } from '../../utils/mediaUrl';
 
 export default function OpenedHeroSection({ event, invitation, animateHero = true }) {
   const parsed = parseEventDate(event.event_date);
@@ -11,7 +12,7 @@ export default function OpenedHeroSection({ event, invitation, animateHero = tru
       year: 'numeric',
     })
     : '';
-  const heroImage = invitation.opening_hero_image || invitation.cover_image;
+  const heroImage = resolveMediaUrl(invitation.opening_hero_image || invitation.cover_image);
 
   return (
     <section className="inv-opened-hero">

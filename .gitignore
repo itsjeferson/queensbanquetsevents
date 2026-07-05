@@ -12,3 +12,4 @@ backend/uploads/*
 !backend/uploads/payments/.gitkeep
 !backend/uploads/profiles/.gitkeep
 !backend/uploads/events/.gitkeep
+!backend/uploads/invitations/.gitkeep

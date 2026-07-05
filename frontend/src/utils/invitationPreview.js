@@ -106,25 +106,34 @@ function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
 
 function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = [
-    'save_the_date_enabled',
+  const mediaFields = [
     'std_message',
     'std_cover_image',
     'std_photo',
     'std_location',
-    'content_reveal_mode',
-    'content_reveal_order',
     'cover_image',
     'opening_hero_image',
     'background_video',
     'music_url',
   ];
 
-  fields.forEach((field) => {
-    if (field in draftInvitation) {
-      merged[field] = draftInvitation[field];
+  mediaFields.forEach((field) => {
+    const draftValue = draftInvitation[field];
+    const apiValue = apiInvitation[field];
+    if (typeof draftValue === 'string' && draftValue.trim() && !pickText(apiValue)) {
+      merged[field] = draftValue;
     }
   });
+
+  if (typeof draftInvitation.save_the_date_enabled === 'boolean') {
+    merged.save_the_date_enabled = draftInvitation.save_the_date_enabled;
+  }
+  if (draftInvitation.content_reveal_mode) {
+    merged.content_reveal_mode = draftInvitation.content_reveal_mode;
+  }
+  if (Array.isArray(draftInvitation.content_reveal_order) && draftInvitation.content_reveal_order.length) {
+    merged.content_reveal_order = draftInvitation.content_reveal_order;
+  }
 
   if (draftInvitation.entourage) {
     merged.entourage = normalizeInvitationContent({

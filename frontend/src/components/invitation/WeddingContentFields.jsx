@@ -84,30 +84,34 @@ export default function WeddingContentFields({
         </div>
 
         <div className="cover-hero-photos">
-          <h4 className="card-subheading">Photos</h4>
-          <p className="form-help">
+          <h4 className="cover-hero-photos-title">Photos</h4>
+          <p className="form-help cover-hero-photos-help">
             Cover photo appears before guests open the invitation. Hero photo appears on the full-width banner after opening.
           </p>
-          <MediaField
-            label="Cover Photo"
-            value={invitation.cover_image || ''}
-            onChange={(value) => onInvitationChange({ cover_image: value })}
-            placeholder="https://..."
-            accept="image/*"
-            maxSizeMb={MAX_IMAGE_SIZE_MB}
-            onError={onFileError}
-            urlHint="Shown on the cover screen. Paste a URL or upload a file."
-          />
-          <MediaField
-            label="Opening Hero Photo"
-            value={invitation.opening_hero_image || ''}
-            onChange={(value) => onInvitationChange({ opening_hero_image: value })}
-            placeholder="https://..."
-            accept="image/*"
-            maxSizeMb={MAX_IMAGE_SIZE_MB}
-            onError={onFileError}
-            urlHint="Shown full-width after guests open the invitation. Paste a URL or upload a file."
-          />
+          <div className="cover-hero-photos-grid">
+            <MediaField
+              label="Cover Photo"
+              value={invitation.cover_image || ''}
+              onChange={(value) => onInvitationChange({ cover_image: value })}
+              placeholder="https://..."
+              accept="image/*"
+              maxSizeMb={MAX_IMAGE_SIZE_MB}
+              onError={onFileError}
+              urlHint="Shown on the cover screen. Paste a URL or upload a file."
+              previewVariant="banner"
+            />
+            <MediaField
+              label="Opening Hero Photo"
+              value={invitation.opening_hero_image || ''}
+              onChange={(value) => onInvitationChange({ opening_hero_image: value })}
+              placeholder="https://..."
+              accept="image/*"
+              maxSizeMb={MAX_IMAGE_SIZE_MB}
+              onError={onFileError}
+              urlHint="Shown full-width after guests open the invitation."
+              previewVariant="banner"
+            />
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { parseEventDate } from '../../utils/eventDate';
 import { getCoupleDisplayName } from '../../utils/invitationContent';
+import { isDirectVideoUrl, resolveMediaUrl } from '../../utils/mediaUrl';
 import { Spinner } from '../common/Loader/Loader';
 
 const OPEN_DELAY_MS = 900;
@@ -21,6 +22,9 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
     })
     : '';
   const coupleName = getCoupleDisplayName(event, invitation);
+  const coverImage = resolveMediaUrl(invitation?.cover_image);
+  const backgroundVideo = resolveMediaUrl(invitation?.background_video);
+  const useVideo = Boolean(backgroundVideo) && isDirectVideoUrl(backgroundVideo);
 
   const handleOpen = () => {
     if (opening) return;
@@ -30,10 +34,10 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
 
   return (
     <section className="inv-cover" id="cover">
-      {invitation?.background_video ? (
-        <video className="inv-cover-video" src={invitation.background_video} autoPlay muted loop playsInline />
-      ) : invitation?.cover_image ? (
-        <div className="inv-cover-bg" style={{ backgroundImage: `url(${invitation.cover_image})` }} />
+      {useVideo ? (
+        <video className="inv-cover-video" src={backgroundVideo} autoPlay muted loop playsInline />
+      ) : coverImage ? (
+        <img src={coverImage} alt="" className="inv-cover-bg" />
       ) : (
         <div className="inv-cover-bg inv-cover-bg-fallback" />
       )}

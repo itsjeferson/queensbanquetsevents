@@ -1,6 +1,6 @@
 import { mediaService } from '../services/mediaService';
 import { ApiError } from '../services/api';
-import { resolveMediaUrl } from './mediaUrl';
+import { isHostedMediaUrl, resolveMediaUrl } from './mediaUrl';
 
 export const MAX_AUDIO_SIZE_MB = 8;
 export const MAX_IMAGE_SIZE_MB = 5;
@@ -73,6 +73,19 @@ export function canPersistMediaUrl(value, maxLength) {
   if (value.startsWith('http://') || value.startsWith('https://')) return true;
   if (/^[a-z0-9_\-/]+\.(jpe?g|png|gif|webp|mp4|webm|mp3|wav|ogg|m4a)$/i.test(value.trim())) return true;
   return value.length <= maxLength;
+}
+
+export async function importRemoteMediaUrl(url) {
+  if (!url || typeof url !== 'string' || isHostedMediaUrl(url)) {
+    return url;
+  }
+
+  try {
+    const response = await mediaService.importRemoteMedia(url.trim());
+    return response?.data?.url || url;
+  } catch {
+    return url;
+  }
 }
 
 export async function uploadInvitationMediaFile(file, maxSizeMb) {

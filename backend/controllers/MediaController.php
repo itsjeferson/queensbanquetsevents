@@ -5,6 +5,8 @@ require_once __DIR__ . '/../middleware/authMiddleware.php';
 
 class MediaController
 {
+    private const BUCKET = 'invitations';
+
     public function uploadInvitationMedia(): void
     {
         requireAuth();
@@ -15,7 +17,7 @@ class MediaController
 
         $file = $_FILES['file'];
         if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            sendError(describeUploadFailure($file, 'events'), 422);
+            sendError(describeUploadFailure($file, self::BUCKET), 422);
         }
 
         if (!$this->isAllowedMediaType($file)) {
@@ -28,9 +30,9 @@ class MediaController
             );
         }
 
-        $path = handleUpload($file, 'events');
+        $path = handleUpload($file, self::BUCKET);
         if (!$path) {
-            sendError(describeUploadFailure($file, 'events'), 500);
+            sendError(describeUploadFailure($file, self::BUCKET), 500);
         }
 
         sendResponse([
@@ -40,6 +42,33 @@ class MediaController
                 'path' => $path,
             ],
         ], 201);
+    }
+
+    public function importRemoteMedia(): void
+    {
+        requireAuth();
+
+        $payload = getJsonInput();
+        $url = trim((string) ($payload['url'] ?? ''));
+        if ($url === '') {
+            sendError('Media URL is required.', 422);
+        }
+
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            sendError('Enter a valid media URL.', 422);
+        }
+
+        $storedUrl = importRemoteMediaToStorage($url, self::BUCKET);
+        if (!$storedUrl) {
+            sendError('Could not import that URL into storage. Upload the file directly instead.', 422);
+        }
+
+        sendResponse([
+            'success' => true,
+            'data' => [
+                'url' => $storedUrl,
+            ],
+        ]);
     }
 
     private function isAllowedMediaType(array $file): bool
@@ -75,7 +104,6 @@ class MediaController
             return true;
         }
 
-        // Windows and some browsers report generic MIME types even for valid files.
         return in_array($ext, $allowedExtensions, true);
     }
 }

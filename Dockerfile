@@ -14,7 +14,7 @@ RUN { \
 
 COPY backend/ /var/www/html/
 
-RUN mkdir -p uploads/gallery uploads/payments uploads/profiles uploads/events \
+RUN mkdir -p uploads/gallery uploads/payments uploads/profiles uploads/events uploads/invitations \
     && chown -R www-data:www-data uploads \
     && chmod -R 755 uploads
 

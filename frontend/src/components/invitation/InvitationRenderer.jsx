@@ -28,6 +28,7 @@ import {
   consumeRsvpPreviewReset,
 } from '../../utils/rsvpUnlock';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
+import { isDirectAudioUrl, resolveMediaUrl } from '../../utils/mediaUrl';
 import '../../styles/invitation.css';
 
 const TYPE_LABELS = {
@@ -62,6 +63,10 @@ export default function InvitationRenderer({
   };
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
   const coupleName = getCoupleDisplayName(event, invitation);
+  const musicUrl = useMemo(() => {
+    const resolved = resolveMediaUrl(invitation.music_url);
+    return resolved && isDirectAudioUrl(resolved) ? resolved : '';
+  }, [invitation.music_url]);
   const saveTheDateActive = isSaveTheDateActive(invitation);
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
@@ -135,7 +140,7 @@ export default function InvitationRenderer({
   ]);
 
   const startMusic = () => {
-    if (!invitation.music_url || !audioRef.current) return;
+    if (!musicUrl || !audioRef.current) return;
     audioRef.current.volume = 0.45;
     audioRef.current.play()
       .then(() => setMusicOn(true))
@@ -188,10 +193,10 @@ export default function InvitationRenderer({
         style={showSaveTheDate ? undefined : themeStyles}
       >
         <FloralThemeProvider value={floralTheme}>
-        {invitation.music_url && (
-          <audio ref={audioRef} src={invitation.music_url} loop preload="auto" playsInline />
+        {musicUrl && (
+          <audio ref={audioRef} src={musicUrl} loop preload="auto" playsInline />
         )}
-        {invitation.music_url && opened && (
+        {musicUrl && opened && (
           <button type="button" className="inv-music-toggle" onClick={toggleMusic}>
             {musicOn ? 'Pause Music' : 'Play Music'}
           </button>

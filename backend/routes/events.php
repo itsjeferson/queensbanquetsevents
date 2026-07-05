@@ -17,6 +17,8 @@ switch ($method) {
     case 'POST':
         if ($action === 'upload') {
             $mediaController->uploadInvitationMedia();
+        } elseif ($action === 'import-media') {
+            $mediaController->importRemoteMedia();
         } elseif ($id && $sub === 'publish') {
             $controller->publish($id);
         } elseif ($id && $sub === 'request-publish') {

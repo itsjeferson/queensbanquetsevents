@@ -1,4 +1,4 @@
-import { api, ApiError } from './api';
+import { api } from './api';
 
 export const mediaService = {
   uploadInvitationMedia: (file) => {
@@ -6,4 +6,5 @@ export const mediaService = {
     formData.append('file', file);
     return api.upload('/events/upload', formData);
   },
+  importRemoteMedia: (url) => api.post('/events/import-media', { url }),
 };

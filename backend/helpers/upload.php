@@ -50,14 +50,96 @@ function handleLocalUpload(array $file, string $subdir): ?string
     if (!is_dir($dir)) mkdir($dir, 0755, true);
 
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = uniqid() . '.' . $ext;
+    $filename = uniqid('', true) . ($ext !== '' ? '.' . $ext : '');
     $path = $dir . $filename;
 
-    if (move_uploaded_file($file['tmp_name'], $path)) {
+    $tmpName = $file['tmp_name'] ?? '';
+    if ($tmpName === '') {
+        return null;
+    }
+
+    $saved = is_uploaded_file($tmpName)
+        ? move_uploaded_file($tmpName, $path)
+        : copy($tmpName, $path);
+
+    if ($saved) {
         return $subdir . '/' . $filename;
     }
 
     return null;
+}
+
+function isStoredMediaUrl(string $url): bool
+{
+    if (str_contains($url, '/storage/v1/object/public/')) {
+        return true;
+    }
+
+    $configured = rtrim(getenv('API_PUBLIC_URL') ?: '', '/');
+    if ($configured !== '' && str_starts_with($url, $configured . '/uploads/')) {
+        return true;
+    }
+
+    return (bool) preg_match('#/uploads/[a-z0-9_\-/]+\.(jpe?g|png|gif|webp|mp4|webm|mp3|wav|ogg|m4a)(\?|#|$)#i', $url);
+}
+
+function importRemoteMediaToStorage(string $url, ?string $bucket = null): ?string
+{
+    $url = trim($url);
+    if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+        return null;
+    }
+
+    if (isStoredMediaUrl($url)) {
+        return $url;
+    }
+
+    $bucket = $bucket ?: (defined('INVITATION_MEDIA_BUCKET') ? INVITATION_MEDIA_BUCKET : 'invitations');
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 30,
+            'follow_location' => 1,
+            'header' => "User-Agent: QueensBanquetMediaImporter/1.0\r\n",
+        ],
+    ]);
+
+    $body = @file_get_contents($url, false, $context);
+    if ($body === false || $body === '') {
+        return null;
+    }
+
+    $path = parse_url($url, PHP_URL_PATH) ?: '';
+    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'mp3', 'wav', 'ogg', 'm4a'];
+    if (!in_array($ext, $allowedExtensions, true)) {
+        $ext = 'jpg';
+    }
+
+    $tmpPath = tempnam(sys_get_temp_dir(), 'qb-media-');
+    if ($tmpPath === false) {
+        return null;
+    }
+
+    $tmpFile = $tmpPath . '.' . $ext;
+    rename($tmpPath, $tmpFile);
+
+    if (@file_put_contents($tmpFile, $body) === false) {
+        @unlink($tmpFile);
+        return null;
+    }
+
+    $file = [
+        'name' => 'imported.' . $ext,
+        'type' => detectUploadMimeType($tmpFile, $ext),
+        'tmp_name' => $tmpFile,
+        'error' => UPLOAD_ERR_OK,
+        'size' => filesize($tmpFile) ?: 0,
+    ];
+
+    $stored = handleUpload($file, $bucket);
+    @unlink($tmpFile);
+
+    return $stored ? getPublicUploadUrl($stored) : null;
 }
 
 function getPublicUploadUrl(string $path): string

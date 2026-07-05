@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
 import { Spinner } from '../Loader/Loader';
-import { isYouTubeUrl, resolveMediaUrl } from '../../../utils/mediaUrl';
+import { isHostedMediaUrl, isYouTubeUrl, resolveMediaUrl } from '../../../utils/mediaUrl';
 import {
   getMediaFieldDisplay,
+  importRemoteMediaUrl,
   isDataUrl,
   uploadInvitationMediaFile,
 } from '../../../utils/mediaUpload';
@@ -19,6 +20,8 @@ export default function MediaField({
   urlHint = 'Paste a direct link to an online image, or upload a file below.',
   urlLabel = 'Image URL',
   rejectYouTube = false,
+  importToStorage = true,
+  previewVariant = 'banner',
 }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
@@ -26,6 +29,7 @@ export default function MediaField({
   const [uploadSuccess, setUploadSuccess] = useState('');
   const hasUploadedFile = isDataUrl(value);
   const hasRemoteUrl = typeof value === 'string' && Boolean(value.trim());
+  const isImageField = accept?.startsWith('image');
 
   const clearValue = () => {
     setUploadError('');
@@ -51,6 +55,26 @@ export default function MediaField({
     onError?.('');
   };
 
+  const handleUrlBlur = async () => {
+    const trimmed = typeof value === 'string' ? value.trim() : '';
+    if (!importToStorage || !trimmed || isDataUrl(trimmed) || isHostedMediaUrl(trimmed)) return;
+
+    setUploading(true);
+    setUploadError('');
+    try {
+      const storedUrl = await importRemoteMediaUrl(trimmed);
+      if (storedUrl && storedUrl !== trimmed) {
+        onChange(storedUrl);
+        setUploadSuccess('Saved to cloud storage');
+        onError?.('');
+      }
+    } catch (err) {
+      setUploadError(err.message || 'Could not save this URL to cloud storage.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleFile = async (file) => {
     if (!file) return;
     setUploading(true);
@@ -71,12 +95,12 @@ export default function MediaField({
     }
   };
 
-  const previewUrl = hasRemoteUrl && !isDataUrl(value) && accept?.startsWith('image')
+  const previewUrl = hasRemoteUrl && !isDataUrl(value) && isImageField
     ? resolveMediaUrl(value)
     : '';
 
   return (
-    <div className="form-group media-field">
+    <div className={`form-group media-field${previewVariant ? ` media-field-${previewVariant}` : ''}`}>
       <label>{label}</label>
 
       {!hasUploadedFile && (
@@ -86,6 +110,7 @@ export default function MediaField({
             type="url"
             value={value || ''}
             onChange={(e) => handleUrlChange(e.target.value)}
+            onBlur={handleUrlBlur}
             placeholder={placeholder}
             disabled={uploading}
           />
