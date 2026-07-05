@@ -157,7 +157,7 @@ export default function PublicInvitation() {
     navigate(`/invite/${encodeURIComponent(eventSlug)}${location.search || ''}`, { replace: true });
   }, [data?.event?.slug, location.search, navigate, slug]);
 
-  if (loading || routeDecision !== 'ready') {
+  if (loading) {
     return <Loader variant="invitation" label="Loading invitation..." />;
   }
 

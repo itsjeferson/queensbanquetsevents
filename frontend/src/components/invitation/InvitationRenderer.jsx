@@ -90,6 +90,7 @@ export default function InvitationRenderer({
 
   const [resetRsvpUnlock] = useState(() => consumeRsvpPreviewReset(unlockContext));
   const skipStoredUnlock = previewMode || resetRsvpUnlock;
+  const [previewSessionUnlocked, setPreviewSessionUnlocked] = useState(false);
 
   const [rsvpUnlocked, setRsvpUnlockedState] = useState(() => {
     if ((saveTheDateActive || forceSaveTheDateStage) && skipStoredUnlock) return false;
@@ -98,8 +99,7 @@ export default function InvitationRenderer({
   });
   const [opened, setOpened] = useState(() => {
     if ((saveTheDateActive || forceSaveTheDateStage) && skipStoredUnlock) return false;
-    if (!saveTheDateActive) return false;
-    return hasRsvpUnlocked(unlockContext);
+    return false;
   });
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
@@ -112,8 +112,10 @@ export default function InvitationRenderer({
     }
 
     if (previewMode) {
-      setRsvpUnlockedState(false);
-      setOpened(false);
+      if (!previewSessionUnlocked) {
+        setRsvpUnlockedState(false);
+        setOpened(false);
+      }
       return;
     }
 
@@ -126,7 +128,6 @@ export default function InvitationRenderer({
 
     const unlocked = saveTheDateActive && hasRsvpUnlocked(unlockContext);
     setRsvpUnlockedState(unlocked);
-    if (unlocked) setOpened(true);
   }, [
     event?.slug,
     event?.id,
@@ -135,6 +136,7 @@ export default function InvitationRenderer({
     saveTheDateActive,
     forceSaveTheDateStage,
     previewMode,
+    previewSessionUnlocked,
     resetRsvpUnlock,
     unlockContext,
   ]);
@@ -154,12 +156,16 @@ export default function InvitationRenderer({
   };
 
   const handleSaveTheDateRsvp = ({ name, attendance }) => {
-    setRsvpUnlocked(unlockContext, { name, attendance });
     setRsvpUnlockedState(true);
-    setOpened(true);
+    setOpened(false);
+
+    if (previewMode) {
+      setPreviewSessionUnlocked(true);
+      return;
+    }
+
+    setRsvpUnlocked(unlockContext, { name, attendance });
     onGuestUnlock?.();
-    startMusic();
-    setTimeout(() => document.getElementById('inv-main')?.scrollIntoView({ behavior: 'smooth' }), 200);
   };
 
   const toggleMusic = () => {
@@ -174,8 +180,8 @@ export default function InvitationRenderer({
 
   const stdGateActive = saveTheDateActive || forceSaveTheDateStage;
   const showSaveTheDate = stdGateActive && !rsvpUnlocked;
-  const showCover = !stdGateActive && !opened;
-  const showInvitation = stdGateActive ? rsvpUnlocked && opened : opened;
+  const showCover = !opened && !showSaveTheDate;
+  const showInvitation = opened && (!stdGateActive || rsvpUnlocked);
 
   useEffect(() => {
     document.documentElement.classList.add('invitation-scroll');

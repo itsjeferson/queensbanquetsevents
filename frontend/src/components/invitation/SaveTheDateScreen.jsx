@@ -69,7 +69,7 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
           <h2 className="inv-std-classic-rsvp-title">Attendance Confirmation</h2>
 
           {submitted ? (
-            <p className="inv-std-classic-rsvp-success">Thank you! Your response has been received.</p>
+            <p className="inv-std-classic-rsvp-success">Thank you! Opening your invitation...</p>
           ) : (
             <form className="inv-std-classic-form" onSubmit={handleSubmit}>
               <div className="inv-std-classic-field">
@@ -116,7 +116,7 @@ export default function SaveTheDateScreen({ event, invitation, onRsvpSuccess }) 
                     <Spinner size="sm" tone="light" />
                     <span>Sending...</span>
                   </span>
-                ) : 'Confirm & View Invitation'}
+                ) : 'Confirm RSVP'}
               </button>
             </form>
           )}

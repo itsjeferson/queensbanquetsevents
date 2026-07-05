@@ -16,7 +16,7 @@ import GuestBook from './GuestBook';
 import QRShare from './QRShare';
 import InvitationFooter from './InvitationFooter';
 import FloralCornerFrame from './FloralCornerFrame';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 function SectionShell({
   sectionId,
@@ -239,42 +239,7 @@ export default function InvitationMainContent({
     animateHero: true,
   };
 
-  const trackableSectionIds = useMemo(
-    () => sectionOrder.filter((id) => !(id === 'rsvp' && saveTheDateEnabled)),
-    [sectionOrder, saveTheDateEnabled],
-  );
-
-  const [allContentRevealed, setAllContentRevealed] = useState(!gradualReveal);
-  const revealedSectionIds = useRef(new Set());
-
-  useEffect(() => {
-    if (!gradualReveal) {
-      setAllContentRevealed(true);
-      return undefined;
-    }
-
-    revealedSectionIds.current = new Set();
-    const firstId = sectionOrder[0];
-    if (firstId && !(firstId === 'rsvp' && saveTheDateEnabled)) {
-      revealedSectionIds.current.add(firstId);
-    }
-
-    const onSectionVisible = (event) => {
-      const sectionId = event.detail?.getAttribute?.('data-section-id');
-      if (!sectionId) return;
-      revealedSectionIds.current.add(sectionId);
-      if (revealedSectionIds.current.size >= trackableSectionIds.length) {
-        setAllContentRevealed(true);
-      }
-    };
-
-    document.addEventListener('aos:in', onSectionVisible);
-    setAllContentRevealed(revealedSectionIds.current.size >= trackableSectionIds.length);
-
-    return () => document.removeEventListener('aos:in', onSectionVisible);
-  }, [gradualReveal, trackableSectionIds, sectionOrder, saveTheDateEnabled]);
-
-  const showFollowMessage = gradualReveal && !allContentRevealed;
+  const showFollowMessage = gradualReveal;
 
   return (
     <main id="inv-main" className="inv-main">
