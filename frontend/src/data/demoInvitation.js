@@ -48,9 +48,9 @@ export const demoWeddingInvitation = {
       { time: '3:00 PM', title: 'Wedding Ceremony' },
       { time: '4:00 PM', title: 'Pictorial' },
       { time: '4:30 PM', title: 'Cocktail Hour' },
-      { time: '6:00 PM', title: 'Program Proper & First Dance' },
+      { time: '6:00 PM', title: 'Program Proper' },
       { time: '7:00 PM', title: 'Dinner' },
-      { time: '8:30 PM', title: 'Same Day Edit' },
+      { time: '8:30 PM', title: 'Same Day Edit Photo and Video' },
     ],
     entourage: {
       principal_sponsors: ['Gaudencio M. Tullao', 'Lira R. Tullao', 'Dolores G. Serrano', 'Gina P. Ayuste'],

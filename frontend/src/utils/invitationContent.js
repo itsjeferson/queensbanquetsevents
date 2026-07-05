@@ -1,6 +1,13 @@
 import { resolveInvitationThemeFields, extractInvitationThemeInput } from './invitationTheme';
 import { stripLargeDataUrls, canPersistMediaUrl, VENUE_IMAGE_SAVE_MAX_CHARS } from './mediaUpload';
 import { resolveMediaUrl } from './mediaUrl';
+import {
+  defaultWeddingProgram as defaultWeddingProgramFromTimeline,
+  normalizeWeddingProgram,
+} from './weddingTimeline';
+
+export { normalizeWeddingProgram };
+export const defaultWeddingProgram = defaultWeddingProgramFromTimeline;
 
 export const defaultGroomProfile = () => ({
   name: '',
@@ -48,16 +55,6 @@ export const defaultAttire = () => ({
   gentlemen_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
   reminders: '',
 });
-
-export const defaultWeddingProgram = () => [
-  { time: '3:00 PM', title: 'Wedding Ceremony' },
-  { time: '4:00 PM', title: 'Pictorial' },
-  { time: '4:30 PM', title: 'Cocktail Hour' },
-  { time: '5:00 PM', title: 'Band First Set' },
-  { time: '6:00 PM', title: 'Program Proper' },
-  { time: '7:00 PM', title: 'Dinner' },
-  { time: '8:30 PM', title: 'Same Day Edit Photo and Video' },
-];
 
 export const defaultWeddingInvitationContent = {
   opening_line: 'With great joy, we invite you',
@@ -304,6 +301,8 @@ export function prepareInvitationForApiSave(invitation) {
     };
   });
 
+  stripped.program = normalizeWeddingProgram(invitation.program);
+
   return {
     ...stripped,
     entourage: cleanEntourageLists(stripped.entourage),
@@ -357,7 +356,7 @@ export function normalizeInvitationContent(invitation = {}) {
     },
     attire: { ...defaultAttire(), ...(invitation.attire || {}) },
     entourage: mergeEntourage(invitation.entourage),
-    program: invitation.program?.length ? invitation.program : defaultWeddingProgram(),
+    program: normalizeWeddingProgram(invitation.program),
     gallery: (Array.isArray(invitation.gallery) ? invitation.gallery : []).map((item) => ({
       ...item,
       image: resolveMedia(item?.image),

@@ -1,7 +1,7 @@
 import MediaField from '../common/MediaField/MediaField';
 import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
 import { MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
-import { defaultAttire, defaultEntourage } from '../../utils/invitationContent';
+import { defaultAttire, defaultEntourage, normalizeWeddingProgram } from '../../utils/invitationContent';
 import { ATTIRE_SWATCH_DEFAULT } from '../../utils/invitationTheme';
 import EntourageNameListEditor from './EntourageNameListEditor';
 import InvitationMotifPicker from './InvitationMotifPicker';
@@ -20,7 +20,7 @@ export default function WeddingContentFields({
   onFileError,
 }) {
   const gallery = invitation.gallery?.length ? invitation.gallery : [{ caption: '', image: '' }];
-  const program = invitation.program?.length ? invitation.program : [{ time: '', title: '' }];
+  const program = normalizeWeddingProgram(invitation.program);
   const faqs = invitation.faqs?.length ? invitation.faqs : [{ question: '', answer: '' }];
   const entourage = invitation.entourage || defaultEntourage();
   const attire = invitation.attire || defaultAttire();
@@ -511,25 +511,27 @@ export default function WeddingContentFields({
 
       <div className="card-widget">
         <h3>Timeline</h3>
-        {program.map((item, index) => (
-          <div key={index} className="form-row" style={{ marginTop: index === 0 ? 20 : 0 }}>
-            <div className="form-group">
-              <label>Time</label>
-              <input value={item.time || ''} onChange={(e) => onProgramChange(index, 'time', e.target.value)} placeholder="3:00 PM" />
+        <p className="form-help" style={{ marginTop: 12 }}>
+          Wedding timeline events are fixed. Adjust the time for each part of your day.
+        </p>
+        <div className="timeline-editor-list">
+          {program.map((item, index) => (
+            <div key={item.id || index} className="timeline-editor-row">
+              <div className="form-group timeline-editor-event">
+                <label>Event</label>
+                <input readOnly value={item.title} />
+              </div>
+              <div className="form-group timeline-editor-time">
+                <label>Time</label>
+                <input
+                  value={item.time || ''}
+                  onChange={(e) => onProgramChange(index, 'time', e.target.value)}
+                  placeholder="3:00 PM"
+                />
+              </div>
             </div>
-            <div className="form-group">
-              <label>Event</label>
-              <input value={item.title || ''} onChange={(e) => onProgramChange(index, 'title', e.target.value)} placeholder="Wedding Ceremony" />
-            </div>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="btn btn-outline"
-          onClick={() => onInvitationChange({ program: [...program, { time: '', title: '' }] })}
-        >
-          Add Timeline Item
-        </button>
+          ))}
+        </div>
       </div>
 
       <div className="card-widget">

@@ -10,7 +10,7 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { slugFromEventName } from '../../utils/slug';
-import { defaultWeddingInvitationContent, normalizeInvitationContent, prepareInvitationForApiSave } from '../../utils/invitationContent';
+import { defaultWeddingInvitationContent, normalizeInvitationContent, normalizeWeddingProgram, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
@@ -95,7 +95,7 @@ export default function InvitationBuilder() {
 
   const updateProgram = (index, field, value) => {
     setForm((current) => {
-      const program = [...(current.invitation.program || [])];
+      const program = normalizeWeddingProgram(current.invitation.program);
       program[index] = { ...(program[index] || {}), [field]: value };
       return { ...current, invitation: { ...current.invitation, program } };
     });

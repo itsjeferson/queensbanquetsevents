@@ -621,6 +621,28 @@ textarea { resize: vertical; min-height: 120px; }
 .cover-hero-photos .form-group {
   margin-bottom: 0;
 }
+.timeline-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.timeline-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr);
+  gap: 16px;
+  align-items: end;
+}
+.timeline-editor-event input {
+  background: var(--bg-soft, #f8f6f3);
+  color: var(--text-muted);
+  cursor: default;
+}
+@media (max-width: 720px) {
+  .timeline-editor-row {
+    grid-template-columns: 1fr;
+  }
+}
 .faq-item-fields {
   display: flex;
   flex-direction: column;

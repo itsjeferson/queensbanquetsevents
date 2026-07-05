@@ -174,7 +174,7 @@ export function renderInvitationSection(sectionId, ctx) {
     case 'program':
       return (
         <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
-          <TimelineSection program={invitation.program} />
+          <TimelineSection program={invitation.program} coupleName={coupleName} />
         </SectionShell>
       );
     case 'gift_registry':

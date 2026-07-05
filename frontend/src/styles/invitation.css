@@ -787,6 +787,109 @@
   color: var(--inv-primary);
 }
 
+/* Wedding icon timeline */
+.inv-wedding-timeline-section {
+  padding-bottom: 72px;
+}
+
+.inv-wedding-timeline {
+  max-width: 920px;
+  margin: 36px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.inv-wedding-timeline-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+}
+
+.inv-wedding-timeline-item {
+  flex: 0 0 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.inv-wedding-timeline-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(15px, 2vw, 19px);
+  line-height: 1.35;
+  color: var(--inv-floral-bloom);
+  min-height: 2.7em;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 0;
+}
+
+.inv-wedding-timeline-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(109, 98, 91, 0.55);
+  display: grid;
+  place-items: center;
+  color: rgba(109, 98, 91, 0.85);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.inv-wedding-timeline-time {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(14px, 1.8vw, 17px);
+  letter-spacing: 0.08em;
+  color: var(--inv-muted);
+  margin: 0;
+}
+
+.inv-wedding-timeline-connector {
+  flex: 1 1 48px;
+  min-width: 32px;
+  max-width: 96px;
+  height: 92px;
+  margin-top: calc(2.7em + 10px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 24' fill='none'%3E%3Cpath d='M0 12c20-14 28-14 40 0s28 14 40 0' stroke='%239a9a9a' stroke-width='1.2'/%3E%3Ccircle cx='18' cy='10' r='2' fill='%23b8d4a8'/%3E%3Ccircle cx='40' cy='12' r='2' fill='%23b8d4a8'/%3E%3Ccircle cx='62' cy='10' r='2' fill='%23b8d4a8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.inv-wedding-timeline-couple {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(28px, 4.5vw, 42px);
+  color: rgba(109, 98, 91, 0.75);
+  text-align: center;
+  margin: 8px 0 0;
+}
+
+@media (max-width: 720px) {
+  .inv-wedding-timeline-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .inv-wedding-timeline-item {
+    flex-basis: auto;
+    width: min(100%, 240px);
+  }
+
+  .inv-wedding-timeline-connector {
+    display: none;
+  }
+
+  .inv-wedding-timeline-title {
+    min-height: 0;
+  }
+}
+
 .template-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

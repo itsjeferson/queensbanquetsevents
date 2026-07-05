@@ -19,7 +19,7 @@ import {
   saveInvitationDraft,
 } from '../../utils/invitationPreview';
 import { normalizeEventDateForApi, toDatetimeLocalValue } from '../../utils/eventDate';
-import { normalizeInvitationContent, prepareInvitationForApiSave } from '../../utils/invitationContent';
+import { normalizeInvitationContent, normalizeWeddingProgram, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import { getInvitationShareUrl } from '../../utils/invitationShare';
 import { eventStatusMeta as statusMeta } from '../../utils/eventStatus';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
@@ -389,7 +389,7 @@ export default function InvitationManage({ variant = 'client' }) {
   const updateProgram = (index, field, value) => {
     markDirty();
     setInvitation((current) => {
-      const program = [...(current.program || [])];
+      const program = normalizeWeddingProgram(current.program);
       program[index] = { ...(program[index] || {}), [field]: value };
       return { ...current, program };
     });
