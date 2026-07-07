@@ -56,6 +56,13 @@ class InvitationTemplate
         ]);
     }
 
+    public static function delete(int $id): void
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare('DELETE FROM invitation_templates WHERE id = ?');
+        $stmt->execute([$id]);
+    }
+
     private static function decodeAll(array $rows): array
     {
         return array_map(function ($row) {

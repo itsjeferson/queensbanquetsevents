@@ -13,6 +13,7 @@ import { slugFromEventName } from '../../utils/slug';
 import { defaultWeddingInvitationContent, normalizeInvitationContent, normalizeWeddingProgram, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
+import InvitationTemplateSelector from '../../components/invitation/InvitationTemplateSelector';
 import '../../styles/invitation.css';
 
 /* ── SVG event-type icons (Lucide-style: 24×24, stroke currentColor) ── */
@@ -90,6 +91,20 @@ export default function InvitationBuilder() {
     setForm((current) => ({
       ...current,
       invitation: { ...current.invitation, ...patch },
+    }));
+  };
+
+  const handleSelectTemplate = (template) => {
+    const config = template.theme_config || {};
+    setForm((current) => ({
+      ...current,
+      template_id: template.id,
+      invitation: {
+        ...current.invitation,
+        primary_color: config.primary || '#D4AF37',
+        secondary_color: config.accent || '#F4EEE7',
+        font_family: config.font || 'Playfair Display',
+      },
     }));
   };
 
@@ -322,12 +337,32 @@ export default function InvitationBuilder() {
                 Auto-generated from event name. Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
               </p>
             </div>
+
+            {form.event_type === 'wedding' && (
+              <InvitationTemplateSelector
+                selectedId={form.template_id}
+                onSelect={handleSelectTemplate}
+                category="wedding"
+                currentForm={form}
+              />
+            )}
+
             {!hasEventName && (
-              <p style={{ fontSize: 13, color: '#DC3545', marginBottom: 12 }}>
+              <p style={{ fontSize: 13, color: '#DC3545', marginBottom: 12, marginTop: 12 }}>
                 Enter an event name to continue.
               </p>
             )}
-            <button type="button" className="btn btn-gold btn-next-step" onClick={() => setStep(1)} disabled={!hasEventName}>
+            {hasEventName && form.event_type === 'wedding' && !form.template_id && (
+              <p style={{ fontSize: 13, color: '#DC3545', marginBottom: 12, marginTop: 12 }}>
+                Please select a design template to continue.
+              </p>
+            )}
+            <button
+              type="button"
+              className="btn btn-gold btn-next-step"
+              onClick={() => setStep(1)}
+              disabled={!hasEventName || (form.event_type === 'wedding' && !form.template_id)}
+            >
               Next: Add Content
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />

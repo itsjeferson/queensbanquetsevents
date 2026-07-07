@@ -16,6 +16,9 @@ switch ($method) {
     case 'PUT':
         $id ? $controller->update($id, getJsonInput()) : sendError('ID required', 400);
         break;
+    case 'DELETE':
+        $id ? $controller->destroy($id) : sendError('ID required', 400);
+        break;
     default:
         sendError('Method not allowed', 405);
 }

@@ -24,6 +24,7 @@ import { getInvitationShareUrl } from '../../utils/invitationShare';
 import { eventStatusMeta as statusMeta } from '../../utils/eventStatus';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
+import InvitationTemplateSelector from '../../components/invitation/InvitationTemplateSelector';
 import '../../styles/invitation.css';
 
 const AUTO_SAVE_DELAY_MS = 600;
@@ -355,6 +356,18 @@ export default function InvitationManage({ variant = 'client' }) {
   const updateInvitation = (patch) => {
     markDirty();
     setInvitation((current) => ({ ...current, ...patch }));
+  };
+
+  const handleSelectTemplate = (template) => {
+    const config = template.theme_config || {};
+    markDirty();
+    setInvitation((current) => ({
+      ...current,
+      template_id: template.id,
+      primary_color: config.primary || '#D4AF37',
+      secondary_color: config.accent || '#F4EEE7',
+      font_family: config.font || 'Playfair Display',
+    }));
   };
 
   const updateVenue = (type, field, value) => {
@@ -717,6 +730,18 @@ export default function InvitationManage({ variant = 'client' }) {
           </div>
         </div>
       </div>
+
+      {event.event_type === 'wedding' && (
+        <div className="card-widget">
+          <h3>Design Template</h3>
+          <InvitationTemplateSelector
+            selectedId={invitation.template_id}
+            onSelect={handleSelectTemplate}
+            category="wedding"
+            currentForm={{ event_name: event.event_name, event_date: event.event_date, slug: event.slug, invitation }}
+          />
+        </div>
+      )}
 
       <InvitationExperienceSettings
         invitation={invitation}

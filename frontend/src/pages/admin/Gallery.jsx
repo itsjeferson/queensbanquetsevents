@@ -3,6 +3,7 @@ import Button from '../../components/common/Button/Button';
 import Loader, { Spinner } from '../../components/common/Loader/Loader';
 import { galleryService } from '../../services/galleryService';
 import { getUploadUrl } from '../../utils/mediaUrl';
+import ConfirmDialog from '../../components/common/ConfirmDialog/ConfirmDialog';
 
 const CATEGORIES = [
   { value: 'wedding', label: 'Weddings' },
@@ -19,6 +20,8 @@ export default function AdminGallery() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const loadGallery = () => {
     setLoading(true);
@@ -58,13 +61,21 @@ export default function AdminGallery() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this photo from the gallery?')) return;
+  const handleDeleteClick = (id) => {
+    setDeleteTargetId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
+    setDeleteLoading(true);
     try {
-      await galleryService.delete(id);
-      setItems((current) => current.filter((item) => item.id !== id));
+      await galleryService.delete(deleteTargetId);
+      setItems((current) => current.filter((item) => item.id !== deleteTargetId));
+      setDeleteTargetId(null);
     } catch {
       setError('Could not delete this photo.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -139,7 +150,7 @@ export default function AdminGallery() {
                 />
                 <button
                   type="button"
-                  onClick={() => handleDelete(item.id)}
+                  onClick={() => handleDeleteClick(item.id)}
                   style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(220,53,69,0.9)', color: '#fff', border: 'none', borderRadius: 4, padding: '3px 8px', fontSize: 11, cursor: 'pointer' }}
                 >
                   ✕
@@ -153,6 +164,19 @@ export default function AdminGallery() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={Boolean(deleteTargetId)}
+        title="Delete Photo"
+        message="Delete this photo from the gallery? This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        loadingLabel="Deleting..."
+        tone="danger"
+        loading={deleteLoading}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTargetId(null)}
+      />
     </>
   );
 }

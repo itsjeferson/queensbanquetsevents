@@ -33,4 +33,12 @@ class TemplateController
         InvitationTemplate::update($id, $data);
         sendResponse(['success' => true, 'data' => InvitationTemplate::find($id)]);
     }
+
+    public function destroy(int $id): void
+    {
+        $template = InvitationTemplate::find($id);
+        if (!$template) sendError('Template not found', 404);
+        InvitationTemplate::delete($id);
+        sendResponse(['success' => true, 'message' => 'Template deleted successfully']);
+    }
 }

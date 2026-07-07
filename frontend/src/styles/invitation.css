@@ -3487,3 +3487,130 @@ html.invitation-scroll::-webkit-scrollbar {
     margin-top: 0;
   }
 }
+
+/* ── Invitation Template Selector (Premium Liquid Glass / UI/UX Pro Max) ── */
+.template-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.template-picker-card {
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-picker-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.template-picker-card.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15), var(--shadow);
+}
+
+.template-picker-preview {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1.5px solid var(--border-soft);
+}
+
+.template-picker-letter {
+  font-size: 40px;
+  font-weight: 700;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.template-picker-dots {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.template-picker-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.template-picker-body {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-picker-body h4 {
+  font-size: 13.5px;
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.template-picker-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.template-picker-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.template-picker-actions button {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 11.5px;
+  border-radius: 6px;
+  height: 30px;
+}
+
+/* Hover preview button overlay */
+.template-preview-hover-btn {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  color: var(--white);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.template-picker-preview:hover .template-preview-hover-btn {
+  opacity: 1;
+}
+
+.template-preview-hover-btn:hover {
+  background: rgba(212, 175, 55, 0.9);
+  color: var(--black);
+}
+
