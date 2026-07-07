@@ -15,12 +15,57 @@ import WeddingContentFields from '../../components/invitation/WeddingContentFiel
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import '../../styles/invitation.css';
 
+/* ── SVG event-type icons (Lucide-style: 24×24, stroke currentColor) ── */
+const evtIconProps = {
+  width: 26, height: 26, viewBox: '0 0 24 24', fill: 'none',
+  stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round',
+  'aria-hidden': true,
+};
+
+const WeddingIcon = () => (
+  <svg {...evtIconProps}>
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+);
+const DebutIcon = () => (
+  <svg {...evtIconProps}>
+    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
+    <path d="M5.5 21h13" />
+  </svg>
+);
+const BirthdayIcon = () => (
+  <svg {...evtIconProps}>
+    <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8" />
+    <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1" />
+    <path d="M2 21h20" />
+    <path d="M7 8v3" /><path d="M12 8v3" /><path d="M17 8v3" />
+    <path d="M7 4h.01" /><path d="M12 4h.01" /><path d="M17 4h.01" />
+  </svg>
+);
+const AnniversaryIcon = () => (
+  <svg {...evtIconProps}>
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z" />
+  </svg>
+);
+const CorporateIcon = () => (
+  <svg {...evtIconProps}>
+    <rect x="4" y="2" width="16" height="20" rx="2" />
+    <path d="M9 22v-4h6v4" />
+    <path d="M8 6h.01" /><path d="M16 6h.01" />
+    <path d="M12 6h.01" />
+    <path d="M12 10h.01" />
+    <path d="M12 14h.01" />
+    <path d="M16 10h.01" /><path d="M16 14h.01" />
+    <path d="M8 10h.01" /><path d="M8 14h.01" />
+  </svg>
+);
+
 const EVENT_TYPES = [
-  { value: 'wedding', label: 'Wedding', icon: '💒' },
-  { value: 'debut', label: 'Debut', icon: '👑' },
-  { value: 'birthday', label: 'Birthday', icon: '🎂' },
-  { value: 'anniversary', label: 'Anniversary', icon: '💕' },
-  { value: 'corporate', label: 'Corporate', icon: '🏢' },
+  { value: 'wedding', label: 'Wedding', Icon: WeddingIcon },
+  { value: 'debut', label: 'Debut', Icon: DebutIcon },
+  { value: 'birthday', label: 'Birthday', Icon: BirthdayIcon },
+  { value: 'anniversary', label: 'Anniversary', Icon: AnniversaryIcon },
+  { value: 'corporate', label: 'Corporate', Icon: CorporateIcon },
 ];
 
 const STEPS = ['Event Info', 'Content', 'Submit'];
@@ -190,11 +235,21 @@ export default function InvitationBuilder() {
         <p>Create your personalized event website in minutes.</p>
       </div>
 
-      <div className="inv-builder-steps">
+      <div className="inv-stepper">
         {STEPS.map((s, i) => (
-          <span key={s} className={`inv-builder-step ${i === step ? 'active' : i < step ? 'done' : ''}`}>
-            {i + 1}. {s}
-          </span>
+          <div key={s} className={`inv-stepper-item ${i === step ? 'active' : i < step ? 'done' : ''}`}>
+            {i > 0 && <span className="inv-stepper-line" />}
+            <span className="inv-stepper-circle">
+              {i < step ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              ) : (
+                i + 1
+              )}
+            </span>
+            <span className="inv-stepper-label">{s}</span>
+          </div>
         ))}
       </div>
 
@@ -208,22 +263,27 @@ export default function InvitationBuilder() {
       <div className="card-widget">
         {step === 0 && (
           <>
-            <h3>Event Information</h3>
+            <div className="inv-builder-section-header">
+              <h3>Event Information</h3>
+              <span className="inv-builder-gold-line" />
+            </div>
             <div className="form-group" style={{ marginTop: 20 }}>
               <label>Event Type</label>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {EVENT_TYPES.map((type) => (
-                  <button
-                    key={type.value}
-                    type="button"
-                    className={`template-card ${form.event_type === type.value ? 'selected' : ''}`}
-                    style={{ minWidth: 100 }}
-                    onClick={() => setForm({ ...form, event_type: type.value })}
-                  >
-                    <span style={{ fontSize: 24 }}>{type.icon}</span>
-                    <h4>{type.label}</h4>
-                  </button>
-                ))}
+              <div className="evt-type-grid">
+                {EVENT_TYPES.map((type) => {
+                  const IconCmp = type.Icon;
+                  return (
+                    <button
+                      key={type.value}
+                      type="button"
+                      className={`evt-type-card ${form.event_type === type.value ? 'selected' : ''}`}
+                      onClick={() => setForm({ ...form, event_type: type.value })}
+                    >
+                      <span className="evt-type-icon"><IconCmp /></span>
+                      <span className="evt-type-label">{type.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div className="form-row">
@@ -267,8 +327,11 @@ export default function InvitationBuilder() {
                 Enter an event name to continue.
               </p>
             )}
-            <button type="button" className="btn btn-gold" onClick={() => setStep(1)} disabled={!hasEventName}>
+            <button type="button" className="btn btn-gold btn-next-step" onClick={() => setStep(1)} disabled={!hasEventName}>
               Next: Add Content
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+              </svg>
             </button>
           </>
         )}
