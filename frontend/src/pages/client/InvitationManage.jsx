@@ -23,6 +23,7 @@ import { normalizeInvitationContent, normalizeWeddingProgram, prepareInvitationF
 import { getInvitationShareUrl } from '../../utils/invitationShare';
 import { eventStatusMeta as statusMeta } from '../../utils/eventStatus';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
+import RoyalLuxuryContentFields from '../../components/invitation/RoyalLuxuryContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import InvitationTemplateSelector from '../../components/invitation/InvitationTemplateSelector';
 import '../../styles/invitation.css';
@@ -731,6 +732,7 @@ export default function InvitationManage({ variant = 'client' }) {
         </div>
       </div>
 
+      {/* Hiding templates selection for future integration
       {event.event_type === 'wedding' && (
         <div className="card-widget">
           <h3>Design Template</h3>
@@ -742,6 +744,7 @@ export default function InvitationManage({ variant = 'client' }) {
           />
         </div>
       )}
+      */}
 
       <InvitationExperienceSettings
         invitation={invitation}

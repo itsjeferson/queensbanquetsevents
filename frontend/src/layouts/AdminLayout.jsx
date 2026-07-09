@@ -20,7 +20,7 @@ const adminNav = [
   { path: '/admin/dashboard', title: 'Dashboard', icon: DashboardIcon, end: true },
   { path: '/admin/client-management', title: 'Client Management', icon: ClientsIcon },
   { path: '/admin/invitation-manager', title: 'Invitation Manager', icon: ManagementIcon },
-  { path: '/admin/invitation-templates', title: 'Templates', icon: TemplateIcon },
+  // { path: '/admin/invitation-templates', title: 'Templates', icon: TemplateIcon },
   { path: '/admin/rsvp-monitoring', title: 'RSVP Monitoring', icon: RsvpIcon },
   { path: '/admin/calendar', title: 'Calendar', icon: CalendarIcon },
   { path: '/admin/settings', title: 'Settings', icon: SettingsIcon },

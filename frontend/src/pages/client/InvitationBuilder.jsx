@@ -12,6 +12,7 @@ import {
 import { slugFromEventName } from '../../utils/slug';
 import { defaultWeddingInvitationContent, normalizeInvitationContent, normalizeWeddingProgram, prepareInvitationForApiSave } from '../../utils/invitationContent';
 import WeddingContentFields from '../../components/invitation/WeddingContentFields';
+import RoyalLuxuryContentFields from '../../components/invitation/RoyalLuxuryContentFields';
 import InvitationExperienceSettings from '../../components/invitation/InvitationExperienceSettings';
 import InvitationTemplateSelector from '../../components/invitation/InvitationTemplateSelector';
 import '../../styles/invitation.css';
@@ -83,7 +84,7 @@ export default function InvitationBuilder() {
     event_type: 'wedding',
     event_date: '',
     slug: '',
-    template_id: null,
+    template_id: 3,
     invitation: normalizeInvitationContent(defaultWeddingInvitationContent),
   });
 
@@ -338,6 +339,7 @@ export default function InvitationBuilder() {
               </p>
             </div>
 
+            {/* Hiding templates selection for future integration
             {form.event_type === 'wedding' && (
               <InvitationTemplateSelector
                 selectedId={form.template_id}
@@ -346,22 +348,18 @@ export default function InvitationBuilder() {
                 currentForm={form}
               />
             )}
+            */}
 
             {!hasEventName && (
               <p style={{ fontSize: 13, color: '#DC3545', marginBottom: 12, marginTop: 12 }}>
                 Enter an event name to continue.
               </p>
             )}
-            {hasEventName && form.event_type === 'wedding' && !form.template_id && (
-              <p style={{ fontSize: 13, color: '#DC3545', marginBottom: 12, marginTop: 12 }}>
-                Please select a design template to continue.
-              </p>
-            )}
             <button
               type="button"
               className="btn btn-gold btn-next-step"
               onClick={() => setStep(1)}
-              disabled={!hasEventName || (form.event_type === 'wedding' && !form.template_id)}
+              disabled={!hasEventName}
             >
               Next: Add Content
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -415,19 +413,30 @@ export default function InvitationBuilder() {
       </div>
       ) : (
         <>
-          <WeddingContentFields
-            invitation={form.invitation}
-            event={builderEvent}
-            onInvitationChange={updateInvitation}
-            onVenueChange={updateVenue}
-            onStoryChange={updateStory}
-            onGalleryChange={updateGallery}
-            onEntourageChange={updateEntourage}
-            onAttireChange={updateAttire}
-            onProgramChange={updateProgram}
-            onFaqChange={updateFaq}
-            onFileError={setFileError}
-          />
+          {form.template_id === 3 ? (
+            <RoyalLuxuryContentFields
+              invitation={form.invitation}
+              event={builderEvent}
+              onInvitationChange={updateInvitation}
+              onVenueChange={updateVenue}
+              onProgramChange={updateProgram}
+              onFileError={setFileError}
+            />
+          ) : (
+            <WeddingContentFields
+              invitation={form.invitation}
+              event={builderEvent}
+              onInvitationChange={updateInvitation}
+              onVenueChange={updateVenue}
+              onStoryChange={updateStory}
+              onGalleryChange={updateGallery}
+              onEntourageChange={updateEntourage}
+              onAttireChange={updateAttire}
+              onProgramChange={updateProgram}
+              onFaqChange={updateFaq}
+              onFileError={setFileError}
+            />
+          )}
 
           <div className="card-widget">
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>

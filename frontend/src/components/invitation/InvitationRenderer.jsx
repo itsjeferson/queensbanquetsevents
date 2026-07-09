@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import CoverScreen from './CoverScreen';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import InvitationMainContent from './InvitationMainContent';
+import RoyalLuxuryInvitation from './RoyalLuxuryInvitation';
 import { FloralThemeProvider } from './FloralThemeContext';
 import {
   normalizeInvitationContent,
@@ -183,7 +184,9 @@ export default function InvitationRenderer({
   const stdGateActive = saveTheDateActive || forceSaveTheDateStage;
   const showSaveTheDate = stdGateActive && !rsvpUnlocked;
   const showCover = !opened && !showSaveTheDate;
-  const showInvitation = opened && (!stdGateActive || rsvpUnlocked);
+  
+  const isEnvelopeTemplate = Number(invitation?.template_id) === 3;
+  const showInvitation = (opened || isEnvelopeTemplate) && (!stdGateActive || rsvpUnlocked);
 
   useEffect(() => {
     document.documentElement.classList.add('invitation-scroll');
@@ -204,11 +207,6 @@ export default function InvitationRenderer({
         {musicUrl && (
           <audio ref={audioRef} src={musicUrl} loop preload="auto" playsInline />
         )}
-        {musicUrl && opened && (
-          <button type="button" className="inv-music-toggle" onClick={toggleMusic}>
-            {musicOn ? 'Pause Music' : 'Play Music'}
-          </button>
-        )}
 
         {showSaveTheDate && (
           <SaveTheDateScreen
@@ -223,16 +221,28 @@ export default function InvitationRenderer({
         )}
 
         {showInvitation && (
-          <InvitationMainContent
-            event={event}
-            invitation={invitation}
-            coupleName={coupleName}
-            shareUrl={shareUrl}
-            guestMessages={guestMessages}
-            saveTheDateEnabled={saveTheDateActive}
-            sectionOrder={sectionOrder}
-            gradualReveal={gradualReveal}
-          />
+          Number(invitation.template_id) === 3 ? (
+            <RoyalLuxuryInvitation
+              event={event}
+              invitation={invitation}
+              guestMessages={guestMessages}
+              shareUrl={shareUrl}
+              saveTheDateEnabled={saveTheDateActive}
+            />
+          ) : (
+            <InvitationMainContent
+              event={event}
+              invitation={invitation}
+              coupleName={coupleName}
+              shareUrl={shareUrl}
+              guestMessages={guestMessages}
+              saveTheDateEnabled={saveTheDateActive}
+              sectionOrder={sectionOrder}
+              gradualReveal={gradualReveal}
+              musicOn={musicOn}
+              toggleMusic={toggleMusic}
+            />
+          )
         )}
         </FloralThemeProvider>
       </div>

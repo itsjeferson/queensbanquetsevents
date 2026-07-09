@@ -16,6 +16,9 @@ import GuestBook from './GuestBook';
 import QRShare from './QRShare';
 import InvitationFooter from './InvitationFooter';
 import FloralCornerFrame from './FloralCornerFrame';
+import MusicPlayerCard from './MusicPlayerCard';
+import WeddingMonthCalendar from './WeddingMonthCalendar';
+import { parseEventDate } from '../../utils/eventDate';
 import { useEffect, useRef } from 'react';
 
 function SectionShell({
@@ -78,6 +81,8 @@ export function renderInvitationSection(sectionId, ctx) {
     animateHero,
     scrollAnimation,
     showFollowMessage,
+    musicOn,
+    toggleMusic,
   } = ctx;
 
   switch (sectionId) {
@@ -91,6 +96,7 @@ export function renderInvitationSection(sectionId, ctx) {
       return (
         <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <QuoteBlock quote={invitation.quote} source={invitation.quote_source} compact />
+          <MusicPlayerCard musicOn={musicOn} toggleMusic={toggleMusic} />
         </SectionShell>
       );
     case 'story_intro':
@@ -134,17 +140,42 @@ export function renderInvitationSection(sectionId, ctx) {
         </SectionShell>
       );
     case 'countdown':
+      const parsedDate = parseEventDate(event.event_date);
+      const dayName = parsedDate ? parsedDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase() : 'TUESDAY';
+      const monthName = parsedDate ? parsedDate.toLocaleDateString('en-US', { month: 'long' }).toUpperCase() : 'MARCH';
+      const dayNum = parsedDate ? parsedDate.getDate() : '23';
+      const yearNum = parsedDate ? parsedDate.getFullYear() : '2027';
+
       return (
         <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
-          <section className="inv-countdown-band" id="countdown">
-            {invitation.gallery?.[2]?.image && <img src={invitation.gallery[2].image} alt="" />}
-            <div className="inv-countdown-overlay">
-              <p>The Countdown</p>
-              <Countdown eventDate={event.event_date} />
-              {showFollowMessage && (
-                <p className="inv-countdown-follow">Formal invitation and further details to follow.</p>
-              )}
+          <section className="custom-countdown-section" id="countdown">
+            {/* Top Text / Quote */}
+            <p className="countdown-invite-text">
+              {invitation.opening_line || "With great joy, we invite you"}
+            </p>
+            
+            <div className="countdown-divider"></div>
+
+            {/* Event Date Block */}
+            <div className="countdown-date-block">
+              <span className="countdown-date-month">{monthName}</span>
+              <div className="countdown-date-row">
+                <span className="countdown-date-day-name">{dayName}</span>
+                <span className="countdown-date-day-number">{dayNum}</span>
+                <span className="countdown-date-year">{yearNum}</span>
+              </div>
             </div>
+
+            <div className="countdown-divider"></div>
+
+            {/* Countdown Title */}
+            <p className="countdown-timer-label">COUNTDOWN</p>
+
+            {/* Countdown Clock */}
+            <Countdown eventDate={event.event_date} />
+
+            {/* Month Calendar Grid */}
+            <WeddingMonthCalendar eventDate={event.event_date} />
           </section>
         </SectionShell>
       );
@@ -227,6 +258,8 @@ export default function InvitationMainContent({
   saveTheDateEnabled,
   sectionOrder,
   gradualReveal = false,
+  musicOn,
+  toggleMusic,
 }) {
   const sectionCtx = {
     event,
@@ -237,6 +270,8 @@ export default function InvitationMainContent({
     saveTheDateEnabled,
     gradualReveal,
     animateHero: true,
+    musicOn,
+    toggleMusic,
   };
 
   const showFollowMessage = gradualReveal;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { rsvpService } from '../../services/invitationService';
 import { Spinner } from '../common/Loader/Loader';
 
-export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send', variant = 'default' }) {
+export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send', variant = 'default', hideHeader = false }) {
   const [form, setForm] = useState({ name: '', attendance: 'yes' });
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,21 +31,25 @@ export default function RSVPForm({ eventId, note, onSuccess, submitLabel = 'Send
 
   return (
     <section className={`inv-section inv-rsvp-${variant}`} id="rsvp">
-      {variant === 'save-the-date' ? (
-        <div className="inv-std-rsvp-heading">
-          <span className="inv-std-rsvp-heading-line" aria-hidden="true" />
-          <p className="inv-std-rsvp-heading-text">RSVP</p>
-          <span className="inv-std-rsvp-heading-line" aria-hidden="true" />
-        </div>
-      ) : (
-        <>
-          <p className="inv-script-title inv-script-title-small">Attendance Confirmation</p>
-          <div className="inv-divider" />
-        </>
+      {!hideHeader && (
+        variant === 'save-the-date' ? (
+          <div className="inv-std-rsvp-heading">
+            <span className="inv-std-rsvp-heading-line" aria-hidden="true" />
+            <p className="inv-std-rsvp-heading-text">RSVP</p>
+            <span className="inv-std-rsvp-heading-line" aria-hidden="true" />
+          </div>
+        ) : (
+          <>
+            <p className="inv-script-title inv-script-title-small">Attendance Confirmation</p>
+            <div className="inv-divider" />
+          </>
+        )
       )}
-      <p className="inv-rsvp-note">
-        {note || 'Please let us know if you can join us.'}
-      </p>
+      {!hideHeader && (
+        <p className="inv-rsvp-note">
+          {note || 'Please let us know if you can join us.'}
+        </p>
+      )}
 
       {status === 'success' ? (
         <div className="inv-rsvp-success">

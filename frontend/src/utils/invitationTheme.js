@@ -276,6 +276,10 @@ export function getInvitationThemeStyles(invitation = {}) {
     '--inv-floral-leaf': leaf,
     '--inv-floral-leaf-soft': rgbaFromHex(leaf, 0.72),
     '--inv-floral-line': palette[3] || theme.primary,
+    '--inv-font-family': invitation.font_family || 'Playfair Display',
+    '--inv-script-font': (invitation.font_family && (invitation.font_family.toLowerCase() === 'lora' || invitation.font_family.toLowerCase() === 'playfair display')) 
+      ? "'Great Vibes', cursive" 
+      : "var(--inv-font-family)",
     background: theme.background,
   };
 }
