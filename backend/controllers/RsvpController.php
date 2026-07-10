@@ -31,6 +31,19 @@ class RsvpController
         if (empty($data['event_id']) || empty($data['name'])) {
             sendError('event_id and name are required', 400);
         }
+
+        $email = $data['email'] ?? null;
+        $phone = $data['phone'] ?? null;
+
+        if (Rsvp::existsForEvent((int)$data['event_id'], $data['name'], $email, $phone)) {
+            sendResponse([
+                'success' => false,
+                'error' => 'duplicate',
+                'message' => 'You have already submitted an RSVP for this invitation.'
+            ], 409);
+            return;
+        }
+
         $id = Rsvp::create($data);
         sendResponse(['success' => true, 'data' => ['id' => $id, 'message' => 'RSVP submitted successfully']], 201);
     }

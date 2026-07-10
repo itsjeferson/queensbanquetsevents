@@ -60,6 +60,30 @@ class Rsvp
         return $stats;
     }
 
+    public static function existsForEvent(int $eventId, string $name, ?string $email, ?string $phone): bool
+    {
+        $pdo = getConnection();
+        
+        $sql = 'SELECT COUNT(*) FROM rsvps WHERE event_id = ? AND (LOWER(TRIM(name)) = LOWER(TRIM(?))';
+        $params = [$eventId, $name];
+        
+        if (!empty($email)) {
+            $sql .= ' OR LOWER(TRIM(email)) = LOWER(TRIM(?))';
+            $params[] = $email;
+        }
+        
+        if (!empty($phone)) {
+            $sql .= ' OR TRIM(phone) = TRIM(?)';
+            $params[] = $phone;
+        }
+        
+        $sql .= ')';
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return ((int) $stmt->fetchColumn()) > 0;
+    }
+
     public static function create(array $data): int
     {
         $pdo = getConnection();

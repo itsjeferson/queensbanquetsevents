@@ -26,8 +26,18 @@ export default function PublicInvitation() {
   const [searchParams] = useSearchParams();
   const isOwnerPreview = searchParams.get('guest') === '1';
   const isSaveTheDateRoute = isSaveTheDatePath(location.pathname);
+  const isRsvpRoute = location.pathname.endsWith('/rsvp');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [transitionLoading, setTransitionLoading] = useState(false);
+
+  useEffect(() => {
+    setTransitionLoading(true);
+    const timer = setTimeout(() => {
+      setTransitionLoading(false);
+    }, 750);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   const lookupByCode = Boolean(code && !slug);
   const identifier = slug || code;
@@ -167,7 +177,7 @@ export default function PublicInvitation() {
     navigate(`/invite/${encodeURIComponent(eventSlug)}${location.search || ''}`, { replace: true });
   }, [data?.event?.slug, location.search, navigate, slug]);
 
-  if (loading) {
+  if (loading || transitionLoading) {
     return <Loader variant="invitation" label="Loading invitation..." />;
   }
 
@@ -185,6 +195,7 @@ export default function PublicInvitation() {
       data={data}
       routeIdentifier={routeIdentifier}
       forceSaveTheDateStage={isSaveTheDateRoute && isSaveTheDateActive(data.invitation)}
+      rsvpForceForm={isRsvpRoute}
       previewMode={isOwnerPreview}
       onGuestUnlock={handleGuestUnlock}
     />

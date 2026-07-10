@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CoverScreen from './CoverScreen';
 import SaveTheDateScreen from './SaveTheDateScreen';
+import RsvpFormPage from './RsvpFormPage';
 import InvitationMainContent from './InvitationMainContent';
 import RoyalLuxuryInvitation from './RoyalLuxuryInvitation';
 import { FloralThemeProvider } from './FloralThemeContext';
@@ -45,6 +46,7 @@ export default function InvitationRenderer({
   data,
   routeIdentifier = '',
   forceSaveTheDateStage = false,
+  rsvpForceForm = false,
   previewMode = false,
   onGuestUnlock,
 }) {
@@ -195,13 +197,13 @@ export default function InvitationRenderer({
 
   return (
     <>
-      {!showSaveTheDate && <style>{themeCss}</style>}
+      <style>{themeCss}</style>
       <div
         className="invitation-page"
-        data-inv-theme={showSaveTheDate ? undefined : themeId}
+        data-inv-theme={themeId}
         data-guest-stage={showSaveTheDate ? 'save-the-date' : 'invitation'}
         data-reveal-mode={gradualReveal ? 'gradual' : 'full'}
-        style={showSaveTheDate ? undefined : themeStyles}
+        style={themeStyles}
       >
         <FloralThemeProvider value={floralTheme}>
         {musicUrl && (
@@ -209,11 +211,20 @@ export default function InvitationRenderer({
         )}
 
         {showSaveTheDate && (
-          <SaveTheDateScreen
-            event={event}
-            invitation={invitation}
-            onRsvpSuccess={handleSaveTheDateRsvp}
-          />
+          rsvpForceForm ? (
+            <RsvpFormPage
+              event={event}
+              invitation={themedInvitation}
+              onRsvpSuccess={handleSaveTheDateRsvp}
+            />
+          ) : (
+            <SaveTheDateScreen
+              event={event}
+              invitation={themedInvitation}
+              rsvpForceForm={rsvpForceForm}
+              onRsvpSuccess={handleSaveTheDateRsvp}
+            />
+          )
         )}
 
         {showCover && (

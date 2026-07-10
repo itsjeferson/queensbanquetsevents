@@ -115,6 +115,9 @@ export default function RSVPMonitoring() {
                 columns={[
                   ...(showEventColumn ? [{ key: 'event_name', label: 'Invitation' }] : []),
                   { key: 'name', label: 'Guest' },
+                  { key: 'phone', label: 'Phone' },
+                  { key: 'email', label: 'Email' },
+                  { key: 'message', label: 'Facebook' },
                   { key: 'attendance', label: 'Status' },
                   { key: 'meal_preference', label: 'Meal' },
                   { key: 'guest_count', label: 'Guests' },
@@ -127,6 +130,12 @@ export default function RSVPMonitoring() {
                       {row.attendance}
                     </span>
                   );
+                  if (key === 'message') {
+                    if (row.message && row.message.startsWith('Facebook: ')) {
+                      return row.message.replace('Facebook: ', '');
+                    }
+                    return row.message ?? '—';
+                  }
                   if (key === 'submitted_at') return new Date(row.submitted_at).toLocaleDateString();
                   return row[key] ?? '—';
                 }}

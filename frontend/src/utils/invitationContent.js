@@ -362,7 +362,7 @@ export function normalizeInvitationContent(invitation = {}) {
       image: resolveMedia(item?.image),
     })),
     faqs: Array.isArray(invitation.faqs) ? invitation.faqs : [],
-    save_the_date_enabled: Boolean(invitation.save_the_date_enabled),
+    save_the_date_enabled: isSaveTheDateActive(invitation),
     std_message: invitation.std_message || '',
     std_cover_image: resolveMedia(invitation.std_cover_image),
     std_photo: resolveMedia(invitation.std_photo || invitation.std_cover_image),
@@ -385,7 +385,9 @@ export function isFloralDesignEnabled(invitation = {}) {
 
 /** True only when the client explicitly enabled Save the Date first. */
 export function isSaveTheDateActive(invitation = {}) {
-  return Boolean(invitation.save_the_date_enabled);
+  const val = invitation.save_the_date_enabled;
+  if (val === true || val === 1 || val === '1' || val === 'true') return true;
+  return false;
 }
 
 export function getCoupleDisplayName(event, invitation) {

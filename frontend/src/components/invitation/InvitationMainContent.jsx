@@ -180,7 +180,7 @@ export function renderInvitationSection(sectionId, ctx) {
         </SectionShell>
       );
     case 'rsvp':
-      if (saveTheDateEnabled) return null;
+      if (saveTheDateEnabled || invitation.save_the_date_enabled) return null;
       return (
         <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <RSVPForm eventId={event.id} note={invitation.rsvp_note} />

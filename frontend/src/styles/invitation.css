@@ -6450,3 +6450,520 @@ html.invitation-scroll::-webkit-scrollbar {
 .wedding-calendar-heart path {
   stroke: #ffffff;
 }
+/* ==========================================================================
+   Save the Date RSVP Details Form & Confirmation Screen overrides
+   ========================================================================== */
+
+.inv-std-rsvp-trigger-btn {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  padding: 12px 48px;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.inv-std-rsvp-trigger-btn:hover {
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+}
+
+/* Details Form layout styling */
+.inv-std-classic-form {
+  max-width: 380px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.inv-std-classic-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.inv-std-classic-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.inv-std-classic-input {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  padding: 10px 14px !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box;
+}
+
+.inv-std-classic-input:focus {
+  outline: none !important;
+  border-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+}
+
+.inv-std-classic-input::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.inv-std-form-error {
+  color: #ff6b6b;
+  font-size: 12px;
+  font-weight: 500;
+  margin: -8px 0 16px 0;
+  text-align: center;
+}
+
+/* YES/NO buttons side-by-side */
+.inv-std-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0 16px 0;
+}
+
+.inv-std-btn-yes,
+.inv-std-btn-no {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.inv-std-btn-yes {
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #ffffff;
+}
+
+.inv-std-btn-yes:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.inv-std-btn-no {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.inv-std-btn-no:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.inv-std-back-link {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 12px;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.inv-std-back-link:hover {
+  color: #ffffff;
+}
+
+/* Confirmation Screen layouts */
+.inv-std-confirm-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 0;
+  animation: stdConfirmFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stdConfirmFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirm-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.confirm-check-circle,
+.confirm-heart-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  animation: stdIconScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes stdIconScale {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-check-circle {
+  background-color: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.confirm-heart-circle {
+  background-color: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.confirm-icon-wrapper h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.confirm-icon-wrapper p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.confirm-redirect-hint {
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  margin-top: 8px !important;
+  font-style: italic;
+}
+
+.inv-std-btn-return {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inv-std-btn-return:hover {
+  background-color: #ffffff;
+  color: #111827;
+  border-color: #ffffff;
+}
+
+.confirm-msg-no {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  max-width: 340px !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  margin: 12px auto 0 auto !important;
+}
+/* ==========================================================================
+   Dedicated RSVP Form Page Component Layout Styles
+   ========================================================================== */
+
+.inv-rsvp-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--inv-background-color, #fdfbfa);
+  padding: 40px 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.inv-rsvp-page-container {
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 48px 36px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+  color: #2d3748;
+}
+
+.inv-rsvp-page-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.rsvp-page-subtitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #718096;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.rsvp-page-couple-names {
+  font-size: 32px;
+  color: #1a202c;
+  margin: 12px 0 6px 0 !important;
+  text-align: center;
+}
+
+.rsvp-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--inv-primary, #6b8f71);
+  text-transform: uppercase;
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+
+.rsvp-page-header-line {
+  width: 60px;
+  height: 2px;
+  background-color: var(--inv-primary, #6b8f71);
+  margin: 20px auto 0 auto;
+}
+
+.inv-rsvp-page-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.inv-rsvp-page-field label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4a5568;
+}
+
+.inv-rsvp-page-input {
+  width: 100%;
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e0 !important;
+  border-radius: 6px !important;
+  padding: 12px 14px !important;
+  color: #2d3748 !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box;
+}
+
+.inv-rsvp-page-input:focus {
+  outline: none !important;
+  border-color: var(--inv-primary, #6b8f71) !important;
+  box-shadow: 0 0 0 3px var(--inv-primary-soft, rgba(107, 143, 113, 0.15)) !important;
+}
+
+.inv-rsvp-page-input::placeholder {
+  color: #a0aec0 !important;
+}
+
+.inv-rsvp-page-error {
+  color: #e53e3e;
+  font-size: 13px;
+  font-weight: 500;
+  margin: -10px 0 20px 0;
+  text-align: center;
+}
+
+.inv-rsvp-page-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.inv-rsvp-page-btn-yes,
+.inv-rsvp-page-btn-no {
+  width: 100%;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.inv-rsvp-page-btn-yes {
+  background-color: var(--inv-primary, #6b8f71) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--inv-primary, #6b8f71) !important;
+}
+
+.inv-rsvp-page-btn-yes:hover:not(:disabled) {
+  background-color: var(--inv-primary-dark, #5f7d65) !important;
+  border-color: var(--inv-primary-dark, #5f7d65) !important;
+  transform: translateY(-1px);
+}
+
+.inv-rsvp-page-btn-no {
+  background-color: transparent !important;
+  color: #718096 !important;
+  border: 1px solid #cbd5e0 !important;
+}
+
+.inv-rsvp-page-btn-no:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+  border-color: #a0aec0 !important;
+  color: #2d3748 !important;
+  transform: translateY(-1px);
+}
+
+.inv-rsvp-page-back-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #718096;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 20px;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.inv-rsvp-page-back-btn:hover {
+  color: #2d3748;
+}
+
+/* Page Confirmation Screens styles */
+.inv-rsvp-page-confirm-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 0;
+  animation: stdConfirmFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.rsvp-page-confirm-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.rsvp-page-check-circle,
+.rsvp-page-heart-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  animation: stdIconScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.rsvp-page-check-circle {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+.rsvp-page-heart-circle {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.rsvp-page-confirm-wrapper h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.rsvp-page-confirm-wrapper p {
+  font-size: 14px;
+  color: #4a5568;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.rsvp-page-confirm-msg-no {
+  max-width: 360px;
+}
+
+.rsvp-page-redirect-hint {
+  font-size: 12px !important;
+  color: #a0aec0 !important;
+  margin-top: 8px !important;
+  font-style: italic;
+}
+
+.inv-rsvp-page-return-btn {
+  background-color: transparent;
+  border: 1px solid #cbd5e0;
+  color: #4a5568;
+  padding: 12px 28px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inv-rsvp-page-return-btn:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-color: #a0aec0;
+  color: #2d3748;
+}

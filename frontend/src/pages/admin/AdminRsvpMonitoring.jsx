@@ -102,6 +102,9 @@ export default function AdminRsvpMonitoring() {
               <DataTable
                 columns={[
                   { key: 'name', label: 'Guest' },
+                  { key: 'phone', label: 'Phone' },
+                  { key: 'email', label: 'Email' },
+                  { key: 'message', label: 'Facebook' },
                   { key: 'attendance', label: 'Status' },
                   { key: 'guest_count', label: 'Guests' },
                   { key: 'submitted_at', label: 'Date' },
@@ -111,6 +114,12 @@ export default function AdminRsvpMonitoring() {
                   if (key === 'attendance') return (
                     <span className={`badge ${row.attendance === 'yes' ? 'badge-green' : 'badge-red'}`}>{row.attendance}</span>
                   );
+                  if (key === 'message') {
+                    if (row.message && row.message.startsWith('Facebook: ')) {
+                      return row.message.replace('Facebook: ', '');
+                    }
+                    return row.message ?? '—';
+                  }
                   if (key === 'submitted_at') return new Date(row.submitted_at).toLocaleDateString();
                   return row[key] ?? '—';
                 }}
