@@ -159,3 +159,17 @@ INSERT INTO invitation_templates (template_name, category, preview_image, theme_
 ('Kids Theme', 'birthday', '/images/templates/birthday-kids.jpg', '{"primary":"#FF6B6B","accent":"#4ECDC4","font":"Poppins"}', 'active'),
 ('Luxury Theme', 'birthday', '/images/templates/birthday-luxury.jpg', '{"primary":"#D4AF37","accent":"#1A1A1A","font":"Playfair Display"}', 'active'),
 ('Minimal Theme', 'birthday', '/images/templates/birthday-minimal.jpg', '{"primary":"#333333","accent":"#F5F1E8","font":"Poppins"}', 'active');
+
+-- Row-Level Security (blocks Supabase REST API; app DB user bypasses RLS as table owner)
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE packages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invitation_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invitation_pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE guests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rsvps ENABLE ROW LEVEL SECURITY;
+ALTER TABLE guest_messages ENABLE ROW LEVEL SECURITY;

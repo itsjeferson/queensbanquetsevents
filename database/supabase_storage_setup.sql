@@ -6,7 +6,6 @@ VALUES
   ('gallery', 'gallery', true),
   ('invitations', 'invitations', true),
   ('profiles', 'profiles', true),
-  ('events', 'events', true),
-  ('payments', 'payments', true)
+  ('events', 'events', true)
 ON CONFLICT (id) DO UPDATE
 SET public = EXCLUDED.public;
