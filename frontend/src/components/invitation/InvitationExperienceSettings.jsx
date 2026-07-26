@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ContentRevealOrderEditor from './ContentRevealOrderEditor';
 import MediaField from '../common/MediaField/MediaField';
 import { MAX_IMAGE_SIZE_MB } from '../../utils/mediaUpload';
@@ -8,7 +9,10 @@ export default function InvitationExperienceSettings({
   onChange,
   embedded = false,
   onFileError,
+  onSavePassword,
 }) {
+  const [saveStatus, setSaveStatus] = useState('idle');
+  const [saveError, setSaveError] = useState('');
   const saveTheDateEnabled = Boolean(invitation.save_the_date_enabled);
   const revealMode = invitation.content_reveal_mode === 'gradual' ? 'gradual' : 'full';
   const revealOrder = getVisibleContentRevealOrder(invitation.content_reveal_order, {
@@ -68,6 +72,80 @@ export default function InvitationExperienceSettings({
             onError={onFileError}
           />
         </>
+      )}
+
+      <div className="form-group" style={{ marginTop: 24 }}>
+        <label className="inv-settings-toggle">
+          <input
+            type="checkbox"
+            checked={Boolean(invitation.password_protected)}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              const nextPass = checked ? (invitation.password || '123456') : '';
+              onChange({ password_protected: checked, password: nextPass });
+              onSavePassword?.({ password_protected: checked, password: nextPass });
+            }}
+          />
+          <span>
+            <strong>Password Protection</strong>
+            <small>Require guests to enter a password before viewing the invitation.</small>
+          </span>
+        </label>
+      </div>
+
+      {invitation.password_protected && (
+        <div className="form-group">
+          <label>Invitation Password</label>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+            <input
+              type="text"
+              value={invitation.password || ''}
+              onChange={(e) => onChange({ password: e.target.value })}
+              onBlur={() => {
+                if (invitation.password_protected && invitation.password?.trim()) {
+                  onSavePassword?.({
+                    password_protected: true,
+                    password: invitation.password.trim(),
+                  });
+                }
+              }}
+              placeholder="Enter a password for your guests"
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              className="btn btn-gold"
+              style={{ whiteSpace: 'nowrap', padding: '10px 20px', fontSize: 13 }}
+              disabled={saveStatus === 'saving' || !invitation.password?.trim()}
+              onClick={async () => {
+                setSaveStatus('saving');
+                setSaveError('');
+                try {
+                  await onSavePassword?.({
+                    password_protected: true,
+                    password: invitation.password,
+                  });
+                  setSaveStatus('saved');
+                } catch {
+                  setSaveError('Could not save password.');
+                  setSaveStatus('error');
+                }
+              }}
+            >
+              {saveStatus === 'saving' ? 'Saving...' : 'Save Password'}
+            </button>
+          </div>
+          {saveStatus === 'saved' && (
+            <p style={{ fontSize: 12, color: 'var(--success, #16a34a)', marginTop: 6 }}>
+              Password saved to server.
+            </p>
+          )}
+          {saveError && (
+            <p style={{ fontSize: 12, color: '#DC3545', marginTop: 6 }}>
+              {saveError}
+            </p>
+          )}
+        </div>
       )}
 
       <div className="form-group" style={{ marginTop: 24 }}>

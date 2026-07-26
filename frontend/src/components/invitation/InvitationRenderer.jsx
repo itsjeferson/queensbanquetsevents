@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import CoverScreen from './CoverScreen';
 import SaveTheDateScreen from './SaveTheDateScreen';
 import RsvpFormPage from './RsvpFormPage';
+import PasswordGate from './PasswordGate';
 import InvitationMainContent from './InvitationMainContent';
 import RoyalLuxuryInvitation from './RoyalLuxuryInvitation';
 import { FloralThemeProvider } from './FloralThemeContext';
@@ -10,6 +11,7 @@ import {
   getCoupleDisplayName,
   isSaveTheDateActive,
   isFloralDesignEnabled,
+  isPasswordProtected,
 } from '../../utils/invitationContent';
 import {
   getVisibleContentRevealOrder,
@@ -85,6 +87,16 @@ export default function InvitationRenderer({
   const themeCss = buildInvitationThemeCss(themedInvitation);
   const themeId = themeInput.color_motif || 'classic-gold';
   const gradualReveal = invitation.content_reveal_mode === 'gradual';
+
+  const passwordProtected = isPasswordProtected(invitation, event);
+  const [passwordUnlocked, setPasswordUnlocked] = useState(() => {
+    if (!passwordProtected) return true;
+    if (previewMode) return false;
+    if (typeof window === 'undefined') return false;
+    const slugKey = event?.slug || routeIdentifier;
+    return localStorage.getItem('qb_pw_unlock_' + slugKey) === '1' ||
+           sessionStorage.getItem('qb_pw_unlock_' + slugKey) === '1';
+  });
   const revealOptions = { hideRsvp: saveTheDateActive };
   const sectionOrder = resolveInvitationSectionOrder(invitation, revealOptions);
   const unlockContext = useMemo(
@@ -173,6 +185,15 @@ export default function InvitationRenderer({
     onGuestUnlock?.();
   };
 
+  const handlePasswordUnlock = () => {
+    setPasswordUnlocked(true);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('qb_pw_unlock_' + (event?.slug || routeIdentifier), '1');
+      } catch {}
+    }
+  };
+
   const toggleMusic = () => {
     if (!audioRef.current) return;
     if (audioRef.current.paused) {
@@ -210,50 +231,56 @@ export default function InvitationRenderer({
           <audio ref={audioRef} src={musicUrl} loop preload="auto" playsInline />
         )}
 
-        {showSaveTheDate && (
-          rsvpForceForm ? (
-            <RsvpFormPage
-              event={event}
-              invitation={themedInvitation}
-              onRsvpSuccess={handleSaveTheDateRsvp}
-            />
-          ) : (
-            <SaveTheDateScreen
-              event={event}
-              invitation={themedInvitation}
-              rsvpForceForm={rsvpForceForm}
-              onRsvpSuccess={handleSaveTheDateRsvp}
-            />
-          )
-        )}
+        {passwordProtected && !passwordUnlocked ? (
+          <PasswordGate event={event} invitation={invitation} onUnlocked={handlePasswordUnlock} />
+        ) : (
+          <>
+            {showSaveTheDate && (
+              rsvpForceForm ? (
+                <RsvpFormPage
+                  event={event}
+                  invitation={themedInvitation}
+                  onRsvpSuccess={handleSaveTheDateRsvp}
+                />
+              ) : (
+                <SaveTheDateScreen
+                  event={event}
+                  invitation={themedInvitation}
+                  rsvpForceForm={rsvpForceForm}
+                  onRsvpSuccess={handleSaveTheDateRsvp}
+                />
+              )
+            )}
 
-        {showCover && (
-          <CoverScreen event={event} invitation={invitation} onOpen={scrollToContent} labels={labels} />
-        )}
+            {showCover && (
+              <CoverScreen event={event} invitation={invitation} onOpen={scrollToContent} labels={labels} />
+            )}
 
-        {showInvitation && (
-          Number(invitation.template_id) === 3 ? (
-            <RoyalLuxuryInvitation
-              event={event}
-              invitation={invitation}
-              guestMessages={guestMessages}
-              shareUrl={shareUrl}
-              saveTheDateEnabled={saveTheDateActive}
-            />
-          ) : (
-            <InvitationMainContent
-              event={event}
-              invitation={invitation}
-              coupleName={coupleName}
-              shareUrl={shareUrl}
-              guestMessages={guestMessages}
-              saveTheDateEnabled={saveTheDateActive}
-              sectionOrder={sectionOrder}
-              gradualReveal={gradualReveal}
-              musicOn={musicOn}
-              toggleMusic={toggleMusic}
-            />
-          )
+            {showInvitation && (
+              Number(invitation.template_id) === 3 ? (
+                <RoyalLuxuryInvitation
+                  event={event}
+                  invitation={invitation}
+                  guestMessages={guestMessages}
+                  shareUrl={shareUrl}
+                  saveTheDateEnabled={saveTheDateActive}
+                />
+              ) : (
+                <InvitationMainContent
+                  event={event}
+                  invitation={invitation}
+                  coupleName={coupleName}
+                  shareUrl={shareUrl}
+                  guestMessages={guestMessages}
+                  saveTheDateEnabled={saveTheDateActive}
+                  sectionOrder={sectionOrder}
+                  gradualReveal={gradualReveal}
+                  musicOn={musicOn}
+                  toggleMusic={toggleMusic}
+                />
+              )
+            )}
+          </>
         )}
         </FloralThemeProvider>
       </div>

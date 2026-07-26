@@ -12,6 +12,17 @@ class InvitationPage
         return $row ? self::formatForApi(self::decodeJsonFields($row)) : null;
     }
 
+    public static function getPasswordHash(int $eventId): string
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare("SELECT story FROM invitation_pages WHERE event_id = ?");
+        $stmt->execute([$eventId]);
+        $row = $stmt->fetch();
+        if (!$row || empty($row['story'])) return '';
+        $story = is_string($row['story']) ? json_decode($row['story'], true) : ($row['story'] ?? []);
+        return is_array($story) ? ($story['password_hash'] ?? '') : '';
+    }
+
     public static function create(int $eventId, array $data = []): int
     {
         $pdo = getConnection();
@@ -40,6 +51,15 @@ class InvitationPage
     {
         $pdo = getConnection();
         $existing = self::findByEventId($eventId);
+        // Preserve existing password hash when no new password is provided
+        if (empty($data['password'])) {
+            $existingStory = is_array($existing['story'] ?? null) ? $existing['story'] : [];
+            if (!empty($existingStory['password_hash'])) {
+                $dataStory = is_array($data['story'] ?? null) ? $data['story'] : [];
+                $dataStory['password_hash'] = $existingStory['password_hash'];
+                $data['story'] = $dataStory;
+            }
+        }
         $normalized = self::normalizeInput($data);
         $normalized = self::preserveMediaFields($normalized, $existing);
         $stmt = $pdo->prepare('UPDATE invitation_pages SET template_id = ?, cover_image = ?, background_music = ?, primary_color = ?, font_family = ?, story = ?, entourage = ?, venue = ?, dress_code = ?, program = ?, gallery = ?, videos = ?, gift_registry = ?, qr_enabled = ? WHERE event_id = ?');
@@ -129,8 +149,35 @@ class InvitationPage
             'floral_design_enabled' => ($story['floral_design_enabled'] ?? true) !== false,
             'envelope_color' => $story['envelope_color'] ?? '',
             'seal_color' => $story['seal_color'] ?? '',
+            'password_protected' => (bool) ($story['password_protected'] ?? false),
             'published_at' => $row['published_at'] ?? null,
         ];
+    }
+
+    /**
+     * Return a default invitation object when no record exists in the database.
+     * Ensures the frontend always receives password_protected and other fields.
+     */
+    public static function emptyDefault(): array
+    {
+        return self::formatForApi([
+            'template_id' => null,
+            'template_name' => null,
+            'category' => null,
+            'cover_image' => '',
+            'background_music' => '',
+            'primary_color' => '#D4AF37',
+            'font_family' => 'Playfair Display',
+            'story' => '{}',
+            'entourage' => '{}',
+            'venue' => '{}',
+            'dress_code' => '',
+            'program' => '{}',
+            'gallery' => '{}',
+            'videos' => '{}',
+            'gift_registry' => '{}',
+            'qr_enabled' => 1,
+        ]);
     }
 
     public static function normalizeInput(array $data): array
@@ -189,6 +236,17 @@ class InvitationPage
 
         $story['envelope_color'] = $data['envelope_color'] ?? ($story['envelope_color'] ?? '');
         $story['seal_color'] = $data['seal_color'] ?? ($story['seal_color'] ?? '');
+
+        // Password protection
+        $story['password_protected'] = (bool) ($data['password_protected'] ?? ($story['password_protected'] ?? false));
+        if (!empty($data['password'])) {
+            $story['password_hash'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        } elseif (!empty($data['password_hash'])) {
+            $story['password_hash'] = $data['password_hash'];
+        }
+        if (empty($story['password_protected'])) {
+            unset($story['password_hash']);
+        }
 
         return [
             'template_id' => $data['template_id'] ?? null,

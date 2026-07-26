@@ -750,6 +750,16 @@ export default function InvitationManage({ variant = 'client' }) {
         invitation={invitation}
         onChange={updateInvitation}
         onFileError={setFileError}
+        onSavePassword={async (data) => {
+          await eventService.update(event.id, { invitation: data });
+          // Clear stale unlock so guests see the fresh password gate
+          if (data.password_protected) {
+            try {
+              localStorage.removeItem('qb_pw_unlock_' + event.slug);
+              sessionStorage.removeItem('qb_pw_unlock_' + event.slug);
+            } catch {}
+          }
+        }}
       />
 
       <WeddingContentFields

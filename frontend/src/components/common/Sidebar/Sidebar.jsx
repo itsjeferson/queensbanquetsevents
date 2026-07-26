@@ -1,68 +1,59 @@
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../../../hooks/useAuth';
-import { adminRoleLabel } from '../../../utils/roles';
+
+function CloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
 
 export default function Sidebar({ items, footerItem, isOpen = false, onClose, onNavigate }) {
-  const { user } = useAuth();
-
   return (
-    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
+    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`} aria-label="Main Navigation">
       <div className="sidebar-mobile-header">
-        <strong>Menu</strong>
+        <div className="sidebar-mobile-brand">
+          <img src="/assets/images/logo.png" alt="" className="sidebar-mobile-logo" />
+          <span className="sidebar-mobile-title">Queen's Banquet</span>
+        </div>
         {onClose && (
-          <button type="button" className="sidebar-close" onClick={onClose} aria-label="Close menu">
-            ✕
+          <button type="button" className="sidebar-close" onClick={onClose} aria-label="Close navigation menu">
+            <CloseIcon />
           </button>
         )}
       </div>
-      <div style={{ padding: '0 16px 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            className="profile-avatar"
-            style={{
-              width: 44,
-              height: 44,
-              fontSize: 18,
-              flexShrink: 0,
-            }}
-          >
-            {user?.role === 'super_admin' ? '★' : (user?.initials || 'U')}
-          </div>
-          <div>
-            <strong style={{ fontSize: 14, display: 'block', color: 'var(--text-inverse)' }}>{user?.name || 'User'}</strong>
-            <span style={{ fontSize: 12, color: 'var(--gold-light)' }}>
-              {adminRoleLabel(user?.role)}
-            </span>
-          </div>
+
+      <nav className="sidebar-nav" aria-label="Dashboard navigation">
+        <div className="sidebar-section">
+          {items.map((item) =>
+            item.label ? (
+              <div key={item.label} className="sidebar-label">{item.label}</div>
+            ) : (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
+                end={item.end}
+                onClick={onNavigate}
+              >
+                <span className="sidebar-item-active-glow" aria-hidden="true" />
+                {item.icon && (
+                  <span className="sidebar-icon">
+                    <item.icon />
+                  </span>
+                )}
+                <span className="sidebar-item-title">{item.title}</span>
+                {item.badge > 0 && (
+                  <span className="sidebar-badge">{item.badge > 99 ? '99+' : item.badge}</span>
+                )}
+              </NavLink>
+            )
+          )}
         </div>
-      </div>
-      <div className="sidebar-section" style={{ paddingBottom: footerItem ? 72 : 0 }}>
-        {items.map((item) => (
-          item.label ? (
-            <div key={item.label} className="sidebar-label">{item.label}</div>
-          ) : (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `sidebar-item${isActive ? ' active' : ''}`}
-              end={item.end}
-              onClick={onNavigate}
-            >
-              {item.icon && (
-                <span className="icon sidebar-icon">
-                  <item.icon />
-                </span>
-              )}
-              {item.title}
-              {item.badge > 0 && (
-                <span className="sidebar-badge">{item.badge > 99 ? '99+' : item.badge}</span>
-              )}
-            </NavLink>
-          )
-        ))}
-      </div>
+      </nav>
+
       {footerItem && (
-        <div style={{ position: 'absolute', bottom: 24, left: 0, right: 0, padding: '0 20px' }}>
+        <div className="sidebar-footer">
           {footerItem}
         </div>
       )}

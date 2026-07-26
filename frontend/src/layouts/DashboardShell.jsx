@@ -9,6 +9,8 @@ export default function DashboardShell({
   unreadCount = 0,
   onOpenNotifications,
   notificationPanel = null,
+  settingsPath,
+  onLogout,
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -34,6 +36,8 @@ export default function DashboardShell({
         menuOpen={sidebarOpen}
         unreadCount={unreadCount}
         onOpenNotifications={onOpenNotifications}
+        settingsPath={settingsPath}
+        onLogout={onLogout}
       />
       <button
         type="button"

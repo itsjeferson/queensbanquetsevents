@@ -93,7 +93,7 @@ function hasAttireDetails(attire, dressCode) {
 
 function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo', 'floral_design_enabled'];
+  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo', 'floral_design_enabled', 'password_protected', 'password'];
 
   fields.forEach((field) => {
     if (draftInvitation[field] !== undefined && draftInvitation[field] !== null) {
@@ -276,6 +276,8 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       attire: hasAttireDetails(invitation.attire, invitation.dress_code)
         ? normalized.attire
         : templateInv.attire,
+      password_protected: normalized.password_protected,
+      password: normalized.password || invitation.password || '',
       save_the_date_enabled: normalized.save_the_date_enabled,
       std_message: pickText(invitation.std_message) || normalized.std_message,
       std_cover_image: pickText(invitation.std_cover_image) || normalized.std_cover_image,

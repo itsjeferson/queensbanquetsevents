@@ -76,6 +76,7 @@ export default function InvitationBuilder() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [eventId, setEventId] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [publishError, setPublishError] = useState('');
   const [fileError, setFileError] = useState('');
@@ -244,6 +245,57 @@ export default function InvitationBuilder() {
     }
   };
 
+  const handleSavePassword = async ({ password_protected, password }) => {
+    const slug = form.slug || slugFromEventName(form.event_name);
+
+    const buildInvitationPayload = () => ({
+      event_name: form.event_name,
+      event_type: form.event_type,
+      event_date: form.event_date,
+      slug,
+      invitation: prepareInvitationForApiSave({
+        template_id: form.template_id,
+        ...form.invitation,
+        password_protected,
+        password,
+      }),
+    });
+
+    if (eventId) {
+      await eventService.update(eventId, buildInvitationPayload());
+    } else {
+      const existingEvents = await eventService.getAll(user?.id);
+      const existing = (existingEvents?.data || []).find(
+        (e) => e.slug?.toLowerCase() === slug.toLowerCase(),
+      );
+
+      if (existing?.id) {
+        setEventId(existing.id);
+        await eventService.update(existing.id, buildInvitationPayload());
+        persistInvitationPreview(existing.id, slug, existing.status || 'draft');
+      } else {
+        const eventPayload = {
+          client_id: user?.id,
+          ...buildInvitationPayload(),
+        };
+        const res = await eventService.create(eventPayload);
+        const created = res.data;
+        if (created?.id) {
+          setEventId(created.id);
+          persistInvitationPreview(created.id, slug, created.status || 'draft');
+        }
+      }
+    }
+
+    // Clear stale unlock so guests see the fresh password gate
+    if (password_protected) {
+      try {
+        localStorage.removeItem('qb_pw_unlock_' + slug);
+        sessionStorage.removeItem('qb_pw_unlock_' + slug);
+      } catch {}
+    }
+  };
+
   return (
     <>
       <div className="dash-header">
@@ -379,6 +431,7 @@ export default function InvitationBuilder() {
               invitation={form.invitation}
               onChange={(patch) => updateInvitation(patch)}
               onFileError={setFileError}
+              onSavePassword={handleSavePassword}
               embedded
             />
             <div style={{ marginTop: 20, padding: 24, background: 'var(--beige)', borderRadius: 12 }}>

@@ -52,7 +52,7 @@ export default function PublicInvitation() {
     if (!identifier) return;
     if (showLoading) setLoading(true);
 
-    const draft = isOwnerPreview ? getLocalInvitationDraft(draftKey) : null;
+    const draft = getLocalInvitationDraft(draftKey);
 
     const applyPayload = (payload) => {
       const merged = draft ? mergeInvitationPayloadWithDraft(payload, draft) : payload;

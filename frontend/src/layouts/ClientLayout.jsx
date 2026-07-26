@@ -52,14 +52,18 @@ function ClientLayoutShell({ navItems }) {
     }, 600);
   };
 
+  const openLogout = () => setLogoutConfirmOpen(true);
+
   return (
     <>
       <DashboardShell
         navItems={navItemsWithBadge}
+        settingsPath="/client/settings"
+        onLogout={openLogout}
         footerItem={
-          <button type="button" className="sidebar-item" onClick={() => setLogoutConfirmOpen(true)}>
-            <span className="icon sidebar-icon"><LogoutIcon /></span>
-            Logout
+          <button type="button" className="sidebar-item sidebar-logout-btn" onClick={openLogout}>
+            <span className="sidebar-icon"><LogoutIcon /></span>
+            <span className="sidebar-item-title">Sign Out</span>
           </button>
         }
         unreadCount={unreadCount}
@@ -68,11 +72,12 @@ function ClientLayoutShell({ navItems }) {
       />
       <ConfirmDialog
         isOpen={logoutConfirmOpen}
-        title="Logout Confirmation"
-        message="Are you sure you want to do logout?"
-        confirmLabel="Confirm"
+        title="Sign Out"
+        message="Are you sure you want to sign out of your session?"
+        confirmLabel="Sign Out"
         cancelLabel="Cancel"
-        loadingLabel="Logging out..."
+        loadingLabel="Signing out..."
+        tone="danger"
         loading={loggingOut}
         onConfirm={confirmSignOut}
         onCancel={() => setLogoutConfirmOpen(false)}
@@ -95,24 +100,29 @@ function ClientLayoutContent() {
     }, 600);
   };
 
+  const openLogout = () => setLogoutConfirmOpen(true);
+
   return (
     <>
       <DashboardShell
         navItems={clientNavBase}
+        settingsPath="/client/settings"
+        onLogout={openLogout}
         footerItem={
-          <button type="button" className="sidebar-item" onClick={() => setLogoutConfirmOpen(true)}>
-            <span className="icon sidebar-icon"><LogoutIcon /></span>
-            Logout
+          <button type="button" className="sidebar-item sidebar-logout-btn" onClick={openLogout}>
+            <span className="sidebar-icon"><LogoutIcon /></span>
+            <span className="sidebar-item-title">Sign Out</span>
           </button>
         }
       />
       <ConfirmDialog
         isOpen={logoutConfirmOpen}
-        title="Logout Confirmation"
-        message="Are you sure you want to do logout?"
-        confirmLabel="Confirm"
+        title="Sign Out"
+        message="Are you sure you want to sign out of your session?"
+        confirmLabel="Sign Out"
         cancelLabel="Cancel"
-        loadingLabel="Logging out..."
+        loadingLabel="Signing out..."
+        tone="danger"
         loading={loggingOut}
         onConfirm={confirmSignOut}
         onCancel={() => setLogoutConfirmOpen(false)}
