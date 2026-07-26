@@ -4,6 +4,7 @@ export const invitationService = {
   getBySlug: (slug) => api.get(`/invitations/slug/${encodeURIComponent(slug)}`),
   getPreviewBySlug: (slug) => api.get(`/invitations/preview/${encodeURIComponent(slug)}`),
   getByCode: (code) => api.get(`/invitations/code/${encodeURIComponent(code)}`),
+  verifyPassword: (data) => api.post('/invitations/verify-password', data),
 };
 
 export const eventService = {

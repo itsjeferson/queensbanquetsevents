@@ -111,6 +111,8 @@ export const defaultWeddingInvitationContent = {
   content_reveal_mode: 'full',
   content_reveal_order: [],
   floral_design_enabled: true,
+  password_protected: false,
+  password: '',
 };
 
 function asList(value) {
@@ -375,7 +377,16 @@ export function normalizeInvitationContent(invitation = {}) {
       : [],
     floral_design_enabled: invitation.floral_design_enabled !== false,
     ...resolveInvitationThemeFields(themeInput),
+    password_protected: isPasswordProtected(invitation),
+    password: invitation.password || '',
   };
+}
+
+/** True when password protection is explicitly enabled. */
+export function isPasswordProtected(invitation = {}, event = {}) {
+  const val = invitation?.password_protected ?? event?.password_protected;
+  if (val === true || val === 1 || val === '1' || val === 'true') return true;
+  return false;
 }
 
 /** True when corner floral ornaments should appear on invitation sections. */

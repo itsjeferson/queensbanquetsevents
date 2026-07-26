@@ -6967,3 +6967,147 @@ html.invitation-scroll::-webkit-scrollbar {
   border-color: #a0aec0;
   color: #2d3748;
 }
+
+/* ── Password Gate ── */
+.inv-password-gate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  min-height: 100vh;
+  background: var(--inv-background);
+  font-family: var(--inv-font-family), serif;
+}
+
+.inv-password-gate-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--inv-background);
+}
+
+.inv-password-gate-content {
+  position: relative;
+  text-align: center;
+  padding: 48px 32px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.inv-password-gate-header {
+  margin-bottom: 40px;
+}
+
+.inv-password-gate-couple {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--inv-ink);
+  margin: 0 0 12px;
+  letter-spacing: 0.02em;
+}
+
+.inv-password-gate-subtitle {
+  font-size: 14px;
+  color: var(--inv-muted);
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+}
+
+.inv-password-gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.inv-password-gate-field {
+  width: 100%;
+}
+
+.inv-password-gate-field input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 15px;
+  font-family: system-ui, -apple-system, sans-serif;
+  border: 1.5px solid var(--inv-line);
+  border-radius: 8px;
+  background: var(--inv-paper);
+  color: var(--inv-ink);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.inv-password-gate-field input:focus {
+  border-color: var(--inv-primary);
+}
+
+.inv-password-gate-error {
+  font-size: 13px;
+  color: #dc3545;
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+}
+
+.inv-password-gate .btn-gold {
+  min-width: 200px;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: 8px;
+}
+
+.inv-password-gate--unlocking {
+  transition: opacity 0.5s ease-out;
+  opacity: 0.95;
+}
+
+.inv-password-gate-buffer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.inv-password-gate-success-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+}
+
+.inv-password-gate-buffer-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--inv-ink);
+  letter-spacing: 0.02em;
+}
+
+/* Mobile Responsive Optimization for Invitation Screens */
+@media (max-width: 600px) {
+  .inv-password-gate-content {
+    padding: 32px 20px;
+    max-width: 90vw;
+  }
+  .inv-password-gate-couple {
+    font-size: 26px;
+  }
+  .inv-password-gate-field input {
+    font-size: 16px !important;
+    min-height: 46px;
+  }
+  .inv-password-gate .btn-gold {
+    width: 100%;
+    min-height: 46px;
+  }
+}
