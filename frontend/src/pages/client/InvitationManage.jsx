@@ -730,6 +730,11 @@ export default function InvitationManage({ variant = 'client' }) {
             <input type="datetime-local" value={toDatetimeLocalValue(event.event_date)} onChange={(e) => updateEvent({ event_date: e.target.value })} />
           </div>
         </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>URL Slug</label>
+          <input value={event.slug || ''} onChange={(e) => updateEvent({ slug: e.target.value })} placeholder="event-name" />
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Your invitation will be at: queensbanquet.com/#/invite/{event.slug || 'your-slug'}</p>
+        </div>
       </div>
 
       {/* Hiding templates selection for future integration

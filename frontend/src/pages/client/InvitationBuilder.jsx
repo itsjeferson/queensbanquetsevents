@@ -364,7 +364,7 @@ export default function InvitationBuilder() {
                     setForm({
                       ...form,
                       event_name,
-                      slug: slugFromEventName(event_name),
+                      slug: form.slug || slugFromEventName(event_name),
                       invitation: {
                         ...form.invitation,
                         couple_display_name: event_name,
@@ -385,9 +385,9 @@ export default function InvitationBuilder() {
             </div>
             <div className="form-group">
               <label>Custom URL Slug</label>
-              <input value={form.slug} readOnly placeholder="Marko-Alexia" />
+              <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="Marko-Alexia" />
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
-                Auto-generated from event name. Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
+                Leave empty to auto-generate from event name. Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
               </p>
             </div>
 
