@@ -108,7 +108,7 @@ export default function PublicInvitation() {
     const saveTheDateActive = isSaveTheDateActive(data.invitation);
 
     if (!saveTheDateActive && isSaveTheDateRoute) return 'to-invite';
-    if (saveTheDateActive && unlocked && isSaveTheDateRoute && !isOwnerPreview) return 'to-invite';
+    if (saveTheDateActive && unlocked && isSaveTheDateRoute && !isOwnerPreview && !isRsvpRoute) return 'to-invite';
     if (saveTheDateActive && !unlocked && !isSaveTheDateRoute) return 'to-std';
     return 'ready';
   }, [
