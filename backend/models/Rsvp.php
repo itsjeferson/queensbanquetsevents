@@ -84,6 +84,14 @@ class Rsvp
         return ((int) $stmt->fetchColumn()) > 0;
     }
 
+    public static function deleteByEvent(int $eventId): int
+    {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare('DELETE FROM rsvps WHERE event_id = ?');
+        $stmt->execute([$eventId]);
+        return $stmt->rowCount();
+    }
+
     public static function create(array $data): int
     {
         $pdo = getConnection();

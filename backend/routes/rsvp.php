@@ -19,6 +19,13 @@ switch ($method) {
     case 'POST':
         $controller->store(getJsonInput());
         break;
+    case 'DELETE':
+        if ($action === 'clear' && isset($parts[2])) {
+            $controller->clearBySlug($parts[2]);
+        } else {
+            sendError('Use DELETE /rsvp/clear/{slug}', 400);
+        }
+        break;
     default:
         sendError('Method not allowed', 405);
 }

@@ -26,6 +26,21 @@ class RsvpController
         ]);
     }
 
+    public function clearBySlug(string $slug): void
+    {
+        require_once __DIR__ . '/../models/Event.php';
+        $event = Event::findBySlugAny($slug);
+        if (!$event) {
+            sendError('Event not found with slug: ' . $slug, 404);
+            return;
+        }
+        $count = Rsvp::deleteByEvent((int) $event['id']);
+        sendResponse([
+            'success' => true,
+            'message' => "Deleted $count RSVP(s) for event '{$event['event_name']}'"
+        ]);
+    }
+
     public function store(array $data): void
     {
         if (empty($data['event_id']) || empty($data['name'])) {
