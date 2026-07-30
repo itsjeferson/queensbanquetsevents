@@ -72,7 +72,7 @@ export default function InvitationTemplateSelector({
 
       <div className="template-picker-grid">
         {templates.map((t) => {
-          const isSelected = Number(selectedId) === Number(t.id);
+          const isSelected = Number(selectedId || 1) === Number(t.id);
           const config = t.theme_config || {};
           return (
             <div key={t.id} className={`template-picker-card ${isSelected ? 'selected' : ''}`}>

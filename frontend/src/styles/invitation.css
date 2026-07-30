@@ -1359,6 +1359,13 @@
   letter-spacing: 0.08em;
 }
 
+.inv-initials-logo {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
 /* Couple showcase */
 .inv-couple-showcase {
   padding-top: 48px;
@@ -4286,6 +4293,14 @@ html.invitation-scroll::-webkit-scrollbar {
   animation: rlRotateRing 60s linear infinite;
 }
 
+.rl-monogram-logo {
+  width: 75%;
+  height: 75%;
+  object-fit: contain;
+  border-radius: 50%;
+  z-index: 1;
+}
+
 @keyframes rlRotateRing {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -5963,6 +5978,15 @@ html.invitation-scroll::-webkit-scrollbar {
   animation: seal-pulse-dark 2s infinite ease-in-out;
 }
 
+.rl-seal-logo-img {
+  max-width: 50px;
+  max-height: 50px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
 .rl-wax-seal-crest {
   font-size: 21px;
   line-height: 1;
@@ -7110,4 +7134,759 @@ html.invitation-scroll::-webkit-scrollbar {
     width: 100%;
     min-height: 46px;
   }
+}
+
+/* ── Full-Bleed Media Countdown Section ──────────────── */
+.inv-countdown-band-media {
+  position: relative;
+  width: 100%;
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 40px 0;
+  padding: 80px 20px;
+  border-radius: 6px;
+  background: #111827;
+}
+
+.inv-countdown-media-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.inv-countdown-media-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.65) 100%);
+  z-index: 2;
+}
+
+.inv-countdown-media-content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: #ffffff;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.inv-countdown-script-title {
+  font-family: 'Great Vibes', cursive, 'Playfair Display', serif;
+  font-size: clamp(34px, 5.5vw, 60px);
+  color: #ffffff;
+  margin-bottom: 36px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.inv-countdown-band-media .inv-countdown {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(14px, 3.5vw, 36px);
+}
+
+.inv-countdown-band-media .inv-countdown-item {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  border: none !important;
+  padding: 0 !important;
+  text-align: center;
+  min-width: 52px;
+}
+
+.inv-countdown-band-media .inv-countdown-item strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.inv-countdown-band-media .inv-countdown-item span {
+  display: block;
+  font-family: 'Great Vibes', cursive, sans-serif;
+  font-size: clamp(20px, 3vw, 30px);
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ── Monogram Ring & Couple Custom Logo ─────────────── */
+.inv-initials-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+  margin: 10px auto;
+}
+
+.inv-custom-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 340px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+
+.inv-custom-logo-img {
+  max-width: 100%;
+  max-height: 260px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  mix-blend-mode: multiply;
+}
+
+.inv-initials-ring {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 1.5px solid var(--inv-primary, #6b8f71);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: var(--inv-paper, #ffffff);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+.inv-initials-ring:hover {
+  transform: scale(1.03);
+}
+
+.inv-initials-text {
+  font-family: 'Playfair Display', 'Lora', serif;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--inv-primary, #6b8f71);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* ── Floating Fixed Music Toggle Button ────────────────── */
+.inv-floating-music-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--inv-primary, #2D4331);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inv-floating-music-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.inv-floating-music-btn.playing {
+  animation: pulseMusicBtn 2s infinite ease-in-out;
+}
+
+@keyframes pulseMusicBtn {
+  0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); }
+  50% { box-shadow: 0 4px 24px rgba(45, 67, 49, 0.8); }
+}
+
+/* ── Save The Date Screen ────────────────────────────── */
+.inv-std {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 40px 16px;
+  box-sizing: border-box;
+  background: #1a2a1c;
+  color: #ffffff;
+}
+
+.inv-std-classic-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.inv-std-classic-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.inv-std-classic-photo-fallback {
+  background: linear-gradient(135deg, #1d2e20 0%, #0f1a11 100%);
+}
+
+.inv-std-classic-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.75) 100%);
+  z-index: 2;
+}
+
+.inv-std-classic-content {
+  position: relative;
+  z-index: 3;
+  max-width: 620px;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  padding: 40px 20px;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  box-sizing: border-box;
+}
+
+.inv-std-classic-header {
+  margin-bottom: 28px;
+}
+
+.inv-std-classic-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.inv-std-classic-title-save,
+.inv-std-classic-title-date {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 5.5vw, 50px);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.inv-std-classic-title-the {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(28px, 5vw, 44px);
+  color: #e2c08d;
+  font-weight: 400;
+}
+
+.inv-std-classic-wedding-date {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(16px, 2.8vw, 22px);
+  color: #e2c08d;
+  letter-spacing: 0.1em;
+  margin: 12px 0 16px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.inv-std-classic-couple-block {
+  margin-top: 14px;
+}
+
+.inv-std-classic-for {
+  font-family: 'Great Vibes', cursive;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 4px;
+}
+
+.inv-std-classic-couple {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4.2vw, 38px);
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.inv-std-rsvp-trigger-btn {
+  background: linear-gradient(135deg, #c5a059 0%, #e2c08d 100%);
+  color: #1a2a1c;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 14px 44px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(226, 192, 141, 0.35);
+  transition: all 0.25s ease;
+  margin-top: 16px;
+}
+
+.inv-std-rsvp-trigger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(226, 192, 141, 0.5);
+}
+
+.inv-std-classic-form {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.inv-std-classic-rsvp-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  color: #e2c08d;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: 0.1em;
+}
+
+.inv-std-classic-field {
+  margin-bottom: 16px;
+}
+
+.inv-std-classic-label {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.inv-std-classic-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 15px;
+  font-family: inherit;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.inv-std-classic-input:focus {
+  border-color: #e2c08d;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.inv-std-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.inv-std-btn-yes {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #c5a059 0%, #e2c08d 100%);
+  color: #1a2a1c;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(226, 192, 141, 0.3);
+}
+
+.inv-std-btn-no {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+.inv-std-back-link {
+  display: block;
+  margin: 16px auto 0;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.inv-std-form-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.inv-std-confirm-view {
+  padding: 20px 0;
+}
+
+.confirm-icon-wrapper h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  color: #e2c08d;
+  margin: 12px 0 8px;
+}
+
+.confirm-icon-wrapper p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.inv-std-btn-return {
+  margin-top: 20px;
+  padding: 12px 28px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+/* ── Full-Page Opening Hero Section ──────────────────── */
+.inv-opened-hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 0 0 40px 0;
+  background: #111827;
+}
+
+.inv-opened-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.inv-hero-placeholder {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+.inv-opened-hero-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.inv-opened-hero.no-overlay .inv-opened-hero-overlay {
+  background: transparent !important;
+}
+
+.inv-opened-hero-content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: #ffffff;
+  padding: 0 20px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.inv-opened-hero-content h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6.5vw, 68px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  margin: 0 0 16px 0;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.inv-opened-hero-line {
+  width: 80px;
+  height: 2px;
+  background: #e2c08d;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.inv-opened-hero-date {
+  font-family: 'Playfair Display', 'Lora', serif;
+  font-size: clamp(18px, 3vw, 26px);
+  color: #e2c08d;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Music Player Card & Hide/Unhide Controls ───────── */
+.music-player-card {
+  position: relative;
+  max-width: 480px;
+  width: 90%;
+  margin: 30px auto;
+  padding: 24px 32px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.music-player-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.music-player-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--inv-primary, #2D4331);
+  font-weight: 600;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.music-player-hide-btn {
+  position: absolute;
+  right: -8px;
+  top: -4px;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.music-player-hide-btn:hover {
+  color: var(--inv-primary, #2D4331);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.music-player-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.music-player-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d1d5db;
+  transition: all 0.3s ease;
+}
+
+.music-player-dots.is-playing span {
+  background: var(--inv-primary, #2D4331);
+  animation: musicDotPulse 1.2s infinite ease-in-out alternate;
+}
+
+.music-player-dots.is-playing span:nth-child(2) { animation-delay: 0.15s; }
+.music-player-dots.is-playing span:nth-child(3) { animation-delay: 0.3s; }
+.music-player-dots.is-playing span:nth-child(4) { animation-delay: 0.45s; }
+.music-player-dots.is-playing span:nth-child(5) { animation-delay: 0.6s; }
+.music-player-dots.is-playing span:nth-child(6) { animation-delay: 0.75s; }
+
+@keyframes musicDotPulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.6); opacity: 1; }
+}
+
+.music-player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.music-control-btn {
+  background: transparent;
+  border: none;
+  color: var(--inv-primary, #2D4331);
+  opacity: 0.6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.music-control-btn:hover {
+  opacity: 1;
+}
+
+.music-play-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--inv-primary, #2D4331);
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(45, 67, 49, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.music-play-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 18px rgba(45, 67, 49, 0.4);
+}
+
+.music-player-progress-wrapper {
+  width: 100%;
+  padding: 0 10px;
+}
+
+.music-player-progress-track {
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.music-player-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--inv-primary, #2D4331);
+  transition: width 0.3s ease;
+}
+
+.music-player-progress-fill.is-active {
+  width: 55%;
+}
+
+/* ── Minimized Music Player Icon Bar ─────────────────── */
+.music-player-card-minimized {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px auto;
+  padding: 8px 16px;
+  background: #ffffff;
+  border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  max-width: fit-content;
+}
+
+.music-minimized-play-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--inv-primary, #2D4331);
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(45, 67, 49, 0.25);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.music-minimized-play-btn:hover {
+  transform: scale(1.04);
+}
+
+.music-minimized-play-btn .music-note-icon {
+  font-size: 16px;
+}
+
+.music-player-unhide-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.music-player-unhide-btn:hover {
+  border-color: var(--inv-primary, #2D4331);
+  color: var(--inv-primary, #2D4331);
+  background: rgba(0, 0, 0, 0.03);
 }

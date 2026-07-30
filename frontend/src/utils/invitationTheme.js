@@ -187,6 +187,8 @@ export function applyMotifToInvitation(invitation, motifId) {
     background_color: palette[1],
     secondary_color: palette[2],
     palette_colors: palette,
+    envelope_color: palette[1],
+    seal_color: palette[0],
   };
 }
 
@@ -208,6 +210,8 @@ export function applyCustomPaletteColors(invitation = {}, colors = []) {
     background_color: palette[1],
     secondary_color: palette[2],
     palette_colors: palette,
+    envelope_color: palette[1],
+    seal_color: palette[0],
   };
 }
 

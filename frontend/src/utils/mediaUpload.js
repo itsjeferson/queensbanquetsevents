@@ -4,7 +4,7 @@ import { isHostedMediaUrl, resolveMediaUrl } from './mediaUrl';
 
 export const MAX_AUDIO_SIZE_MB = 8;
 export const MAX_IMAGE_SIZE_MB = 5;
-export const MAX_VIDEO_SIZE_MB = 15;
+export const MAX_VIDEO_SIZE_MB = 10;
 
 export function isDataUrl(value) {
   return typeof value === 'string' && value.startsWith('data:');

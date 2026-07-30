@@ -44,12 +44,13 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
     : '';
   const coupleName = getCoupleDisplayName(event, invitation);
   const coverImage = resolveMediaUrl(invitation?.cover_image);
+  const coupleLogo = resolveMediaUrl(invitation?.couple_logo || invitation?.story?.couple_logo);
   const backgroundVideo = resolveMediaUrl(invitation?.background_video);
   const useVideo = Boolean(backgroundVideo) && isDirectVideoUrl(backgroundVideo);
 
   const isRoyalLuxury = Number(invitation?.template_id) === 3;
   const isModernMinimalist = Number(invitation?.template_id) === 2;
-  const useEnvelope = isRoyalLuxury || isModernMinimalist;
+  const useEnvelope = invitation?.disable_envelope === true ? false : true;
 
   const handleOpen = () => {
     if (opening) return;
@@ -84,9 +85,6 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
   };
 
   const initials = getInitials(coupleName);
-  const names = coupleName ? coupleName.split(/\s+(?:&|and|\+)\s+/i) : ['Mark', 'She'];
-  const firstName = names[0] ? names[0].trim() : 'Mark';
-  const lastName = names[1] ? names[1].trim() : 'She';
 
   if (useEnvelope) {
     const themeClass = isRoyalLuxury ? 'theme-royal-luxury' : 'theme-modern-minimalist';
@@ -144,7 +142,6 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
 
           {/* Wax seal to trigger opening */}
           <div className="rl-wax-seal-wrapper">
-            <span className="rl-envelope-label-top">{firstName}</span>
             <div className="rl-wax-seal" onClick={handleSealClick}>
               <div className="rl-wax-seal-crest">
                 <span>{initials[0]}</span>
@@ -152,7 +149,6 @@ export default function CoverScreen({ event, invitation, onOpen, labels }) {
                 <span>{initials[1]}</span>
               </div>
             </div>
-            <span className="rl-envelope-label-bottom">{lastName}</span>
             <span className="rl-seal-hint">TAP SEAL TO OPEN</span>
           </div>
         </div>

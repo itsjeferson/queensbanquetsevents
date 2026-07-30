@@ -69,10 +69,6 @@ export default function InvitationRenderer({
   };
   const labels = TYPE_LABELS[event.event_type] || TYPE_LABELS.wedding;
   const coupleName = getCoupleDisplayName(event, invitation);
-  const musicUrl = useMemo(() => {
-    const resolved = resolveMediaUrl(invitation.music_url);
-    return resolved && isDirectAudioUrl(resolved) ? resolved : '';
-  }, [invitation.music_url]);
   const saveTheDateActive = isSaveTheDateActive(invitation);
   const shareUrl = getInvitationShareUrl({
     slug: event?.slug,
@@ -123,6 +119,15 @@ export default function InvitationRenderer({
   });
   const [musicOn, setMusicOn] = useState(false);
   const audioRef = useRef(null);
+
+  const musicUrl = useMemo(() => {
+    const stdActive = (saveTheDateActive || forceSaveTheDateStage) && !opened;
+    const rawUrl = stdActive
+      ? (invitation.std_music_url || invitation.music_url)
+      : (invitation.music_url || invitation.std_music_url);
+    const resolved = resolveMediaUrl(rawUrl);
+    return resolved && isDirectAudioUrl(resolved) ? resolved : '';
+  }, [invitation.music_url, invitation.std_music_url, saveTheDateActive, forceSaveTheDateStage, opened]);
 
   useEffect(() => {
     if (!saveTheDateActive && !forceSaveTheDateStage) {
@@ -192,6 +197,9 @@ export default function InvitationRenderer({
         localStorage.setItem('qb_pw_unlock_' + (event?.slug || routeIdentifier), '1');
       } catch {}
     }
+    setTimeout(() => {
+      startMusic();
+    }, 150);
   };
 
   const toggleMusic = () => {
@@ -204,11 +212,29 @@ export default function InvitationRenderer({
     }
   };
 
+  useEffect(() => {
+    if (passwordUnlocked && musicUrl && !musicOn) {
+      const handleUserInteraction = (e) => {
+        if (e.target?.closest?.('.inv-floating-music-btn,.music-play-btn')) return;
+        startMusic();
+        window.removeEventListener('click', handleUserInteraction);
+        window.removeEventListener('touchstart', handleUserInteraction);
+      };
+      window.addEventListener('click', handleUserInteraction);
+      window.addEventListener('touchstart', handleUserInteraction);
+      return () => {
+        window.removeEventListener('click', handleUserInteraction);
+        window.removeEventListener('touchstart', handleUserInteraction);
+      };
+    }
+  }, [passwordUnlocked, musicUrl, musicOn]);
+
   const stdGateActive = saveTheDateActive || forceSaveTheDateStage;
   const showSaveTheDate = stdGateActive && !rsvpUnlocked;
   const showCover = !opened && !showSaveTheDate;
   
-  const isEnvelopeTemplate = Number(invitation?.template_id) === 3;
+  const effectiveTemplateId = Number(invitation?.template_id) || 1;
+  const isEnvelopeTemplate = effectiveTemplateId === 3;
   const showInvitation = (opened || isEnvelopeTemplate) && (!stdGateActive || rsvpUnlocked);
 
   useEffect(() => {
@@ -257,7 +283,7 @@ export default function InvitationRenderer({
             )}
 
             {showInvitation && (
-              Number(invitation.template_id) === 3 ? (
+              effectiveTemplateId === 3 ? (
                 <RoyalLuxuryInvitation
                   event={event}
                   invitation={invitation}
@@ -281,6 +307,17 @@ export default function InvitationRenderer({
               )
             )}
           </>
+        )}
+        {showInvitation && musicUrl && passwordUnlocked && invitation.hide_music_player && (
+          <button
+            type="button"
+            className={`inv-floating-music-btn ${musicOn ? 'playing' : ''}`}
+            onClick={toggleMusic}
+            aria-label={musicOn ? "Pause Music" : "Play Music"}
+            title={musicOn ? "Pause Music" : "Play Music"}
+          >
+            {musicOn ? '🎵' : '🔇'}
+          </button>
         )}
         </FloralThemeProvider>
       </div>

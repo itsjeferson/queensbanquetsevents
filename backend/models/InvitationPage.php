@@ -85,7 +85,7 @@ class InvitationPage
     public static function markPublished(int $eventId): void
     {
         $pdo = getConnection();
-        $stmt = $pdo->prepare('UPDATE invitation_pages SET published_at = NOW() WHERE event_id = ?');
+        $stmt = $pdo->prepare('UPDATE invitation_pages SET published_at = NOW(), template_id = COALESCE(template_id, 1) WHERE event_id = ?');
         $stmt->execute([$eventId]);
     }
 
@@ -94,17 +94,19 @@ class InvitationPage
         $story = is_array($row['story'] ?? null) ? $row['story'] : [];
 
         return [
-            'template_id' => $row['template_id'] ?? null,
+            'template_id' => (!empty($row['template_id']) && (int)$row['template_id'] !== 3) ? (int) $row['template_id'] : 1,
             'template_name' => $row['template_name'] ?? null,
             'category' => $row['category'] ?? null,
             'cover_image' => $row['cover_image'] ?? '',
             'music_url' => $row['background_music'] ?? '',
+            'std_music_url' => $story['std_music_url'] ?? '',
             'background_video' => $story['background_video'] ?? '',
             'primary_color' => $row['primary_color'] ?? ($story['primary_color'] ?? '#D4AF37'),
             'secondary_color' => $story['secondary_color'] ?? '#F4EEE7',
             'font_family' => $row['font_family'] ?? 'Playfair Display',
             'opening_line' => $story['opening_line'] ?? '',
             'hero_caption' => $story['hero_caption'] ?? '',
+            'hide_hero_text_overlay' => (bool) ($story['hide_hero_text_overlay'] ?? false),
             'quote' => $story['quote'] ?? '',
             'quote_source' => $story['quote_source'] ?? '',
             'rsvp_note' => $story['rsvp_note'] ?? '',
@@ -127,6 +129,7 @@ class InvitationPage
             'faqs' => $story['faqs'] ?? [],
             'opening_hero_image' => $story['opening_hero_image'] ?? '',
             'couple_initials' => $story['couple_initials'] ?? '',
+            'couple_logo' => $story['couple_logo'] ?? '',
             'couple_display_name' => $story['couple_display_name'] ?? '',
             'secondary_quote' => $story['secondary_quote'] ?? '',
             'story_image' => $story['image'] ?? '',
@@ -147,9 +150,12 @@ class InvitationPage
             'content_reveal_mode' => ($story['content_reveal_mode'] ?? 'full') === 'gradual' ? 'gradual' : 'full',
             'content_reveal_order' => is_array($story['content_reveal_order'] ?? null) ? $story['content_reveal_order'] : [],
             'floral_design_enabled' => ($story['floral_design_enabled'] ?? true) !== false,
+            'countdown_title' => $story['countdown_title'] ?? 'Countdown to forever:',
+            'countdown_bg_media' => $story['countdown_bg_media'] ?? '',
             'envelope_color' => $story['envelope_color'] ?? '',
             'seal_color' => $story['seal_color'] ?? '',
             'password_protected' => (bool) ($story['password_protected'] ?? false),
+            'hide_music_player' => (bool) ($story['hide_music_player'] ?? false),
             'published_at' => $row['published_at'] ?? null,
         ];
     }
@@ -161,7 +167,7 @@ class InvitationPage
     public static function emptyDefault(): array
     {
         return self::formatForApi([
-            'template_id' => null,
+            'template_id' => 1,
             'template_name' => null,
             'category' => null,
             'cover_image' => '',
@@ -209,7 +215,9 @@ class InvitationPage
         $story['attire'] = $data['attire'] ?? ($story['attire'] ?? []);
         $story['faqs'] = $data['faqs'] ?? ($story['faqs'] ?? []);
         $story['opening_hero_image'] = $data['opening_hero_image'] ?? ($story['opening_hero_image'] ?? '');
+        $story['hide_hero_text_overlay'] = (bool) ($data['hide_hero_text_overlay'] ?? ($story['hide_hero_text_overlay'] ?? false));
         $story['couple_initials'] = $data['couple_initials'] ?? ($story['couple_initials'] ?? '');
+        $story['couple_logo'] = $data['couple_logo'] ?? ($story['couple_logo'] ?? '');
         $story['couple_display_name'] = $data['couple_display_name'] ?? ($story['couple_display_name'] ?? '');
         $story['secondary_quote'] = $data['secondary_quote'] ?? ($story['secondary_quote'] ?? '');
         $story['image'] = $data['story_image'] ?? ($story['image'] ?? '');
@@ -222,6 +230,8 @@ class InvitationPage
         $story['std_cover_image'] = $data['std_cover_image'] ?? ($story['std_cover_image'] ?? '');
         $story['std_photo'] = $data['std_photo'] ?? ($data['std_cover_image'] ?? ($story['std_photo'] ?? ($story['std_cover_image'] ?? '')));
         $story['std_location'] = $data['std_location'] ?? ($story['std_location'] ?? '');
+        $story['std_music_url'] = $data['std_music_url'] ?? ($story['std_music_url'] ?? '');
+        $story['hide_music_player'] = (bool) ($data['hide_music_player'] ?? ($story['hide_music_player'] ?? false));
         $story['content_reveal_mode'] = ($data['content_reveal_mode'] ?? ($story['content_reveal_mode'] ?? 'full')) === 'gradual'
             ? 'gradual'
             : 'full';
@@ -233,6 +243,9 @@ class InvitationPage
         } elseif (!array_key_exists('floral_design_enabled', $story)) {
             $story['floral_design_enabled'] = true;
         }
+
+        $story['countdown_bg_media'] = $data['countdown_bg_media'] ?? ($story['countdown_bg_media'] ?? '');
+        $story['countdown_title'] = $data['countdown_title'] ?? ($story['countdown_title'] ?? '');
 
         $story['envelope_color'] = $data['envelope_color'] ?? ($story['envelope_color'] ?? '');
         $story['seal_color'] = $data['seal_color'] ?? ($story['seal_color'] ?? '');
@@ -249,7 +262,7 @@ class InvitationPage
         }
 
         return [
-            'template_id' => $data['template_id'] ?? null,
+            'template_id' => (!empty($data['template_id']) && (int)$data['template_id'] !== 3) ? (int) $data['template_id'] : 1,
             'cover_image' => $data['cover_image'] ?? null,
             'background_music' => $data['music_url'] ?? ($data['background_music'] ?? null),
             'primary_color' => $data['primary_color'] ?? '#D4AF37',
@@ -328,6 +341,11 @@ class InvitationPage
 
         if (empty($story['std_location']) && !empty($existing['std_location'])) {
             $story['std_location'] = $existing['std_location'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['couple_logo']) && !empty($existing['couple_logo'] ?? $existing['story']['couple_logo'] ?? null)) {
+            $story['couple_logo'] = $existing['couple_logo'] ?? $existing['story']['couple_logo'];
             $normalized['story'] = $story;
         }
 

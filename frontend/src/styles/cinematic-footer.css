@@ -1,0 +1,374 @@
+/* ============================================================
+   Cinematic Invitation Footer
+   Adapted from GSAP ScrollTrigger-powered cinematic footer
+   using the Queen's Banquet design tokens
+   ============================================================ */
+
+.cf-wrapper {
+  position: relative;
+  min-height: 80vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--inv-background);
+  color: var(--inv-ink);
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Ambient Aurora Glow */
+.cf-aurora {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 80vw;
+  height: 60vh;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: cf-breathe 8s ease-in-out infinite alternate;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--inv-primary) 15%, transparent) 0%,
+    color-mix(in srgb, var(--inv-floral-bloom) 12%, transparent) 40%,
+    transparent 70%
+  );
+}
+
+@keyframes cf-breathe {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+/* Theme-adaptive Grid Background */
+.cf-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-size: 60px 60px;
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--inv-ink) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--inv-ink) 3%, transparent) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+}
+
+/* Giant Background Text */
+.cf-giant-text {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  font-size: 26vw;
+  line-height: 0.75;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--inv-ink) 6%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--inv-ink) 10%, transparent) 0%, transparent 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Marquee Band */
+.cf-marquee-band {
+  position: absolute;
+  top: 3rem;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid var(--inv-line);
+  border-bottom: 1px solid var(--inv-line);
+  background: color-mix(in srgb, var(--inv-background) 60%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 1rem 0;
+  z-index: 10;
+  transform: rotate(-2deg) scale(1.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cf-marquee-inner {
+  display: flex;
+  width: max-content;
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--inv-muted);
+  animation: cf-scroll-marquee 40s linear infinite;
+}
+
+@keyframes cf-scroll-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.cf-marquee-item {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  padding: 0 1.5rem;
+  white-space: nowrap;
+}
+
+.cf-marquee-dot {
+  color: var(--inv-primary);
+  opacity: 0.6;
+}
+
+/* Center Content */
+.cf-center {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.5rem;
+  margin-top: 6rem;
+  width: 100%;
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 50vh;
+}
+
+.cf-heading {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 3rem;
+  text-align: center;
+  background: linear-gradient(180deg, var(--inv-ink) 0%, color-mix(in srgb, var(--inv-ink) 40%, transparent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0px 0px 20px color-mix(in srgb, var(--inv-ink) 15%, transparent));
+}
+
+.cf-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.cf-buttons-primary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.cf-buttons-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Glass Pill Button */
+.cf-glass-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid var(--inv-primary-border);
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--inv-ink) 3%, transparent) 0%,
+    color-mix(in srgb, var(--inv-ink) 1%, transparent) 100%);
+  box-shadow:
+    0 10px 30px -10px color-mix(in srgb, var(--inv-background) 50%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--inv-ink) 10%, transparent),
+    inset 0 -1px 2px color-mix(in srgb, var(--inv-background) 80%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--inv-ink);
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+}
+
+.cf-glass-pill:hover {
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--inv-ink) 8%, transparent) 0%,
+    color-mix(in srgb, var(--inv-ink) 2%, transparent) 100%);
+  border-color: color-mix(in srgb, var(--inv-ink) 20%, transparent);
+  box-shadow:
+    0 20px 40px -10px color-mix(in srgb, var(--inv-background) 70%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--inv-ink) 20%, transparent);
+  color: var(--inv-ink);
+}
+
+.cf-glass-pill-sm {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.cf-glass-pill-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--inv-muted);
+  flex-shrink: 0;
+  transition: color 0.3s;
+}
+
+.cf-glass-pill:hover .cf-glass-pill-icon {
+  color: var(--inv-ink);
+}
+
+/* Bottom Bar */
+.cf-bottom-bar {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .cf-bottom-bar {
+    flex-direction: row;
+    padding: 2rem 3rem;
+  }
+}
+
+.cf-copyright {
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--inv-muted);
+  order: 2;
+}
+
+@media (min-width: 768px) {
+  .cf-copyright { order: 1; }
+}
+
+/* Made With Love Badge */
+.cf-love-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  cursor: default;
+  border: 1px solid var(--inv-line);
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--inv-ink) 3%, transparent) 0%,
+    color-mix(in srgb, var(--inv-ink) 1%, transparent) 100%);
+  box-shadow:
+    0 10px 30px -10px color-mix(in srgb, var(--inv-background) 50%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--inv-ink) 10%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  order: 1;
+}
+
+@media (min-width: 768px) {
+  .cf-love-badge { order: 2; }
+}
+
+.cf-love-badge-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--inv-muted);
+}
+
+.cf-love-heart {
+  font-size: 1rem;
+  animation: cf-heartbeat 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  color: var(--danger);
+}
+
+@keyframes cf-heartbeat {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--danger) 50%, transparent));
+  }
+  15%, 45% {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--danger) 80%, transparent));
+  }
+  30% {
+    transform: scale(1);
+  }
+}
+
+.cf-love-brand {
+  font-weight: 900;
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  margin-left: -0.25rem;
+}
+
+/* Back to Top Button */
+.cf-back-top {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--inv-muted);
+  border: 1px solid var(--inv-primary-border);
+  background: linear-gradient(145deg,
+    color-mix(in srgb, var(--inv-ink) 3%, transparent) 0%,
+    color-mix(in srgb, var(--inv-ink) 1%, transparent) 100%);
+  box-shadow:
+    0 10px 30px -10px color-mix(in srgb, var(--inv-background) 50%, transparent),
+    inset 0 1px 1px color-mix(in srgb, var(--inv-ink) 10%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  order: 3;
+}
+
+.cf-back-top:hover {
+  color: var(--inv-ink);
+  border-color: color-mix(in srgb, var(--inv-ink) 20%, transparent);
+  box-shadow:
+    0 20px 40px -10px color-mix(in srgb, var(--inv-background) 70%, transparent);
+}
+
+.cf-back-top svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s;
+}
+
+.cf-back-top:hover svg {
+  transform: translateY(-0.375rem);
+}
+
+/* Marquee font overrides for the invitation */
+.cf-marquee-item span {
+  font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+}

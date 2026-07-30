@@ -61,13 +61,19 @@ export const defaultWeddingInvitationContent = {
   hero_caption: 'In the union of',
   couple_display_name: '',
   opening_hero_image: '',
+  hide_hero_text_overlay: false,
   couple_initials: '',
+  couple_logo: '',
   quote: 'So they are no longer two, but one flesh. Therefore what God has joined together, let no one separate.',
   quote_source: '',
   secondary_quote: '',
   cover_image: '',
   background_video: '',
   music_url: '',
+  hide_music_player: false,
+  countdown_title: 'Countdown to forever:',
+  countdown_bg_media: '',
+  std_music_url: '',
   dress_code: 'Formal / Black Tie Optional',
   rsvp_note: 'You are special to us. Kindly confirm your attendance below.',
   coordinator: '',
@@ -246,7 +252,7 @@ export function prepareInvitationForApiSave(invitation) {
     }
   };
 
-  ['cover_image', 'opening_hero_image', 'background_video', 'music_url'].forEach((field) => {
+  ['cover_image', 'opening_hero_image', 'background_video', 'music_url', 'couple_logo', 'countdown_bg_media', 'std_music_url'].forEach((field) => {
     restoreField(field);
   });
 
@@ -307,6 +313,7 @@ export function prepareInvitationForApiSave(invitation) {
 
   return {
     ...stripped,
+    template_id: (invitation?.template_id && Number(invitation.template_id) !== 3) ? Number(invitation.template_id) : 1,
     entourage: cleanEntourageLists(stripped.entourage),
   };
 }
@@ -320,13 +327,20 @@ export function normalizeInvitationContent(invitation = {}) {
   return {
     ...defaultWeddingInvitationContent,
     ...invitation,
+    template_id: (invitation?.template_id && Number(invitation.template_id) !== 3) ? Number(invitation.template_id) : 1,
     couple_display_name: invitation.couple_display_name || '',
     opening_hero_image: resolveMedia(invitation.opening_hero_image),
+    hide_hero_text_overlay: Boolean(invitation.hide_hero_text_overlay),
     couple_initials: invitation.couple_initials || '',
+    couple_logo: resolveMedia(invitation.couple_logo),
     secondary_quote: invitation.secondary_quote || '',
     cover_image: resolveMedia(invitation.cover_image),
     background_video: resolveMedia(invitation.background_video),
     music_url: resolveMedia(invitation.music_url),
+    hide_music_player: Boolean(invitation.hide_music_player ?? story.hide_music_player),
+    std_music_url: resolveMedia(invitation.std_music_url),
+    countdown_title: invitation.countdown_title || 'Countdown to forever:',
+    countdown_bg_media: resolveMedia(invitation.countdown_bg_media || invitation.countdown_media),
     groom_profile: {
       ...defaultGroomProfile(),
       ...(invitation.groom_profile || {}),
@@ -419,5 +433,8 @@ export function getCoupleInitials(event, invitation) {
   if (parts.length >= 2) {
     return `${parts[0][0] || ''}&${parts[1][0] || ''}`.toUpperCase();
   }
-  return name.slice(0, 2).toUpperCase();
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return 'RJ';
 }

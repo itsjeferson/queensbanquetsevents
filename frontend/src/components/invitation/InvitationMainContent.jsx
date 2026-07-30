@@ -14,11 +14,12 @@ import HappyMomentsSlideshow from './HappyMomentsSlideshow';
 import RSVPForm from './RSVPForm';
 import GuestBook from './GuestBook';
 import QRShare from './QRShare';
-import InvitationFooter from './InvitationFooter';
+import CinematicInvitationFooter from './CinematicInvitationFooter';
 import FloralCornerFrame from './FloralCornerFrame';
 import MusicPlayerCard from './MusicPlayerCard';
 import WeddingMonthCalendar from './WeddingMonthCalendar';
 import { parseEventDate } from '../../utils/eventDate';
+import { isDirectVideoUrl, resolveMediaUrl } from '../../utils/mediaUrl';
 import { useEffect, useRef } from 'react';
 
 function SectionShell({
@@ -96,7 +97,9 @@ export function renderInvitationSection(sectionId, ctx) {
       return (
         <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <QuoteBlock quote={invitation.quote} source={invitation.quote_source} compact />
-          <MusicPlayerCard musicOn={musicOn} toggleMusic={toggleMusic} />
+          {!invitation.hide_music_player && (
+            <MusicPlayerCard musicOn={musicOn} toggleMusic={toggleMusic} />
+          )}
         </SectionShell>
       );
     case 'story_intro':
@@ -140,42 +143,29 @@ export function renderInvitationSection(sectionId, ctx) {
         </SectionShell>
       );
     case 'countdown':
-      const parsedDate = parseEventDate(event.event_date);
-      const dayName = parsedDate ? parsedDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase() : 'TUESDAY';
-      const monthName = parsedDate ? parsedDate.toLocaleDateString('en-US', { month: 'long' }).toUpperCase() : 'MARCH';
-      const dayNum = parsedDate ? parsedDate.getDate() : '23';
-      const yearNum = parsedDate ? parsedDate.getFullYear() : '2027';
+      const countdownMedia = resolveMediaUrl(
+        invitation.countdown_bg_media ||
+        invitation.countdown_media ||
+        invitation.opening_hero_image ||
+        invitation.cover_image ||
+        'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1800&q=80'
+      );
+      const isVideoMedia = Boolean(countdownMedia) && isDirectVideoUrl(countdownMedia);
+      const countdownTitle = invitation.countdown_title?.trim() || "Countdown to forever:";
 
       return (
         <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
-          <section className="custom-countdown-section" id="countdown">
-            {/* Top Text / Quote */}
-            <p className="countdown-invite-text">
-              {invitation.opening_line || "With great joy, we invite you"}
-            </p>
-            
-            <div className="countdown-divider"></div>
-
-            {/* Event Date Block */}
-            <div className="countdown-date-block">
-              <span className="countdown-date-month">{monthName}</span>
-              <div className="countdown-date-row">
-                <span className="countdown-date-day-name">{dayName}</span>
-                <span className="countdown-date-day-number">{dayNum}</span>
-                <span className="countdown-date-year">{yearNum}</span>
-              </div>
+          <section className="inv-countdown-band-media" id="countdown">
+            {isVideoMedia ? (
+              <video src={countdownMedia} autoPlay muted loop playsInline className="inv-countdown-media-bg" />
+            ) : (
+              <img src={countdownMedia} alt="" className="inv-countdown-media-bg" />
+            )}
+            <div className="inv-countdown-media-overlay" />
+            <div className="inv-countdown-media-content">
+              <h3 className="inv-countdown-script-title">{countdownTitle}</h3>
+              <Countdown eventDate={event.event_date} />
             </div>
-
-            <div className="countdown-divider"></div>
-
-            {/* Countdown Title */}
-            <p className="countdown-timer-label">COUNTDOWN</p>
-
-            {/* Countdown Clock */}
-            <Countdown eventDate={event.event_date} />
-
-            {/* Month Calendar Grid */}
-            <WeddingMonthCalendar eventDate={event.event_date} />
           </section>
         </SectionShell>
       );
@@ -240,9 +230,7 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'footer':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
-          <InvitationFooter eventName={coupleName} shareUrl={shareUrl} />
-        </SectionShell>
+        <CinematicInvitationFooter eventName={coupleName} shareUrl={shareUrl} coupleName={coupleName} />
       );
     default:
       return null;

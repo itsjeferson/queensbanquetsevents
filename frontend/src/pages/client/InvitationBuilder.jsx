@@ -85,7 +85,7 @@ export default function InvitationBuilder() {
     event_type: 'wedding',
     event_date: '',
     slug: '',
-    template_id: 3,
+    template_id: 1,
     invitation: normalizeInvitationContent(defaultWeddingInvitationContent),
   });
 

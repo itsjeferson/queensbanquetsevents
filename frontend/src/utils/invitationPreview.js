@@ -93,7 +93,7 @@ function hasAttireDetails(attire, dressCode) {
 
 function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo', 'floral_design_enabled', 'password_protected', 'password'];
+  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo', 'floral_design_enabled', 'password_protected', 'password', 'hide_music_player'];
 
   fields.forEach((field) => {
     if (draftInvitation[field] !== undefined && draftInvitation[field] !== null) {
@@ -115,6 +115,9 @@ function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
     'opening_hero_image',
     'background_video',
     'music_url',
+    'countdown_bg_media',
+    'couple_logo',
+    'std_music_url',
   ];
 
   mediaFields.forEach((field) => {
@@ -127,6 +130,9 @@ function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
 
   if (typeof draftInvitation.save_the_date_enabled === 'boolean') {
     merged.save_the_date_enabled = draftInvitation.save_the_date_enabled;
+  }
+  if (typeof draftInvitation.hide_music_player === 'boolean') {
+    merged.hide_music_player = draftInvitation.hide_music_player;
   }
   if (draftInvitation.content_reveal_mode) {
     merged.content_reveal_mode = draftInvitation.content_reveal_mode;
@@ -240,19 +246,26 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
     },
     invitation: {
       ...normalized,
+      template_id: (normalized.template_id && Number(normalized.template_id) !== 3) ? Number(normalized.template_id) : 1,
       font_family: pickText(invitation.font_family) || templateInv.font_family,
       qr_enabled: invitation.qr_enabled ?? templateInv.qr_enabled,
       opening_line: pickText(invitation.opening_line) || templateInv.opening_line,
       hero_caption: pickText(invitation.hero_caption) || templateInv.hero_caption,
       couple_display_name: pickText(invitation.couple_display_name),
       couple_initials: pickText(invitation.couple_initials),
+      couple_logo: pickText(invitation.couple_logo),
       opening_hero_image: pickText(invitation.opening_hero_image),
+      hide_hero_text_overlay: Boolean(invitation.hide_hero_text_overlay),
       secondary_quote: pickText(invitation.secondary_quote),
       quote: pickText(invitation.quote) || templateInv.quote,
       quote_source: pickText(invitation.quote_source) || templateInv.quote_source,
       cover_image: pickText(invitation.cover_image) || templateInv.cover_image,
       background_video: pickText(invitation.background_video),
       music_url: pickText(invitation.music_url),
+      hide_music_player: Boolean(invitation.hide_music_player ?? invitation.story?.hide_music_player),
+      std_music_url: pickText(invitation.std_music_url),
+      countdown_title: pickText(invitation.countdown_title) || 'Countdown to forever:',
+      countdown_bg_media: pickText(invitation.countdown_bg_media),
       dress_code: pickText(invitation.dress_code) || templateInv.dress_code,
       coordinator: pickText(invitation.coordinator) || templateInv.coordinator,
       coordinator_phone: pickText(invitation.coordinator_phone),

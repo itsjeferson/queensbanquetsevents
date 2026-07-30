@@ -2,19 +2,36 @@ import { useEffect, useState } from 'react';
 import { parseEventDate } from '../../utils/eventDate';
 
 function getTimeLeft(targetDate) {
-  const parsed = parseEventDate(targetDate);
-  if (!parsed) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  const target = parseEventDate(targetDate);
+  if (!target) {
+    return { months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   }
 
-  const diff = parsed.getTime() - Date.now();
-  if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+  const now = new Date();
+  if (target.getTime() <= now.getTime()) {
+    return { months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+  }
+
+  let months = (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+  let tempDate = new Date(now.getFullYear(), now.getMonth() + months, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+  
+  if (tempDate.getTime() > target.getTime()) {
+    months--;
+    tempDate = new Date(now.getFullYear(), now.getMonth() + months, now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+  }
+
+  const diffMs = target.getTime() - tempDate.getTime();
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
   return {
-    days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-    minutes: Math.floor((diff / (1000 * 60)) % 60),
-    seconds: Math.floor((diff / 1000) % 60),
+    months: Math.max(0, months),
+    days: Math.max(0, days),
+    hours: Math.max(0, hours),
+    minutes: Math.max(0, minutes),
+    seconds: Math.max(0, seconds),
   };
 }
 
@@ -28,10 +45,11 @@ export default function Countdown({ eventDate }) {
   }, [eventDate]);
 
   const items = [
-    { value: time.days, label: 'Days' },
-    { value: time.hours, label: 'Hours' },
-    { value: time.minutes, label: 'Minutes' },
-    { value: time.seconds, label: 'Seconds' },
+    { value: time.months, label: 'mos' },
+    { value: time.days, label: 'days' },
+    { value: time.hours, label: 'hrs' },
+    { value: time.minutes, label: 'mins' },
+    { value: time.seconds, label: 'secs' },
   ];
 
   return (

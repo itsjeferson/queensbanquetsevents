@@ -82,6 +82,16 @@ export default function WeddingContentFields({
             />
           </div>
         </div>
+        <MediaField
+          label="Couple Logo (replaces initials)"
+          value={invitation.couple_logo || ''}
+          onChange={(value) => onInvitationChange({ couple_logo: value })}
+          placeholder="https://..."
+          accept="image/*"
+          maxSizeMb={MAX_IMAGE_SIZE_MB}
+          onError={onFileError}
+          urlHint="Upload or paste a URL for your custom logo. When set, it replaces the initials in the monogram."
+        />
 
         <div className="cover-hero-photos">
           <h4 className="cover-hero-photos-title">Photos</h4>
@@ -110,6 +120,35 @@ export default function WeddingContentFields({
               onError={onFileError}
               urlHint="Shown full-width after guests open the invitation."
               previewVariant="banner"
+            >
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginTop: 10, cursor: 'pointer', fontSize: 12, color: 'var(--text-color, #374151)', lineHeight: 1.4 }}>
+                <input
+                  type="checkbox"
+                  style={{ marginTop: 2, flexShrink: 0, width: 15, height: 15, accentColor: 'var(--primary-color, #6b8f71)' }}
+                  checked={Boolean(invitation.hide_hero_text_overlay)}
+                  onChange={(e) => onInvitationChange({ hide_hero_text_overlay: e.target.checked })}
+                />
+                <span>My Opening Hero Photo already includes couple's name & date (hide text overlay)</span>
+              </label>
+            </MediaField>
+            <MediaField
+              label="Countdown Background Photo / Video"
+              value={invitation.countdown_bg_media || ''}
+              onChange={(value) => onInvitationChange({ countdown_bg_media: value })}
+              placeholder="https://... (photo or video link)"
+              accept="image/*,video/*"
+              maxSizeMb={MAX_VIDEO_SIZE_MB}
+              onError={onFileError}
+              urlHint="Background image or video for the 'Countdown to forever' banner. Upload a file or paste a URL."
+              previewVariant="banner"
+            />
+          </div>
+          <div className="form-group" style={{ marginTop: 16 }}>
+            <label>Countdown Title</label>
+            <input
+              value={invitation.countdown_title || ''}
+              onChange={(e) => onInvitationChange({ countdown_title: e.target.value })}
+              placeholder="Countdown to forever:"
             />
           </div>
         </div>
@@ -255,6 +294,40 @@ export default function WeddingContentFields({
             previewVariant=""
             uploadHint="Upload an MP3 file only. Links are not supported for background music."
           />
+
+          {/* Music Player Visibility */}
+          <div style={{ marginTop: 4 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-color, #374151)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Music Player Visibility
+            </label>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: 'var(--text-color, #374151)', background: !invitation.hide_music_player ? 'rgba(107,143,113,0.1)' : 'transparent', border: `1px solid ${!invitation.hide_music_player ? 'var(--primary-color, #6b8f71)' : '#d1d5db'}`, borderRadius: 8, padding: '8px 14px', transition: 'all 0.15s ease' }}>
+                <input
+                  type="radio"
+                  name="hide_music_player"
+                  value="show"
+                  checked={!invitation.hide_music_player}
+                  onChange={() => onInvitationChange({ hide_music_player: false })}
+                  style={{ accentColor: 'var(--primary-color, #6b8f71)' }}
+                />
+                <span>👁️ Show Player</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: 'var(--text-color, #374151)', background: invitation.hide_music_player ? 'rgba(107,143,113,0.1)' : 'transparent', border: `1px solid ${invitation.hide_music_player ? 'var(--primary-color, #6b8f71)' : '#d1d5db'}`, borderRadius: 8, padding: '8px 14px', transition: 'all 0.15s ease' }}>
+                <input
+                  type="radio"
+                  name="hide_music_player"
+                  value="hide"
+                  checked={Boolean(invitation.hide_music_player)}
+                  onChange={() => onInvitationChange({ hide_music_player: true })}
+                  style={{ accentColor: 'var(--primary-color, #6b8f71)' }}
+                />
+                <span>🙈 Hide Player</span>
+              </label>
+            </div>
+            <p style={{ fontSize: 11, color: '#6b7280', marginTop: 6 }}>
+              When hidden, guests can still play/pause music from a floating icon.
+            </p>
+          </div>
         </div>
       </div>
 

@@ -39,7 +39,7 @@ function RoyalCrest({ flip = false }) {
 }
 
 /* ─── Monogram Crest ────────────────────────────────── */
-function MonogramCrest({ initL, initR }) {
+function MonogramCrest({ initL, initR, coupleLogo }) {
   return (
     <div className="rl-monogram-container">
       <div className="rl-monogram-shield">
@@ -49,11 +49,15 @@ function MonogramCrest({ initL, initR }) {
           {/* Elegant top crown accent */}
           <path d="M40 26 L44 34 L50 29 L56 34 L60 26 L54 30 L50 26 L46 30 Z" fill="url(#rlGoldGrad)" />
         </svg>
-        <div className="rl-monogram-letters">
-          <span className="rl-mono-char">{initL || 'R'}</span>
-          <span className="rl-mono-amp">&</span>
-          <span className="rl-mono-char">{initR || 'J'}</span>
-        </div>
+        {coupleLogo ? (
+          <img src={coupleLogo} alt="couple logo" className="rl-monogram-logo" />
+        ) : (
+          <div className="rl-monogram-letters">
+            <span className="rl-mono-char">{initL || 'R'}</span>
+            <span className="rl-mono-amp">&</span>
+            <span className="rl-mono-char">{initR || 'J'}</span>
+          </div>
+        )}
       </div>
       <p className="rl-monogram-subtitle">OUR WEDDING</p>
     </div>
@@ -201,6 +205,7 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
   })();
 
   const [initL, initR] = coupleInitials.split(/\s+/);
+  const coupleLogo = resolveMediaUrl(invitation?.couple_logo);
 
   const dateDay = parsed
     ? parsed.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()
@@ -227,7 +232,7 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
       )}
 
       {/* Monogram */}
-      <MonogramCrest initL={initL} initR={initR} />
+      <MonogramCrest initL={initL} initR={initR} coupleLogo={coupleLogo} />
 
       {/* Couple Photo Frame with luxury shadow & border */}
       <div className="rl-cover-photo-frame">

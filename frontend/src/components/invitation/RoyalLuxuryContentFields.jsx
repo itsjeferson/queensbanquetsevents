@@ -2,6 +2,7 @@ import MediaField from '../common/MediaField/MediaField';
 import { normalizeWeddingProgram } from '../../utils/weddingTimeline';
 import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
 import { ATTIRE_SWATCH_DEFAULT } from '../../utils/invitationTheme';
+import { MAX_IMAGE_SIZE_MB } from '../../utils/mediaUpload';
 
 /**
  * Template-specific content fields for the Royal Luxury (template_id=3) design.
@@ -91,6 +92,16 @@ export default function RoyalLuxuryContentFields({
             </p>
           </div>
         </div>
+        <MediaField
+          label="Couple Logo (replaces initials)"
+          value={invitation.couple_logo || ''}
+          onChange={(value) => onInvitationChange({ couple_logo: value })}
+          placeholder="https://..."
+          accept="image/*"
+          maxSizeMb={MAX_IMAGE_SIZE_MB}
+          onError={onFileError}
+          urlHint="Upload or paste a URL for your custom logo. When set, it replaces the initials in the monogram."
+        />
       </div>
 
       {/* ── Cover Photo ──────────────────────────────── */}
@@ -415,6 +426,40 @@ export default function RoyalLuxuryContentFields({
             label="Background Music (MP3)"
             onError={onFileError}
           />
+
+          {/* Music Player Visibility */}
+          <div style={{ marginTop: 12 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-color, #374151)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Music Player Visibility
+            </label>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: 'var(--text-color, #374151)', background: !invitation.hide_music_player ? 'rgba(62,92,68,0.1)' : 'transparent', border: `1px solid ${!invitation.hide_music_player ? '#3E5C44' : '#d1d5db'}`, borderRadius: 8, padding: '8px 14px', transition: 'all 0.15s ease' }}>
+                <input
+                  type="radio"
+                  name="hide_music_player_rl"
+                  value="show"
+                  checked={!invitation.hide_music_player}
+                  onChange={() => onInvitationChange({ hide_music_player: false })}
+                  style={{ accentColor: '#3E5C44' }}
+                />
+                <span>👁️ Show Player</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: 'var(--text-color, #374151)', background: invitation.hide_music_player ? 'rgba(62,92,68,0.1)' : 'transparent', border: `1px solid ${invitation.hide_music_player ? '#3E5C44' : '#d1d5db'}`, borderRadius: 8, padding: '8px 14px', transition: 'all 0.15s ease' }}>
+                <input
+                  type="radio"
+                  name="hide_music_player_rl"
+                  value="hide"
+                  checked={Boolean(invitation.hide_music_player)}
+                  onChange={() => onInvitationChange({ hide_music_player: true })}
+                  style={{ accentColor: '#3E5C44' }}
+                />
+                <span>🙈 Hide Player</span>
+              </label>
+            </div>
+            <p style={{ fontSize: 11, color: '#6b7280', marginTop: 6 }}>
+              When hidden, guests can still play/pause music from a floating icon.
+            </p>
+          </div>
         </div>
       </div>
     </>

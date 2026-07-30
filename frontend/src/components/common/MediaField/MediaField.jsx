@@ -24,6 +24,7 @@ export default function MediaField({
   previewVariant = 'banner',
   uploadOnly = false,
   uploadHint = 'Upload a file from your device.',
+  children,
 }) {
   const fileInputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
@@ -198,6 +199,8 @@ export default function MediaField({
           Use image URL instead
         </button>
       )}
+
+      {children}
 
       {previewUrl && (
         <div className="media-field-preview">
