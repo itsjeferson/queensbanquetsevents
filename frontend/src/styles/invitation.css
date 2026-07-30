@@ -7890,3 +7890,163 @@ html.invitation-scroll::-webkit-scrollbar {
   color: var(--inv-primary, #2D4331);
   background: rgba(0, 0, 0, 0.03);
 }
+
+/* ── Mobile Responsive Fixes (Password Gate, STD, Cover, Main Content) ── */
+
+/* Very small screens */
+@media (max-width: 400px) {
+  .inv-password-gate-content {
+    padding: 24px 16px;
+  }
+  .inv-password-gate-couple {
+    font-size: 22px;
+  }
+  .inv-password-gate-subtitle {
+    font-size: 13px;
+  }
+  .inv-password-gate .btn-gold {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .inv-std {
+    padding: 24px 12px;
+  }
+  .inv-std-classic-content {
+    padding: 24px 12px;
+  }
+  .inv-std-classic-title-save,
+  .inv-std-classic-title-date {
+    font-size: clamp(22px, 6vw, 30px);
+  }
+  .inv-std-classic-title-the {
+    font-size: clamp(20px, 5vw, 28px);
+  }
+  .inv-std-classic-wedding-date {
+    font-size: clamp(13px, 4vw, 16px);
+    margin: 8px 0 12px;
+  }
+  .inv-std-classic-for {
+    font-size: 18px;
+  }
+  .inv-std-classic-couple {
+    font-size: clamp(16px, 5vw, 22px);
+  }
+  .inv-std-classic-couple-block {
+    margin-top: 10px;
+  }
+  .inv-std-rsvp-trigger-btn {
+    padding: 12px 32px;
+    font-size: 13px;
+    width: 100%;
+  }
+  .inv-std-classic-field {
+    width: 100%;
+  }
+  .inv-std-classic-form {
+    width: 100%;
+  }
+  .inv-std-classic-input {
+    font-size: 16px;
+  }
+  .inv-std-action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .inv-std-btn-yes,
+  .inv-std-btn-no {
+    width: 100%;
+    padding: 14px;
+    font-size: 14px;
+  }
+  .confirm-check-circle,
+  .confirm-heart-circle {
+    width: 60px;
+    height: 60px;
+  }
+  .confirm-check-circle svg,
+  .confirm-heart-circle svg {
+    width: 32px;
+    height: 32px;
+  }
+  .confirm-icon-wrapper h3 {
+    font-size: 20px;
+  }
+
+  .inv-cover-content {
+    padding: 24px 16px;
+    width: min(880px, calc(100% - 24px));
+  }
+  .inv-cover h1 {
+    font-size: clamp(30px, 10vw, 42px);
+  }
+  .inv-cover .inv-date {
+    font-size: clamp(14px, 4vw, 18px);
+  }
+  .inv-open-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .inv-section {
+    padding: 48px 14px;
+  }
+  .inv-opened-hero-content h1 {
+    font-size: clamp(28px, 7vw, 36px);
+  }
+  .inv-opened-hero-content {
+    padding: 0 16px;
+  }
+  .inv-opened-hero-line {
+    width: 56px;
+  }
+  .inv-countdown-band-media {
+    padding: 48px 16px;
+    min-height: 50vh;
+  }
+}
+
+/* Mobile landscape: STD and Cover */
+@media (max-height: 500px) and (orientation: landscape) {
+  .inv-std {
+    min-height: auto;
+    padding: 20px 12px;
+  }
+  .inv-std-classic-bg {
+    position: absolute;
+  }
+  .inv-std-classic-content {
+    padding: 16px 12px;
+  }
+  .inv-std-classic-header {
+    margin-bottom: 12px;
+  }
+  .inv-std-classic-couple-block {
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  .inv-std-classic-rsvp-trigger-btn {
+    margin-top: 8px;
+    padding: 10px 28px;
+  }
+  .inv-std-classic-wedding-date {
+    margin: 4px 0 8px;
+  }
+  .inv-std-classic-form {
+    margin-top: 8px;
+  }
+  .inv-std-classic-field {
+    margin-bottom: 8px;
+  }
+
+  .inv-cover-content {
+    padding: 20px 16px;
+  }
+}
+
+/* Tablet/mobile: ensure STD bg uses absolute positioning for better keyboard/scroll behavior */
+@media (max-width: 768px) {
+  .inv-std-classic-bg {
+    position: absolute;
+  }
+}
