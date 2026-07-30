@@ -7145,7 +7145,7 @@ html.invitation-scroll::-webkit-scrollbar {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin: 40px 0;
+  margin: 0 0 40px;
   padding: 80px 20px;
   border-radius: 6px;
   background: #111827;

@@ -371,7 +371,7 @@ export default function InvitationBuilder() {
                       },
                     });
                   }}
-                  placeholder="Mark & She"
+                  placeholder="Marko & Alexia"
                 />
               </div>
               <div className="form-group">
@@ -385,7 +385,7 @@ export default function InvitationBuilder() {
             </div>
             <div className="form-group">
               <label>Custom URL Slug</label>
-              <input value={form.slug} readOnly placeholder="Mark-She" />
+              <input value={form.slug} readOnly placeholder="Marko-Alexia" />
               <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
                 Auto-generated from event name. Your invitation will be at: queensbanquet.com/#/invite/{form.slug || 'your-slug'}
               </p>

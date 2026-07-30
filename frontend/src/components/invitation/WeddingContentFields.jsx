@@ -67,7 +67,7 @@ export default function WeddingContentFields({
             <input
               value={invitation.couple_display_name || ''}
               onChange={(e) => onInvitationChange({ couple_display_name: e.target.value })}
-              placeholder={event?.event_name || 'Mark & She'}
+              placeholder={event?.event_name || 'Marko & Alexia'}
             />
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
               Shown on cover and opened hero. Leave blank to use event name.

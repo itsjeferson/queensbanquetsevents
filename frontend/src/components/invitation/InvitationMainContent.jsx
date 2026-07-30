@@ -14,7 +14,7 @@ import HappyMomentsSlideshow from './HappyMomentsSlideshow';
 import RSVPForm from './RSVPForm';
 import GuestBook from './GuestBook';
 import QRShare from './QRShare';
-import CinematicInvitationFooter from './CinematicInvitationFooter';
+import InvitationFooter from './InvitationFooter';
 import FloralCornerFrame from './FloralCornerFrame';
 import MusicPlayerCard from './MusicPlayerCard';
 import WeddingMonthCalendar from './WeddingMonthCalendar';
@@ -230,7 +230,7 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'footer':
       return (
-        <CinematicInvitationFooter eventName={coupleName} shareUrl={shareUrl} coupleName={coupleName} />
+        <InvitationFooter eventName={coupleName} shareUrl={shareUrl} />
       );
     default:
       return null;

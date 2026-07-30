@@ -38,7 +38,7 @@ export default function InvitationTemplateSelector({
 
     return {
       event: {
-        event_name: currentForm.event_name || 'Mark & She',
+        event_name: currentForm.event_name || 'Marko & Alexia',
         event_type: 'wedding',
         event_date: currentForm.event_date || new Date().toISOString(),
         slug: currentForm.slug || 'preview-slug',
