@@ -1,5 +1,20 @@
 import { getCustomizedAttireColors } from '../../utils/invitationTheme';
 
+const GENTLEMEN_PANTS_COLOR_GUIDE = [
+  { role: 'Groom', name: 'Dark Brown', colors: ['#4E342E'] },
+  { role: 'Ninongs', name: 'Light Brown', colors: ['#A1887F'] },
+  { role: 'Groomsmen & Secondary Sponsors', name: 'Black', colors: ['#111111'] },
+  { role: 'All Other Gentlemen', name: 'Black', colors: ['#111111'] },
+];
+
+const LADIES_GOWNS_COLOR_GUIDE = [
+  { role: 'Mothers of the Couple', name: 'Beacon Blue', colors: ['#0288D1'] },
+  { role: 'Ninangs', name: 'Mid-Blue', colors: ['#1E88E5'] },
+  { role: 'Bridesmaids', name: 'Pale Blue or Lime Cream', colors: ['#81D4FA', '#E6EE9C'] },
+  { role: 'Female Secondary Sponsors', name: 'Titanite Green', colors: ['#43A047'] },
+  { role: 'All Other Ladies', name: 'Light Beige, Warm Taupe, Sage Green, or Espresso', colors: ['#F5F5DC', '#B0A99F', '#87A96B', '#362819'] },
+];
+
 function AttireColorSwatches({ colors, prefix }) {
   const displayColors = getCustomizedAttireColors(colors);
   if (!displayColors.length) return null;
@@ -30,17 +45,9 @@ function AttireBlock({ title, description, colors, prefix }) {
   );
 }
 
-export default function AttireGuideSection({ attire, dressCode }) {
-  if (!attire && !dressCode) return null;
-
-  const hasContent = dressCode
-    || attire?.female_primary_sponsors
-    || attire?.male_primary_sponsors
-    || attire?.ladies
-    || attire?.gentlemen
-    || attire?.reminders;
-
-  if (!hasContent) return null;
+export default function AttireGuideSection({ attire = {}, dressCode }) {
+  const effectiveDressCode = dressCode || attire.dress_code || 'Formal Filipino';
+  const colorGuideNote = 'To honor our wedding party and family, we have assigned specific colors for each group.';
 
   return (
     <section className="inv-section inv-attire-section" id="attire">
@@ -48,52 +55,54 @@ export default function AttireGuideSection({ attire, dressCode }) {
       <div className="inv-divider" />
 
       <div className="inv-attire-stack">
-        {dressCode && (
+        <div className="inv-attire-header-block">
           <p className="inv-attire-dresscode">
-            Dress Code: <strong>{dressCode}</strong>
+            Attire: <strong>{effectiveDressCode}</strong>
           </p>
-        )}
+          <p className="inv-attire-general-note">{colorGuideNote}</p>
+        </div>
 
-        <AttireBlock
-          title="Female Primary Sponsors"
-          description={attire?.female_primary_sponsors}
-          colors={attire?.female_primary_sponsors_colors}
-          prefix="female-sponsors"
-        />
-
-        <AttireBlock
-          title="Male Primary Sponsors"
-          description={attire?.male_primary_sponsors}
-          colors={attire?.male_primary_sponsors_colors}
-          prefix="male-sponsors"
-        />
-
-        {(attire?.ladies || attire?.gentlemen) && (
-          <div className="inv-attire-guests">
-            <h4 className="inv-attire-guests-heading">Guest</h4>
-
-            <AttireBlock
-              title="Ladies"
-              description={attire?.ladies}
-              colors={attire?.ladies_colors}
-              prefix="ladies"
-            />
-
-            <AttireBlock
-              title="Gentlemen"
-              description={attire?.gentlemen}
-              colors={attire?.gentlemen_colors}
-              prefix="gentlemen"
-            />
+        <div className="inv-attire-guide-card">
+          {/* Gentlemen's Pants */}
+          <div className="inv-attire-group-box">
+            <h5 className="inv-attire-group-title" style={{ color: 'var(--inv-primary)' }}>Gentlemen’s Pants</h5>
+            <div className="inv-attire-group-list">
+              {GENTLEMEN_PANTS_COLOR_GUIDE.map((item, idx) => (
+                <div key={idx} className="inv-attire-guide-item">
+                  <div className="inv-attire-guide-item-info">
+                    <strong className="inv-attire-role">{item.role}:</strong>{' '}
+                    <span className="inv-attire-color-label">{item.name}</span>
+                  </div>
+                  <div className="inv-attire-swatch-pills">
+                    {item.colors.map((c, cIdx) => (
+                      <span key={cIdx} className="inv-attire-pill-swatch" style={{ background: c }} title={item.name} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
 
-        {attire?.reminders && (
-          <div className="inv-attire-reminders">
-            <span>Reminders</span>
-            <p>{attire.reminders}</p>
+          {/* Ladies' Gowns */}
+          <div className="inv-attire-group-box" style={{ marginTop: 20 }}>
+            <h5 className="inv-attire-group-title" style={{ color: 'var(--inv-primary)' }}>Ladies’ Gowns</h5>
+            <div className="inv-attire-group-list">
+              {LADIES_GOWNS_COLOR_GUIDE.map((item, idx) => (
+                <div key={idx} className="inv-attire-guide-item">
+                  <div className="inv-attire-guide-item-info">
+                    <strong className="inv-attire-role">{item.role}:</strong>{' '}
+                    <span className="inv-attire-color-label">{item.name}</span>
+                  </div>
+                  <div className="inv-attire-swatch-pills">
+                    {item.colors.map((c, cIdx) => (
+                      <span key={cIdx} className="inv-attire-pill-swatch" style={{ background: c }} title={item.name} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

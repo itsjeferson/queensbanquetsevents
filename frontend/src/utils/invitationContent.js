@@ -45,15 +45,16 @@ export const defaultEntourage = () => ({
 });
 
 export const defaultAttire = () => ({
-  female_primary_sponsors: '',
-  male_primary_sponsors: '',
-  ladies: '',
-  gentlemen: '',
-  female_primary_sponsors_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
-  male_primary_sponsors_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
-  ladies_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
-  gentlemen_colors: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
-  reminders: '',
+  female_primary_sponsors: 'Ninangs: Mid-Blue',
+  male_primary_sponsors: 'Ninongs: Light Brown',
+  ladies: 'Mothers: Beacon Blue | Ninangs: Mid-Blue | Bridesmaids: Pale Blue or Lime Cream | Female Secondary Sponsors: Titanite Green | All Other Ladies: Light Beige, Warm Taupe, Sage Green, or Espresso',
+  gentlemen: 'Groom: Dark Brown | Ninongs: Light Brown | Groomsmen & Secondary Sponsors: Black | All Other Gentlemen: Black',
+  female_primary_sponsors_colors: ['#1E88E5', '#1565C0', '#FFFFFF', '#FFFFFF'],
+  male_primary_sponsors_colors: ['#A1887F', '#8D6E63', '#FFFFFF', '#FFFFFF'],
+  ladies_colors: ['#0288D1', '#1E88E5', '#81D4FA', '#43A047'],
+  gentlemen_colors: ['#4E342E', '#A1887F', '#111111', '#111111'],
+  reminders: 'To honor our wedding party and family, we have assigned specific colors for each group.',
+  color_guide_note: 'To honor our wedding party and family, we have assigned specific colors for each group.',
 });
 
 export const defaultWeddingInvitationContent = {
@@ -74,7 +75,7 @@ export const defaultWeddingInvitationContent = {
   countdown_title: 'Countdown to forever:',
   countdown_bg_media: '',
   std_music_url: '',
-  dress_code: 'Formal / Black Tie Optional',
+  dress_code: 'Formal Filipino',
   rsvp_note: 'You are special to us. Kindly confirm your attendance below.',
   coordinator: '',
   story: {

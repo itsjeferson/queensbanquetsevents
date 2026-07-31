@@ -359,10 +359,17 @@
 .inv-details-card {
   max-width: 980px;
   margin: 0 auto;
-  border-radius: 8px;
-  background: var(--inv-paper);
-  padding: clamp(34px, 6vw, 72px);
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0;
   text-align: center;
+}
+
+.inv-details-card .inv-script-title,
+.inv-details-band .inv-script-title {
+  color: #ffffff !important;
 }
 
 .inv-details-grid {
@@ -372,11 +379,14 @@
   margin-top: 36px;
 }
 
-.inv-detail-card {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid var(--inv-primary-soft-strong);
+.inv-detail-card,
+.inv-venue-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 26px;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
 .inv-detail-card span {
@@ -623,9 +633,119 @@
 }
 
 .inv-attire-stack {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
   text-align: center;
+}
+
+.inv-attire-header-block {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.inv-attire-general-note {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--inv-muted, #555);
+  margin-top: 12px;
+}
+
+.inv-attire-guide-card {
+  max-width: 680px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 32px 28px;
+  border-radius: 12px;
+  border: 1px solid var(--inv-line, #e2d7c7);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  text-align: left;
+}
+
+.inv-attire-guide-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--inv-primary, #6b8f71);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.inv-attire-guide-intro {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.inv-attire-group-box {
+  background: #faf8f5;
+  border-radius: 8px;
+  padding: 18px 20px;
+  border: 1px solid #f0e8dc;
+}
+
+.inv-attire-group-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--inv-primary, #2d4331);
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--inv-line, #e8dfd1);
+  padding-bottom: 6px;
+}
+
+.inv-attire-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inv-attire-guide-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inv-attire-guide-item-info {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.inv-attire-role {
+  font-weight: 600;
+  color: #222;
+}
+
+.inv-attire-color-label {
+  color: #555;
+}
+
+.inv-attire-swatch-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inv-attire-pill-swatch {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .inv-attire-block {
@@ -3938,7 +4058,7 @@ html.invitation-scroll::-webkit-scrollbar {
 }
 
 .inv-main[data-template-id="3"] .inv-opened-hero-content h1 {
-  font-size: clamp(52px, 10vw, 96px) !important;
+  font-size: clamp(32px, 7vw, 96px) !important;
   color: #fff !important;
   text-shadow: 0 2px 32px rgba(26, 42, 28, 0.45);
   margin-bottom: 8px;
@@ -8051,5 +8171,239 @@ html.invitation-scroll::-webkit-scrollbar {
 @media (max-width: 768px) {
   .inv-std-classic-bg {
     position: absolute;
+  }
+}
+
+/* ── Comprehensive Mobile Responsiveness Fixes (< 640px) ── */
+@media (max-width: 640px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .inv-section {
+    padding: clamp(32px, 7vw, 48px) 12px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .inv-section-shell {
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .inv-floral-frame-section {
+    padding: 14px 8px;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* Opened Hero Section - Mobile Zoom Out Fix */
+  .inv-opened-hero,
+  .inv-main[data-template-id="3"] .inv-opened-hero {
+    min-height: 60vh;
+    height: 72vh;
+    max-height: 640px;
+  }
+  .inv-opened-hero-bg,
+  .inv-main[data-template-id="3"] .inv-opened-hero-bg {
+    object-fit: cover;
+    object-position: center 25%;
+  }
+  .inv-opened-hero-content {
+    padding: 0 12px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .inv-opened-hero-content h1,
+  .inv-main[data-template-id="3"] .inv-opened-hero-content h1 {
+    font-size: clamp(20px, 6vw, 32px) !important;
+    letter-spacing: 0.03em !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+    padding: 0 4px !important;
+  }
+  .inv-opened-hero-subtitle {
+    font-size: clamp(13px, 4vw, 16px);
+  }
+
+  /* Quote Block & Music Player */
+  .inv-quote-block {
+    padding: 20px 14px;
+    margin: 0 4px;
+  }
+  .music-player-card {
+    padding: 16px 12px;
+    margin: 16px auto;
+    width: calc(100% - 16px);
+    box-sizing: border-box;
+  }
+  .music-play-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* Couple Showcase */
+  .inv-couple-showcase {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .inv-profile-card {
+    max-width: 100%;
+    padding: 16px 12px;
+  }
+
+  /* Wedding Details & Venue */
+  .inv-details-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .inv-detail-card {
+    padding: 18px 14px;
+  }
+  .inv-map-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+  }
+
+  /* Countdown Section */
+  .inv-countdown-band-media {
+    padding: 36px 12px;
+    min-height: 220px;
+  }
+  .inv-countdown-timer {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .inv-countdown-item {
+    min-width: 58px;
+    padding: 8px 6px;
+  }
+  .inv-countdown-value {
+    font-size: clamp(20px, 6vw, 28px);
+  }
+  .inv-countdown-label {
+    font-size: 10px;
+  }
+
+  /* Attire Section */
+  .inv-attire-stack {
+    padding: 0 2px;
+  }
+  .inv-attire-guide-card {
+    padding: 18px 12px;
+    border-radius: 10px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .inv-attire-group-box {
+    padding: 14px 10px;
+    border-radius: 8px;
+  }
+  .inv-attire-guide-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .inv-attire-guide-item-info {
+    font-size: 12.5px;
+    max-width: 72%;
+    word-break: break-word;
+  }
+  .inv-attire-swatch-pills {
+    gap: 4px;
+  }
+  .inv-attire-pill-swatch {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Entourage Section */
+  .inv-entourage-grid {
+    grid-template-columns: 1fr;
+    gap: 20px 12px;
+  }
+  .inv-entourage-group p,
+  .inv-entourage-group li {
+    font-size: 18px;
+  }
+
+  /* Timeline / Program */
+  .inv-timeline {
+    padding-left: 14px;
+  }
+  .inv-timeline-item {
+    padding-left: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* Gift Registry Cards */
+  .inv-gift-info {
+    padding: 18px 12px;
+  }
+  .inv-payment-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .inv-gift-card {
+    padding: 16px 12px;
+  }
+  .inv-copy-account-btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  /* RSVP Form & Inputs */
+  .inv-rsvp-form {
+    padding: 18px 12px;
+  }
+  .inv-rsvp-form input,
+  .inv-rsvp-form select,
+  .inv-rsvp-form textarea {
+    font-size: 16px !important; /* Prevents iOS auto-zoom */
+  }
+  .inv-attendance-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .inv-attendance-btn {
+    min-height: 46px;
+    width: 100%;
+  }
+  .inv-rsvp-submit-btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  /* FAQs Section */
+  .inv-faq-item {
+    padding: 14px 12px;
+  }
+  .inv-faq-question {
+    font-size: 14px;
+    min-height: 44px;
+  }
+
+  /* Gallery / Slideshow */
+  .inv-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Guest Book & Footer */
+  .inv-guestbook-form {
+    padding: 16px 10px;
+  }
+  .inv-footer {
+    padding: 32px 14px 20px;
   }
 }

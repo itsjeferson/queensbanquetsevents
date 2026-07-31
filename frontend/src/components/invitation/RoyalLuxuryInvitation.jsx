@@ -345,84 +345,55 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
       )}
 
       {/* What To Wear */}
-      {(invitation?.dress_code || invitation?.attire?.female_primary_sponsors || invitation?.attire?.male_primary_sponsors || invitation?.attire?.ladies || invitation?.attire?.gentlemen || invitation?.attire?.reminders) && (
-        <div className="rl-attire-block">
-          <h4 className="rl-attire-heading">WHAT TO WEAR</h4>
-          {invitation.dress_code && (
-            <p className="rl-attire-dresscode">
-              Dress Code: <strong>{invitation.dress_code}</strong>
-            </p>
-          )}
+      {/* What To Wear */}
+      <div className="rl-attire-block">
+        <h4 className="rl-attire-heading">WHAT TO WEAR</h4>
+        <p className="rl-attire-dresscode">
+          Attire: <strong>{invitation.dress_code || 'Formal Filipino'}</strong>
+        </p>
 
-          {invitation.attire?.female_primary_sponsors && (
-            <div className="rl-attire-sub-block">
-              <h5 className="rl-attire-sub-title">FEMALE PRIMARY SPONSORS</h5>
-              <p className="rl-attire-sub-desc">{invitation.attire.female_primary_sponsors}</p>
-              {invitation.attire.female_primary_sponsors_colors && (
-                <div className="rl-attire-colors">
-                  {getCustomizedAttireColors(invitation.attire.female_primary_sponsors_colors).map((color, idx) => (
-                    <span key={idx} className="rl-attire-color-swatch" style={{ background: color }} />
-                  ))}
+        <p className="rl-attire-sub-desc" style={{ maxWidth: '640px', margin: '0 auto 20px', lineHeight: '1.6', color: '#e8dfd1' }}>
+          To honor our wedding party and family, we have assigned specific colors for each group.
+        </p>
+
+        <div className="rl-attire-guide-wrapper" style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'left', background: 'rgba(255, 255, 255, 0.05)', padding: '24px', borderRadius: '12px', border: '1px solid rgba(190, 155, 99, 0.3)' }}>
+          <div className="rl-attire-group-box">
+            <h6 style={{ fontSize: '14px', color: '#f3e7c4', borderBottom: '1px solid rgba(190, 155, 99, 0.25)', paddingBottom: '6px', marginBottom: '12px', letterSpacing: '0.08em' }}>GENTLEMEN’S PANTS</h6>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {GENTLEMEN_PANTS_COLOR_GUIDE.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ fontSize: '13px', color: '#e8dfd1' }}>
+                    <strong style={{ color: '#ffffff' }}>{item.role}:</strong> {item.name}
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {item.colors.map((c, cIdx) => (
+                      <span key={cIdx} style={{ width: '18px', height: '18px', borderRadius: '50%', background: c, border: '1px solid rgba(255,255,255,0.3)', display: 'inline-block' }} />
+                    ))}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          )}
+          </div>
 
-          {invitation.attire?.male_primary_sponsors && (
-            <div className="rl-attire-sub-block">
-              <h5 className="rl-attire-sub-title">MALE PRIMARY SPONSORS</h5>
-              <p className="rl-attire-sub-desc">{invitation.attire.male_primary_sponsors}</p>
-              {invitation.attire.male_primary_sponsors_colors && (
-                <div className="rl-attire-colors">
-                  {getCustomizedAttireColors(invitation.attire.male_primary_sponsors_colors).map((color, idx) => (
-                    <span key={idx} className="rl-attire-color-swatch" style={{ background: color }} />
-                  ))}
+          <div className="rl-attire-group-box" style={{ marginTop: '20px' }}>
+            <h6 style={{ fontSize: '14px', color: '#f3e7c4', borderBottom: '1px solid rgba(190, 155, 99, 0.25)', paddingBottom: '6px', marginBottom: '12px', letterSpacing: '0.08em' }}>LADIES’ GOWNS</h6>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {LADIES_GOWNS_COLOR_GUIDE.map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ fontSize: '13px', color: '#e8dfd1' }}>
+                    <strong style={{ color: '#ffffff' }}>{item.role}:</strong> {item.name}
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {item.colors.map((c, cIdx) => (
+                      <span key={cIdx} style={{ width: '18px', height: '18px', borderRadius: '50%', background: c, border: '1px solid rgba(255,255,255,0.3)', display: 'inline-block' }} />
+                    ))}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          )}
-
-          {(invitation.attire?.ladies || invitation.attire?.gentlemen) && (
-            <div className="rl-attire-guests">
-              <h5 className="rl-attire-sub-title" style={{ color: '#ffffff', fontSize: '13px', marginBottom: '16px' }}>GUEST</h5>
-              
-              {invitation.attire?.ladies && (
-                <div className="rl-attire-sub-block">
-                  <h6 className="rl-attire-sub-title">LADIES</h6>
-                  <p className="rl-attire-sub-desc">{invitation.attire.ladies}</p>
-                  {invitation.attire.ladies_colors && (
-                    <div className="rl-attire-colors">
-                      {getCustomizedAttireColors(invitation.attire.ladies_colors).map((color, idx) => (
-                        <span key={idx} className="rl-attire-color-swatch" style={{ background: color }} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {invitation.attire?.gentlemen && (
-                <div className="rl-attire-sub-block">
-                  <h6 className="rl-attire-sub-title">GENTLEMEN</h6>
-                  <p className="rl-attire-sub-desc">{invitation.attire.gentlemen}</p>
-                  {invitation.attire.gentlemen_colors && (
-                    <div className="rl-attire-colors">
-                      {getCustomizedAttireColors(invitation.attire.gentlemen_colors).map((color, idx) => (
-                        <span key={idx} className="rl-attire-color-swatch" style={{ background: color }} />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {invitation.attire?.reminders && (
-            <div className="rl-attire-reminders">
-              <p>{invitation.attire.reminders}</p>
-            </div>
-          )}
+          </div>
         </div>
-      )}
+      </div>
 
       {/* RSVP / Confirmation */}
       {!saveTheDateEnabled && (
