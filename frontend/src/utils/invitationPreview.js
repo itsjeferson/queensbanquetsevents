@@ -278,14 +278,12 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       program: program.length ? program : normalized.program,
       videos: (invitation.videos || []).filter((item) => pickText(item?.url)),
       faqs: (invitation.faqs || []).filter((item) => pickText(item?.question)),
-      gift_registry: giftPreferences || paymentDetails
-        ? {
-          ...templateInv.gift_registry,
-          ...invitation.gift_registry,
-          preferences: giftPreferences || templateInv.gift_registry?.preferences,
-          payment_details: paymentDetails,
-        }
-        : templateInv.gift_registry,
+      gift_registry: {
+        ...templateInv.gift_registry,
+        ...normalized.gift_registry,
+        preferences: giftPreferences || normalized.gift_registry?.preferences || templateInv.gift_registry?.preferences,
+        payment_details: paymentDetails || normalized.gift_registry?.payment_details || '',
+      },
       attire: hasAttireDetails(invitation.attire, invitation.dress_code)
         ? normalized.attire
         : templateInv.attire,

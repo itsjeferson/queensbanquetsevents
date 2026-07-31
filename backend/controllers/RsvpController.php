@@ -26,6 +26,21 @@ class RsvpController
         ]);
     }
 
+    public function existsByEvent(int $eventId): void
+    {
+        $name = trim((string) ($_GET['name'] ?? ''));
+        if ($name === '') {
+            sendError('name query param is required', 400);
+            return;
+        }
+        sendResponse([
+            'success' => true,
+            'data' => [
+                'exists' => Rsvp::existsForEvent($eventId, $name, null, null),
+            ],
+        ]);
+    }
+
     public function clearBySlug(string $slug): void
     {
         require_once __DIR__ . '/../models/Event.php';

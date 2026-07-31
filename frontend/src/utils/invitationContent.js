@@ -324,6 +324,18 @@ export function normalizeInvitationContent(invitation = {}) {
   const themeInput = extractInvitationThemeInput(invitation);
   const resolveMedia = (value) => resolveMediaUrl(value) || '';
 
+  const rawRegistry = invitation.gift_registry;
+  const giftRegistryObj = (rawRegistry && typeof rawRegistry === 'object' && !Array.isArray(rawRegistry))
+    ? rawRegistry
+    : {};
+
+  const gift_registry = {
+    ...defaultWeddingInvitationContent.gift_registry,
+    ...giftRegistryObj,
+    preferences: giftRegistryObj.preferences ?? giftRegistryObj.note ?? (typeof rawRegistry === 'string' ? rawRegistry : defaultWeddingInvitationContent.gift_registry.preferences),
+    payment_details: giftRegistryObj.payment_details ?? invitation.payment_details ?? '',
+  };
+
   return {
     ...defaultWeddingInvitationContent,
     ...invitation,
@@ -370,6 +382,7 @@ export function normalizeInvitationContent(invitation = {}) {
         image: resolveMedia(venue.reception?.image),
       },
     },
+    gift_registry,
     attire: { ...defaultAttire(), ...(invitation.attire || {}) },
     entourage: mergeEntourage(invitation.entourage),
     program: normalizeWeddingProgram(invitation.program),

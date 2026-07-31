@@ -50,6 +50,7 @@ export default function InvitationRenderer({
   forceSaveTheDateStage = false,
   rsvpForceForm = false,
   previewMode = false,
+  forceRsvpGate = false,
   onGuestUnlock,
 }) {
   const { event, invitation: rawInvitation = {}, guest_messages: guestMessages } = data;
@@ -103,7 +104,7 @@ export default function InvitationRenderer({
   const [resetRsvpUnlock] = useState(() => (
     previewMode ? consumeRsvpPreviewReset(unlockContext) : false
   ));
-  const skipStoredUnlock = previewMode || resetRsvpUnlock;
+  const skipStoredUnlock = previewMode || resetRsvpUnlock || forceRsvpGate;
   const [previewSessionUnlocked, setPreviewSessionUnlocked] = useState(false);
   const storedUnlock = !skipStoredUnlock && saveTheDateActive && hasRsvpUnlocked(unlockContext);
   const storedOpened = storedUnlock && hasInvitationOpened(unlockContext);
@@ -144,7 +145,7 @@ export default function InvitationRenderer({
       return;
     }
 
-    const unlocked = saveTheDateActive && hasRsvpUnlocked(unlockContext);
+    const unlocked = saveTheDateActive && !skipStoredUnlock && hasRsvpUnlocked(unlockContext);
     setRsvpUnlockedState(unlocked);
     setOpened(unlocked && hasInvitationOpened(unlockContext));
   }, [
@@ -157,6 +158,7 @@ export default function InvitationRenderer({
     previewMode,
     previewSessionUnlocked,
     resetRsvpUnlock,
+    skipStoredUnlock,
     unlockContext,
   ]);
 
@@ -279,14 +281,14 @@ export default function InvitationRenderer({
             )}
 
             {showCover && (
-              <CoverScreen event={event} invitation={invitation} onOpen={scrollToContent} labels={labels} />
+              <CoverScreen event={event} invitation={themedInvitation} onOpen={scrollToContent} labels={labels} />
             )}
 
             {showInvitation && (
               effectiveTemplateId === 3 ? (
                 <RoyalLuxuryInvitation
                   event={event}
-                  invitation={invitation}
+                  invitation={themedInvitation}
                   guestMessages={guestMessages}
                   shareUrl={shareUrl}
                   saveTheDateEnabled={saveTheDateActive}
@@ -294,7 +296,7 @@ export default function InvitationRenderer({
               ) : (
                 <InvitationMainContent
                   event={event}
-                  invitation={invitation}
+                  invitation={themedInvitation}
                   coupleName={coupleName}
                   shareUrl={shareUrl}
                   guestMessages={guestMessages}

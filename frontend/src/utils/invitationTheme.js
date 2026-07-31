@@ -140,11 +140,12 @@ export function getMotifPreviewColors(motif) {
 }
 
 export function resolveInvitationPalette(invitation = {}, motif = getMotifById(invitation.color_motif || 'classic-gold')) {
-  if (Array.isArray(invitation.palette_colors) && invitation.palette_colors.length >= PALETTE_COLOR_COUNT) {
-    return padPalette(invitation.palette_colors);
-  }
+  const activeMotifId = invitation.color_motif || 'classic-gold';
 
-  if ((invitation.color_motif || 'classic-gold') === 'custom') {
+  if (activeMotifId === 'custom') {
+    if (Array.isArray(invitation.palette_colors) && invitation.palette_colors.length >= PALETTE_COLOR_COUNT) {
+      return padPalette(invitation.palette_colors);
+    }
     return padPalette([
       invitation.primary_color,
       invitation.background_color,

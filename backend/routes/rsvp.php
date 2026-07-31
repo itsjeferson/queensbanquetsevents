@@ -10,6 +10,8 @@ switch ($method) {
     case 'GET':
         if ($action === 'event' && isset($parts[2])) {
             $controller->byEvent((int) $parts[2]);
+        } elseif ($action === 'exists' && isset($parts[2])) {
+            $controller->existsByEvent((int) $parts[2]);
         } elseif ($action === 'client' && isset($parts[2])) {
             $controller->byClient((int) $parts[2]);
         } else {

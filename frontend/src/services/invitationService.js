@@ -30,6 +30,7 @@ export const rsvpService = {
   getByEvent: (eventId) => api.get(`/rsvp/event/${eventId}`),
   getByClient: (clientId) => api.get(`/rsvp/client/${clientId}`),
   submit: (data) => api.post('/rsvp', data),
+  verifyRsvpExists: (eventId, name) => api.get(`/rsvp/exists/${eventId}?name=${encodeURIComponent(name)}`),
 };
 
 export const guestMessageService = {
