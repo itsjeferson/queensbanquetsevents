@@ -449,7 +449,6 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
             {invitation?.gift_registry?.payment_details && (
               <>
                 <div className="rl-gift-divider" />
-                <h5 className="rl-gift-payment-title">PAYMENT DETAILS</h5>
                 <p className="rl-gift-payment-body">
                   {invitation.gift_registry.payment_details}
                 </p>

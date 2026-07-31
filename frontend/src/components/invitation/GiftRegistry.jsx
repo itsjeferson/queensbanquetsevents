@@ -17,7 +17,6 @@ export default function GiftRegistry({ registry }) {
           {registry.preferences && <p>{registry.preferences}</p>}
           {registry.payment_details && (
             <div className="inv-gift-payment">
-              <strong>Payment Details</strong>
               <p>{registry.payment_details}</p>
             </div>
           )}
