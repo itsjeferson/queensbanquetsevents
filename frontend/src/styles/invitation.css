@@ -3300,7 +3300,7 @@ html.invitation-scroll::-webkit-scrollbar {
 }
 
 .inv-std-classic-rsvp {
-  margin-top: auto;
+  margin-top: clamp(20px, 5vh, 40px);
   padding-top: 12px;
   --std-classic-control-width: min(100%, 260px);
 }
