@@ -10,7 +10,7 @@ const GENTLEMEN_PANTS_COLOR_GUIDE = [
 const LADIES_GOWNS_COLOR_GUIDE = [
   { role: 'Mothers of the Couple', name: 'Beacon Blue', colors: ['#0288D1'] },
   { role: 'Ninangs', name: 'Mid-Blue', colors: ['#1E88E5'] },
-  { role: 'Bridesmaids', name: 'Pale Blue or Lime Cream', colors: ['#81D4FA', '#E6EE9C'] },
+  { role: 'Bridesmaids', name: 'Pale Blue or Lime Cream', colors: ['#81D4FA', '#9ECE75'] },
   { role: 'Female Secondary Sponsors', name: 'Titanite Green', colors: ['#43A047'] },
   { role: 'All Other Ladies', name: 'Light Beige, Warm Taupe, Sage Green, or Espresso', colors: ['#F5F5DC', '#B0A99F', '#87A96B', '#362819'] },
 ];
