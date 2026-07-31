@@ -30,14 +30,19 @@
   letter-spacing: 0;
 }
 
-.invitation-page .btn-gold {
-  background: var(--inv-btn-bg, var(--inv-primary));
-  color: var(--inv-btn-text, #fff);
+.invitation-page .btn-gold,
+.inv-password-gate .btn-gold {
+  background: var(--inv-btn-bg, var(--inv-primary, #1B2B48)) !important;
+  border-color: var(--inv-btn-bg, var(--inv-primary, #1B2B48)) !important;
+  color: var(--inv-btn-text, #ffffff) !important;
 }
 
-.invitation-page .btn-gold:hover:not(:disabled) {
-  background: var(--inv-btn-hover, var(--inv-primary-dark));
-  box-shadow: 0 6px 20px var(--inv-btn-shadow, var(--inv-primary-shadow));
+.invitation-page .btn-gold:hover:not(:disabled),
+.inv-password-gate .btn-gold:hover:not(:disabled) {
+  background: var(--inv-btn-hover, var(--inv-primary-dark, #121F35)) !important;
+  border-color: var(--inv-btn-hover, var(--inv-primary-dark, #121F35)) !important;
+  color: var(--inv-btn-text, #ffffff) !important;
+  box-shadow: 0 6px 20px var(--inv-btn-shadow, var(--inv-primary-shadow, rgba(0, 0, 50, 0.25))) !important;
 }
 
 .invitation-page .btn-outline {
@@ -948,7 +953,9 @@
   font-style: italic;
   font-size: clamp(15px, 2vw, 19px);
   line-height: 1.35;
-  color: var(--inv-floral-bloom);
+  color: #B0DB8A !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   min-height: 2.7em;
   display: flex;
   align-items: flex-end;
@@ -4257,7 +4264,7 @@ html.invitation-scroll::-webkit-scrollbar {
 }
 
 .inv-main[data-template-id="3"] .inv-wedding-timeline-title {
-  color: #7E8F7A;
+  color: #B0DB8A !important;
   font-family: 'Lora', serif;
 }
 
