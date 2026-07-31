@@ -7413,14 +7413,14 @@ html.invitation-scroll::-webkit-scrollbar {
 .inv-std-classic-title-the {
   font-family: 'Great Vibes', cursive;
   font-size: clamp(28px, 5vw, 44px);
-  color: #e2c08d;
+  color: #ffffff;
   font-weight: 400;
 }
 
 .inv-std-classic-wedding-date {
   font-family: 'Playfair Display', serif;
   font-size: clamp(16px, 2.8vw, 22px);
-  color: #e2c08d;
+  color: #ffffff;
   letter-spacing: 0.1em;
   margin: 12px 0 16px;
   text-transform: uppercase;
@@ -7434,7 +7434,7 @@ html.invitation-scroll::-webkit-scrollbar {
 .inv-std-classic-for {
   font-family: 'Great Vibes', cursive;
   font-size: 24px;
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
   margin-bottom: 4px;
 }
 
@@ -7447,8 +7447,8 @@ html.invitation-scroll::-webkit-scrollbar {
 }
 
 .inv-std-rsvp-trigger-btn {
-  background: linear-gradient(135deg, #c5a059 0%, #e2c08d 100%);
-  color: #1a2a1c;
+  background: transparent;
+  color: #ffffff;
   font-family: 'Poppins', sans-serif;
   font-size: 15px;
   font-weight: 600;
@@ -7456,16 +7456,19 @@ html.invitation-scroll::-webkit-scrollbar {
   text-transform: uppercase;
   padding: 14px 44px;
   border-radius: 30px;
-  border: none;
+  border: 1.5px solid #ffffff;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(226, 192, 141, 0.35);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
   transition: all 0.25s ease;
   margin-top: 16px;
 }
 
 .inv-std-rsvp-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(226, 192, 141, 0.5);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
 }
 
 .inv-std-classic-form {
@@ -7476,7 +7479,7 @@ html.invitation-scroll::-webkit-scrollbar {
 .inv-std-classic-rsvp-title {
   font-family: 'Playfair Display', serif;
   font-size: 24px;
-  color: #e2c08d;
+  color: #ffffff;
   text-align: center;
   margin-bottom: 20px;
   letter-spacing: 0.1em;
