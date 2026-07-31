@@ -31,13 +31,13 @@
 }
 
 .invitation-page .btn-gold {
-  background: var(--inv-primary);
-  color: #fff;
+  background: var(--inv-btn-bg, var(--inv-primary));
+  color: var(--inv-btn-text, #fff);
 }
 
 .invitation-page .btn-gold:hover:not(:disabled) {
-  background: var(--inv-primary-dark);
-  box-shadow: 0 6px 20px var(--inv-primary-shadow);
+  background: var(--inv-btn-hover, var(--inv-primary-dark));
+  box-shadow: 0 6px 20px var(--inv-btn-shadow, var(--inv-primary-shadow));
 }
 
 .invitation-page .btn-outline {
@@ -409,9 +409,9 @@
   justify-content: center;
   margin-top: 16px;
   padding: 10px 18px;
-  background: var(--inv-primary);
-  border: 1px solid var(--inv-primary);
-  color: #fff;
+  background: var(--inv-btn-bg, var(--inv-primary));
+  border: 1px solid var(--inv-btn-bg, var(--inv-primary));
+  color: var(--inv-btn-text, #fff);
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
@@ -420,8 +420,8 @@
 }
 
 .inv-map-btn:hover {
-  background: var(--inv-primary-dark);
-  border-color: var(--inv-primary-dark);
+  background: var(--inv-btn-hover, var(--inv-primary-dark));
+  border-color: var(--inv-btn-hover, var(--inv-primary-dark));
 }
 
 .inv-faq-list summary:hover {
@@ -538,9 +538,9 @@
 }
 
 .inv-attendance-btn.active {
-  border-color: var(--inv-primary);
-  background: var(--inv-primary-soft);
-  color: var(--inv-primary);
+  border-color: var(--inv-btn-bg, var(--inv-primary));
+  background: var(--inv-btn-bg, var(--inv-primary));
+  color: var(--inv-btn-text, #ffffff);
   font-weight: 600;
 }
 
@@ -1615,6 +1615,16 @@
   text-transform: uppercase;
   margin-bottom: 12px;
   color: var(--inv-primary);
+}
+
+.inv-entourage-header-primary {
+  color: var(--inv-primary) !important;
+}
+
+.inv-entourage-header-accent {
+  color: #B0DB8A !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .inv-entourage-couple-row > div > span {
@@ -6342,21 +6352,21 @@ html.invitation-scroll::-webkit-scrollbar {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: var(--inv-floral-leaf, #6b8f71);
+  background-color: var(--inv-btn-bg, var(--inv-floral-leaf, #6b8f71));
   color: #ffffff;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(107, 143, 113, 0.25);
+  box-shadow: 0 4px 15px var(--inv-btn-shadow, rgba(107, 143, 113, 0.25));
   transition: all 0.2s ease;
 }
 
 .music-play-btn:hover {
   transform: scale(1.05);
-  background-color: var(--inv-floral-leaf-soft, #5f7d65);
-  box-shadow: 0 6px 20px rgba(107, 143, 113, 0.35);
+  background-color: var(--inv-btn-hover, var(--inv-floral-leaf-soft, #5f7d65));
+  box-shadow: 0 6px 20px var(--inv-btn-shadow, rgba(107, 143, 113, 0.35));
 }
 
 .music-player-progress-wrapper {

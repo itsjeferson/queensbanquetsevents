@@ -1,6 +1,6 @@
 import { normalizeColorToHex } from './colorInput';
 
-export const PALETTE_COLOR_COUNT = 6;
+export const PALETTE_COLOR_COUNT = 7;
 export const ATTIRE_COLOR_COUNT = 4;
 export const PALETTE_DEFAULT_COLOR = '#FFFFFF';
 export const ATTIRE_SWATCH_DEFAULT = PALETTE_DEFAULT_COLOR;
@@ -9,6 +9,7 @@ export const PALETTE_COLOR_LABELS = [
   'Headings',
   'Background',
   'Section Background',
+  'Button Color',
   'Accent',
   'Floral Bloom',
   'Floral Detail',
@@ -129,10 +130,11 @@ export function getMotifPaletteColors(motif) {
     motif.primary_color,
     motif.background_color,
     motif.secondary_color,
+    motif.button_color || motif.primary_color,
     motif.accent_colors[1] || motif.primary_color,
     motif.accent_colors[2] || motif.primary_color,
     motif.accent_colors[3] || motif.primary_color,
-  ]);
+  ], PALETTE_DEFAULT_COLOR, 7);
 }
 
 export function getMotifPreviewColors(motif) {
@@ -263,14 +265,20 @@ export function getInvitationThemeStyles(invitation = {}) {
   const theme = getInvitationTheme({ ...invitation, ...themeInput });
   const palette = theme.palette || resolveInvitationPalette({ ...invitation, ...themeInput });
   const rgb = parseHex(theme.primary);
-  const bloom = palette[4] || theme.primary;
-  const leaf = palette[5] || theme.primary_dark;
+  const buttonColor = palette[3] || theme.primary;
+  const buttonDark = darkenHex(buttonColor, 0.18);
+  const bloom = palette[5] || theme.primary;
+  const leaf = palette[6] || theme.primary_dark;
 
   return {
     '--inv-primary': theme.primary,
     '--inv-primary-dark': theme.primary_dark,
     '--inv-paper': theme.secondary,
     '--inv-background': theme.background,
+    '--inv-btn-bg': buttonColor,
+    '--inv-btn-hover': buttonDark,
+    '--inv-btn-text': '#ffffff',
+    '--inv-btn-shadow': rgbaFromHex(buttonColor, 0.35),
     '--inv-primary-rgb': rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : '180, 123, 54',
     '--inv-primary-soft': rgbaFromHex(theme.primary, 0.1),
     '--inv-primary-soft-strong': rgbaFromHex(theme.primary, 0.18),
@@ -280,7 +288,7 @@ export function getInvitationThemeStyles(invitation = {}) {
     '--inv-floral-bloom-soft': rgbaFromHex(bloom, 0.62),
     '--inv-floral-leaf': leaf,
     '--inv-floral-leaf-soft': rgbaFromHex(leaf, 0.72),
-    '--inv-floral-line': palette[3] || theme.primary,
+    '--inv-floral-line': palette[4] || theme.primary,
     '--inv-font-family': invitation.font_family || 'Playfair Display',
     '--inv-script-font': (invitation.font_family && (invitation.font_family.toLowerCase() === 'lora' || invitation.font_family.toLowerCase() === 'playfair display')) 
       ? "'Great Vibes', cursive" 

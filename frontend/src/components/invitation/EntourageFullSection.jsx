@@ -68,21 +68,21 @@ export default function EntourageFullSection({ entourage }) {
 
       <div className="inv-entourage-couple-row">
         <div>
-          <h4>Groom</h4>
+          <h4 className="inv-entourage-header-primary">Groom</h4>
           <SingleName value={groom?.name} />
           {groom?.parents?.length > 0 && (
             <>
-              <span>Parents of the Groom</span>
+              <span className="inv-entourage-header-accent">Parents of the Groom</span>
               <NameList items={groom.parents} />
             </>
           )}
         </div>
         <div>
-          <h4>Bride</h4>
+          <h4 className="inv-entourage-header-primary">Bride</h4>
           <SingleName value={bride?.name} />
           {bride?.parents?.length > 0 && (
             <>
-              <span>Parents of the Bride</span>
+              <span className="inv-entourage-header-accent">Parents of the Bride</span>
               <NameList items={bride.parents} />
             </>
           )}
@@ -93,11 +93,11 @@ export default function EntourageFullSection({ entourage }) {
         <div className="inv-entourage-block">
           <div className="inv-entourage-split">
             <div>
-              <span>Best Man{bestMen?.length > 1 ? 's' : ''}</span>
+              <span className="inv-entourage-header-accent">Best Man{bestMen?.length > 1 ? 's' : ''}</span>
               <NameList items={bestMen} />
             </div>
             <div>
-              <span>Maid of Honor{maidList.length > 1 ? 's' : ''}</span>
+              <span className="inv-entourage-header-accent">Maid of Honor{maidList.length > 1 ? 's' : ''}</span>
               <NameList items={maidList} />
             </div>
           </div>
@@ -108,11 +108,11 @@ export default function EntourageFullSection({ entourage }) {
         <div className="inv-entourage-block">
           <div className="inv-entourage-split">
             <div>
-              <span>Groomsmen</span>
+              <span className="inv-entourage-header-accent">Groomsmen</span>
               <NameList items={groomsmen} />
             </div>
             <div>
-              <span>Bridesmaids</span>
+              <span className="inv-entourage-header-accent">Bridesmaids</span>
               <NameList items={bridesmaids} />
             </div>
           </div>
@@ -121,14 +121,14 @@ export default function EntourageFullSection({ entourage }) {
 
       {(principal?.male?.length || principal?.female?.length) && (
         <div className="inv-entourage-block">
-          <h4>Principal Sponsors</h4>
+          <h4 className="inv-entourage-header-primary">Principal Sponsors</h4>
           <div className="inv-entourage-split">
             <div>
-              <span>Male Sponsors</span>
+              <span className="inv-entourage-header-accent">Male Sponsors</span>
               <NameList items={principal.male} />
             </div>
             <div>
-              <span>Female Sponsors</span>
+              <span className="inv-entourage-header-accent">Female Sponsors</span>
               <NameList items={principal.female} />
             </div>
           </div>
@@ -137,18 +137,18 @@ export default function EntourageFullSection({ entourage }) {
 
       {(secondary?.candle?.length || secondary?.veil?.length || secondary?.cord?.length) && (
         <div className="inv-entourage-block">
-          <h4>Secondary Sponsors</h4>
+          <h4 className="inv-entourage-header-primary">Secondary Sponsors</h4>
           <div className="inv-entourage-triple">
             <div>
-              <span>Candle Sponsors</span>
+              <span className="inv-entourage-header-accent">Candle Sponsors</span>
               <NameList items={secondary.candle} />
             </div>
             <div>
-              <span>Veil Sponsors</span>
+              <span className="inv-entourage-header-accent">Veil Sponsors</span>
               <NameList items={secondary.veil} />
             </div>
             <div>
-              <span>Cord Sponsors</span>
+              <span className="inv-entourage-header-accent">Cord Sponsors</span>
               <NameList items={secondary.cord} />
             </div>
           </div>
@@ -159,15 +159,15 @@ export default function EntourageFullSection({ entourage }) {
         <div className="inv-entourage-block">
           <div className="inv-entourage-triple">
             <div>
-              <span>Bible Bearer{bibleList.length > 1 ? 's' : ''}</span>
+              <span className="inv-entourage-header-accent">Bible Bearer{bibleList.length > 1 ? 's' : ''}</span>
               <NameList items={bibleList} />
             </div>
             <div>
-              <span>Ring Bearer{ringList.length > 1 ? 's' : ''}</span>
+              <span className="inv-entourage-header-accent">Ring Bearer{ringList.length > 1 ? 's' : ''}</span>
               <NameList items={ringList} />
             </div>
             <div>
-              <span>Coin Bearer{coinList.length > 1 ? 's' : ''}</span>
+              <span className="inv-entourage-header-accent">Coin Bearer{coinList.length > 1 ? 's' : ''}</span>
               <NameList items={coinList} />
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function EntourageFullSection({ entourage }) {
 
       {flowerGirls?.length > 0 && (
         <div className="inv-entourage-block">
-          <h4>Flower Girls</h4>
+          <h4 className="inv-entourage-header-accent">Flower Girls</h4>
           <NameList items={flowerGirls} />
         </div>
       )}
