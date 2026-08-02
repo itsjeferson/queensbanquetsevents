@@ -1,21 +1,19 @@
-# Fullstack Developer Report: Default Mark & She Design Implementation
+# Fullstack Developer Report
 
-## Modifications Summary
+## Summary of Completed Tasks
 
-1. `backend/models/InvitationPage.php`:
-   - Updated `markPublished` to set `template_id = COALESCE(template_id, 1)` when an invitation is published.
-   - Updated `formatForApi` to return `template_id => 1` by default when `template_id` is missing/null in the database.
-   - Updated `emptyDefault` to return `template_id => 1`.
-   - Updated `normalizeInput` to assign `template_id => 1` if no template ID is provided in data payload.
+### 1. What To Wear Role Inputs (No Color Selection)
+- Updated **What To Wear** editor controls in `WeddingContentFields.jsx` & `RoyalLuxuryContentFields.jsx` to display clean text input fields for each group:
+  - **Gentlemen’s Pants**: Groom, Ninongs, Groomsmen & Secondary Sponsors, All Other Gentlemen
+  - **Ladies’ Gowns**: Mothers of the Couple, Ninangs, Bridesmaids, Female Secondary Sponsors, All Other Ladies
+- Removed the old color pickers from the What To Wear card.
+- Updated `AttireGuideSection.jsx` & `RoyalLuxuryInvitation.jsx` to dynamically render role descriptions.
 
-2. `frontend/src/utils/invitationContent.js`:
-   - Updated `normalizeInvitationContent` to default `template_id` to `1` when unspecified or falsy.
+### 2. Custom Color Guide Image Upload Option
+- Added `color_guide_image` field in `invitationContent.js` defaults & normalization.
+- Updated `ColorGuideSection.jsx` to render custom uploaded image when `color_guide_image` is provided, or default swatch grid when no image is uploaded.
+- Added `MediaField` upload control for **Custom Color Guide Design Image (Optional)** in `WeddingContentFields.jsx` and `RoyalLuxuryContentFields.jsx`.
 
-3. `frontend/src/components/invitation/InvitationRenderer.jsx`:
-   - Added `effectiveTemplateId = Number(invitation?.template_id) || 1` so that template 1 (`<InvitationMainContent>` rendering Mark & She hero banner, PLAY OUR SONG card, story balloons, M&S monogram, and groom/bride profiles) renders by default.
-
-4. `frontend/src/pages/client/InvitationBuilder.jsx`:
-   - Updated form initialization state so default `template_id` is `1`.
-
-5. `frontend/src/components/invitation/InvitationTemplateSelector.jsx`:
-   - Updated selection check to default fallback to Template ID `1` if `selectedId` is undefined or falsy.
+### 3. Section Order Auto-Inclusion Fix
+- Updated `getVisibleContentRevealOrder` in `contentReveal.js` so `color_guide` section is automatically included right after `attire` on existing saved invitation drafts where `content_reveal_order` was saved prior to adding `color_guide`.
+- Updated PHP backend model `InvitationPage.php` to persist `$story['color_guide_image']` into database JSON.

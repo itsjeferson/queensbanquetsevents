@@ -45,17 +45,36 @@ export const defaultEntourage = () => ({
 });
 
 export const defaultAttire = () => ({
-  female_primary_sponsors: 'Ninangs: Mid-Blue',
-  male_primary_sponsors: 'Ninongs: Light Brown',
-  ladies: 'Mothers: Beacon Blue | Ninangs: Mid-Blue | Bridesmaids: Pale Blue or Lime Cream | Female Secondary Sponsors: Titanite Green | All Other Ladies: Light Beige, Warm Taupe, Sage Green, or Espresso',
-  gentlemen: 'Groom: Dark Brown | Ninongs: Light Brown | Groomsmen & Secondary Sponsors: Black | All Other Gentlemen: Black',
-  female_primary_sponsors_colors: ['#1E88E5', '#1565C0', '#FFFFFF', '#FFFFFF'],
-  male_primary_sponsors_colors: ['#A1887F', '#8D6E63', '#FFFFFF', '#FFFFFF'],
-  ladies_colors: ['#0288D1', '#1E88E5', '#81D4FA', '#43A047'],
-  gentlemen_colors: ['#4E342E', '#A1887F', '#111111', '#111111'],
+  dress_code: 'Formal Filipino',
+  gentlemen_pants: {
+    groom: 'Dark Brown',
+    ninongs: 'Light Brown',
+    groomsmen: 'Black',
+    other_gentlemen: 'Black',
+  },
+  ladies_gowns: {
+    mothers: 'Beacon Blue',
+    ninangs: 'Mid-Blue',
+    bridesmaids: 'Pale Blue or Lime Cream',
+    secondary_sponsors: 'Titanite Green',
+    other_ladies: 'Light Beige, Warm Taupe, Sage Green, or Espresso',
+  },
   reminders: 'To honor our wedding party and family, we have assigned specific colors for each group.',
   color_guide_note: 'To honor our wedding party and family, we have assigned specific colors for each group.',
 });
+
+export const defaultColorGuide = () => [
+  { name: 'NAVY / DEEP BEACON', color: '#091333' },
+  { name: 'MID-BLUE', color: '#6184a8' },
+  { name: 'PALE BLUE', color: '#b5d4e8' },
+  { name: 'TITANITE GREEN', color: '#739527' },
+  { name: 'LIME CREAM', color: '#b6e18c' },
+  { name: 'SOFT CREAM', color: '#fef4c9' },
+  { name: 'SAGE GREEN', color: '#a2c983' },
+  { name: 'LIGHT BEIGE', color: '#e6dfc9' },
+  { name: 'WARM TAUPE', color: '#d7a26c' },
+  { name: 'ESPRESSO', color: '#6f6356' },
+];
 
 export const defaultWeddingInvitationContent = {
   opening_line: 'With great joy, we invite you',
@@ -102,9 +121,16 @@ export const defaultWeddingInvitationContent = {
     payment_details: '',
   },
   attire: defaultAttire(),
+  color_guide: defaultColorGuide(),
+  color_guide_image: '',
   faqs: [],
   entourage: defaultEntourage(),
   qr_enabled: 1,
+  hide_qr_share: false,
+  hide_share_button: false,
+  hide_rsvp_button: false,
+  hide_rsvp: false,
+  hide_footer: false,
   color_motif: 'classic-gold',
   primary_color: '#B47B36',
   secondary_color: '#F4EEE7',
@@ -384,7 +410,22 @@ export function normalizeInvitationContent(invitation = {}) {
       },
     },
     gift_registry,
-    attire: { ...defaultAttire(), ...(invitation.attire || {}) },
+    attire: {
+      ...defaultAttire(),
+      ...(invitation.attire || {}),
+      gentlemen_pants: {
+        ...defaultAttire().gentlemen_pants,
+        ...(invitation.attire?.gentlemen_pants || {}),
+      },
+      ladies_gowns: {
+        ...defaultAttire().ladies_gowns,
+        ...(invitation.attire?.ladies_gowns || {}),
+      },
+    },
+    color_guide: Array.isArray(invitation.color_guide) && invitation.color_guide.length > 0
+      ? invitation.color_guide
+      : defaultColorGuide(),
+    color_guide_image: resolveMedia(invitation.color_guide_image),
     entourage: mergeEntourage(invitation.entourage),
     program: normalizeWeddingProgram(invitation.program),
     gallery: (Array.isArray(invitation.gallery) ? invitation.gallery : []).map((item) => ({
@@ -404,10 +445,26 @@ export function normalizeInvitationContent(invitation = {}) {
       ? invitation.content_reveal_order
       : [],
     floral_design_enabled: invitation.floral_design_enabled !== false,
+    hide_qr_share: Boolean(invitation.hide_qr_share || invitation.qr_enabled === false || invitation.qr_enabled === 0 || invitation.qr_enabled === '0'),
+    hide_share_button: Boolean(invitation.hide_share_button),
+    hide_rsvp_button: Boolean(invitation.hide_rsvp_button),
+    hide_rsvp: Boolean(invitation.hide_rsvp),
+    hide_footer: Boolean(invitation.hide_footer),
     ...resolveInvitationThemeFields(themeInput),
     password_protected: isPasswordProtected(invitation),
     password: invitation.password || '',
   };
+}
+
+/** True when QR / Scan to View share section is enabled. */
+export function isQrShareEnabled(invitation = {}) {
+  if (invitation.hide_qr_share === true || invitation.hide_qr_share === 1 || invitation.hide_qr_share === '1' || invitation.hide_qr_share === 'true') {
+    return false;
+  }
+  if (invitation.qr_enabled === false || invitation.qr_enabled === 0 || invitation.qr_enabled === '0' || invitation.qr_enabled === 'false') {
+    return false;
+  }
+  return true;
 }
 
 /** True when password protection is explicitly enabled. */

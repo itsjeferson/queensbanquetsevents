@@ -203,6 +203,74 @@ export default function InvitationExperienceSettings({
         )}
       </div>
 
+      <div className="form-group" style={{ marginTop: 24, borderTop: '1px solid #eee', paddingTop: 24 }}>
+        <span className="inv-settings-field-label" style={{ display: 'block', marginBottom: 6 }}>
+          Section & Sharing Visibility
+        </span>
+        <p className="form-help" style={{ marginBottom: 16 }}>
+          Choose which sharing features, RSVP forms, or footer components to show or hide for guests.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <label className="inv-settings-toggle">
+            <input
+              type="checkbox"
+              checked={Boolean(
+                invitation.hide_qr_share ||
+                invitation.qr_enabled === false ||
+                invitation.qr_enabled === 0 ||
+                invitation.qr_enabled === '0' ||
+                invitation.qr_enabled === 'false'
+              )}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onChange({ hide_qr_share: checked, qr_enabled: checked ? 0 : 1 });
+              }}
+            />
+            <span>
+              <strong>Hide "Scan to View" (QR Code Section)</strong>
+              <small>Hides the QR Code and Scan to View section from the invitation.</small>
+            </span>
+          </label>
+
+          <label className="inv-settings-toggle">
+            <input
+              type="checkbox"
+              checked={Boolean(invitation.hide_share_button)}
+              onChange={(e) => onChange({ hide_share_button: e.target.checked })}
+            />
+            <span>
+              <strong>Hide "Share Invitation" Button</strong>
+              <small>Hides the Share Invitation button in the Thank You footer.</small>
+            </span>
+          </label>
+
+          <label className="inv-settings-toggle">
+            <input
+              type="checkbox"
+              checked={Boolean(invitation.hide_rsvp || invitation.hide_rsvp_button)}
+              onChange={(e) => onChange({ hide_rsvp: e.target.checked, hide_rsvp_button: e.target.checked })}
+            />
+            <span>
+              <strong>Hide RSVP Form & RSVP Now Button</strong>
+              <small>Hides the RSVP submission form and RSVP button from guests.</small>
+            </span>
+          </label>
+
+          <label className="inv-settings-toggle">
+            <input
+              type="checkbox"
+              checked={Boolean(invitation.hide_footer)}
+              onChange={(e) => onChange({ hide_footer: e.target.checked })}
+            />
+            <span>
+              <strong>Hide Thank You Footer Section</strong>
+              <small>Hides the entire Thank You footer section at the bottom of the invitation.</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
       {/* Envelope & Seal Styling (Interactive envelope cover) */}
       {(Number(invitation.template_id || 1) >= 1) && (
         <div className="form-group" style={{ marginTop: 24, borderTop: '1px solid #eee', paddingTop: 24 }}>

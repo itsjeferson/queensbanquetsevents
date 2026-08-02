@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import PanelNavbar from '../components/common/Navbar/PanelNavbar';
 import Sidebar from '../components/common/Sidebar/Sidebar';
+import ScrollToTopButton from '../components/common/ScrollToTop/ScrollToTopButton';
 
 export default function DashboardShell({
   navItems,
@@ -58,6 +59,7 @@ export default function DashboardShell({
         </main>
       </div>
       {notificationPanel}
+      <ScrollToTopButton />
     </>
   );
 }

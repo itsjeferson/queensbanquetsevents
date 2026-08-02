@@ -1801,6 +1801,38 @@
   background: var(--inv-paper);
 }
 
+.inv-slideshow-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 22px;
+  max-width: 720px;
+}
+
+.inv-slideshow-tabs button {
+  border: 1px solid rgba(var(--inv-primary-rgb), 0.35);
+  background: transparent;
+  color: var(--inv-primary);
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  padding: 7px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.inv-slideshow-tabs button:hover {
+  background: rgba(var(--inv-primary-rgb), 0.08);
+}
+
+.inv-slideshow-tabs button.active {
+  background: var(--inv-primary);
+  color: var(--inv-paper);
+  border-color: var(--inv-primary);
+}
+
 .inv-slideshow {
   max-width: 720px;
   margin: 0 auto;

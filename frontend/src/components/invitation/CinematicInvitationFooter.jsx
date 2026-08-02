@@ -56,11 +56,20 @@ function MarqueeItem() {
   );
 }
 
-export default function CinematicInvitationFooter({ eventName = '', shareUrl = '', coupleName = '' }) {
+export default function CinematicInvitationFooter({
+  eventName = '',
+  shareUrl = '',
+  coupleName = '',
+  hideShareButton = false,
+  hideRsvpButton = false,
+  hideFooter = false,
+}) {
   const wrapperRef = useRef(null);
   const giantTextRef = useRef(null);
   const headingRef = useRef(null);
   const linksRef = useRef(null);
+
+  if (hideFooter) return null;
 
   const displayName = coupleName || eventName || 'Forever';
 
@@ -130,21 +139,27 @@ export default function CinematicInvitationFooter({ eventName = '', shareUrl = '
         </h2>
 
         <div ref={linksRef} className="cf-links">
-          <div className="cf-buttons-primary">
-            <MagneticButton as="a" href="#rsvp" onClick={handleRsvpClick} className="cf-glass-pill">
-              <svg className="cf-glass-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-              RSVP Now
-            </MagneticButton>
-            <MagneticButton as="button" onClick={handleShare} className="cf-glass-pill">
-              <svg className="cf-glass-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-              </svg>
-              Share Invitation
-            </MagneticButton>
-          </div>
+          {(!hideRsvpButton || !hideShareButton) && (
+            <div className="cf-buttons-primary">
+              {!hideRsvpButton && (
+                <MagneticButton as="a" href="#rsvp" onClick={handleRsvpClick} className="cf-glass-pill">
+                  <svg className="cf-glass-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  RSVP Now
+                </MagneticButton>
+              )}
+              {!hideShareButton && (
+                <MagneticButton as="button" onClick={handleShare} className="cf-glass-pill">
+                  <svg className="cf-glass-pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                  Share Invitation
+                </MagneticButton>
+              )}
+            </div>
+          )}
 
           <div className="cf-buttons-secondary">
             <MagneticButton as="a" href="#guest_book" className="cf-glass-pill cf-glass-pill-sm">

@@ -1,5 +1,5 @@
-export default function QRShare({ url, enabled }) {
-  if (!enabled || !url) return null;
+export default function QRShare({ url, enabled = true }) {
+  if (enabled === false || enabled === 0 || enabled === '0' || enabled === 'false' || !url) return null;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
 
   return (

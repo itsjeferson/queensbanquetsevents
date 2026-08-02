@@ -11,6 +11,7 @@ export const CONTENT_REVEAL_SECTIONS = [
   { id: 'rsvp', label: 'RSVP' },
   { id: 'entourage', label: 'Entourage' },
   { id: 'attire', label: 'Attire Guide' },
+  { id: 'color_guide', label: 'Color Guide' },
   { id: 'program', label: 'Program / Timeline' },
   { id: 'gift_registry', label: 'Gift Registry' },
   { id: 'faqs', label: 'FAQs' },
@@ -22,9 +23,13 @@ export const CONTENT_REVEAL_SECTIONS = [
 
 export const DEFAULT_CONTENT_REVEAL_ORDER = CONTENT_REVEAL_SECTIONS.map((section) => section.id);
 
-export function getAvailableRevealSections({ hideRsvp = false } = {}) {
-  if (!hideRsvp) return CONTENT_REVEAL_SECTIONS;
-  return CONTENT_REVEAL_SECTIONS.filter((section) => section.id !== 'rsvp');
+export function getAvailableRevealSections({ hideRsvp = false, hideQr = false, hideFooter = false } = {}) {
+  return CONTENT_REVEAL_SECTIONS.filter((section) => {
+    if (hideRsvp && section.id === 'rsvp') return false;
+    if (hideQr && section.id === 'qr_share') return false;
+    if (hideFooter && section.id === 'footer') return false;
+    return true;
+  });
 }
 
 export function getDefaultContentRevealOrder(options = {}) {
@@ -36,6 +41,16 @@ export function getVisibleContentRevealOrder(order, options = {}) {
   const available = getAvailableRevealSections(options).map((section) => section.id);
   const source = Array.isArray(order) ? order.filter((id) => available.includes(id)) : [];
   if (!source.length) return available;
+
+  if (available.includes('color_guide') && !source.includes('color_guide')) {
+    const attireIndex = source.indexOf('attire');
+    if (attireIndex >= 0) {
+      source.splice(attireIndex + 1, 0, 'color_guide');
+    } else {
+      source.push('color_guide');
+    }
+  }
+
   return source;
 }
 
@@ -93,11 +108,23 @@ export function moveContentRevealSection(order, sectionId, direction, options = 
 }
 
 export function resolveInvitationSectionOrder(invitation = {}, options = {}) {
+  const hideQr = Boolean(
+    invitation.hide_qr_share ||
+    invitation.qr_enabled === false ||
+    invitation.qr_enabled === 0 ||
+    invitation.qr_enabled === '0'
+  );
+  const mergedOptions = {
+    ...options,
+    hideRsvp: Boolean(options.hideRsvp || invitation.hide_rsvp),
+    hideQr: Boolean(options.hideQr || hideQr),
+    hideFooter: Boolean(options.hideFooter || invitation.hide_footer),
+  };
   const gradual = invitation.content_reveal_mode === 'gradual';
   if (gradual) {
-    return getVisibleContentRevealOrder(invitation.content_reveal_order, options);
+    return getVisibleContentRevealOrder(invitation.content_reveal_order, mergedOptions);
   }
-  return getDefaultContentRevealOrder(options);
+  return getDefaultContentRevealOrder(mergedOptions);
 }
 
 export function getContentRevealSectionLabel(sectionId) {

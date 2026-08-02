@@ -7,6 +7,7 @@ import CoupleShowcaseSection from './CoupleShowcaseSection';
 import WeddingDetailsSection from './WeddingDetailsSection';
 import EntourageFullSection from './EntourageFullSection';
 import AttireGuideSection from './AttireGuideSection';
+import ColorGuideSection from './ColorGuideSection';
 import TimelineSection from './TimelineSection';
 import GiftRegistry from './GiftRegistry';
 import FaqSection from './FaqSection';
@@ -18,6 +19,7 @@ import InvitationFooter from './InvitationFooter';
 import FloralCornerFrame from './FloralCornerFrame';
 import MusicPlayerCard from './MusicPlayerCard';
 import WeddingMonthCalendar from './WeddingMonthCalendar';
+import ScrollToTopButton from '../common/ScrollToTop/ScrollToTopButton';
 import { parseEventDate } from '../../utils/eventDate';
 import { isDirectVideoUrl, resolveMediaUrl } from '../../utils/mediaUrl';
 import { useEffect, useRef } from 'react';
@@ -170,7 +172,7 @@ export function renderInvitationSection(sectionId, ctx) {
         </SectionShell>
       );
     case 'rsvp':
-      if (saveTheDateEnabled || invitation.save_the_date_enabled) return null;
+      if (saveTheDateEnabled || invitation.save_the_date_enabled || invitation.hide_rsvp) return null;
       return (
         <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
           <RSVPForm eventId={event.id} note={invitation.rsvp_note} />
@@ -190,6 +192,12 @@ export function renderInvitationSection(sectionId, ctx) {
             dressCode={invitation.dress_code}
             invitation={invitation}
           />
+        </SectionShell>
+      );
+    case 'color_guide':
+      return (
+        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+          <ColorGuideSection colorGuide={invitation.color_guide} image={invitation.color_guide_image} />
         </SectionShell>
       );
     case 'program':
@@ -223,14 +231,24 @@ export function renderInvitationSection(sectionId, ctx) {
         </SectionShell>
       );
     case 'qr_share':
+      if (invitation.hide_qr_share || invitation.qr_enabled === false || invitation.qr_enabled === 0 || invitation.qr_enabled === '0' || invitation.qr_enabled === 'false') {
+        return null;
+      }
       return (
         <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
           <QRShare url={shareUrl} enabled={invitation.qr_enabled} />
         </SectionShell>
       );
     case 'footer':
+      if (invitation.hide_footer) return null;
       return (
-        <InvitationFooter eventName={coupleName} shareUrl={shareUrl} />
+        <InvitationFooter
+          eventName={coupleName}
+          shareUrl={shareUrl}
+          hideShareButton={invitation.hide_share_button}
+          hideRsvpButton={invitation.hide_rsvp_button || invitation.hide_rsvp}
+          hideFooter={invitation.hide_footer}
+        />
       );
     default:
       return null;
@@ -278,6 +296,7 @@ export default function InvitationMainContent({
         if (!section) return null;
         return <div key={sectionId}>{section}</div>;
       })}
+      <ScrollToTopButton />
     </main>
   );
 }

@@ -73,11 +73,6 @@ export default function AttireGuideSection({ attire = {}, dressCode }) {
                     <strong className="inv-attire-role">{item.role}:</strong>{' '}
                     <span className="inv-attire-color-label">{item.name}</span>
                   </div>
-                  <div className="inv-attire-swatch-pills">
-                    {item.colors.map((c, cIdx) => (
-                      <span key={cIdx} className="inv-attire-pill-swatch" style={{ background: c }} title={item.name} />
-                    ))}
-                  </div>
                 </div>
               ))}
             </div>
@@ -92,11 +87,6 @@ export default function AttireGuideSection({ attire = {}, dressCode }) {
                   <div className="inv-attire-guide-item-info">
                     <strong className="inv-attire-role">{item.role}:</strong>{' '}
                     <span className="inv-attire-color-label">{item.name}</span>
-                  </div>
-                  <div className="inv-attire-swatch-pills">
-                    {item.colors.map((c, cIdx) => (
-                      <span key={cIdx} className="inv-attire-pill-swatch" style={{ background: c }} title={item.name} />
-                    ))}
                   </div>
                 </div>
               ))}

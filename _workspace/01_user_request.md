@@ -1,1 +1,1 @@
-Make Mark & She invitation design (Template 1: Classic Gold / Standard InvitationMainContent layout) the default design for all wedding invitations that will be published, created, saved, or rendered.
+here in the scan to view and the Share invitation and RSVP, i want you to add a option that can hide that part

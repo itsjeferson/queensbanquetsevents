@@ -156,6 +156,13 @@ class InvitationPage
             'seal_color' => $story['seal_color'] ?? '',
             'password_protected' => (bool) ($story['password_protected'] ?? false),
             'hide_music_player' => (bool) ($story['hide_music_player'] ?? false),
+            'hide_qr_share' => (bool) ($story['hide_qr_share'] ?? ((int)($row['qr_enabled'] ?? 1) === 0)),
+            'hide_share_button' => (bool) ($story['hide_share_button'] ?? false),
+            'hide_rsvp_button' => (bool) ($story['hide_rsvp_button'] ?? false),
+            'hide_rsvp' => (bool) ($story['hide_rsvp'] ?? false),
+            'hide_footer' => (bool) ($story['hide_footer'] ?? false),
+            'color_guide' => is_array($story['color_guide'] ?? null) ? $story['color_guide'] : [],
+            'color_guide_image' => $story['color_guide_image'] ?? '',
             'published_at' => $row['published_at'] ?? null,
         ];
     }
@@ -261,6 +268,22 @@ class InvitationPage
             unset($story['password_hash']);
         }
 
+        // Section & Button Hide Flags
+        $story['hide_qr_share'] = (bool) ($data['hide_qr_share'] ?? ($story['hide_qr_share'] ?? false));
+        $story['hide_share_button'] = (bool) ($data['hide_share_button'] ?? ($story['hide_share_button'] ?? false));
+        $story['hide_rsvp_button'] = (bool) ($data['hide_rsvp_button'] ?? ($story['hide_rsvp_button'] ?? false));
+        $story['hide_rsvp'] = (bool) ($data['hide_rsvp'] ?? ($story['hide_rsvp'] ?? false));
+        $story['hide_footer'] = (bool) ($data['hide_footer'] ?? ($story['hide_footer'] ?? false));
+        $story['color_guide'] = $data['color_guide'] ?? ($story['color_guide'] ?? []);
+        $story['color_guide_image'] = $data['color_guide_image'] ?? ($story['color_guide_image'] ?? '');
+
+        $qrEnabled = isset($data['qr_enabled'])
+            ? (int) $data['qr_enabled']
+            : ($story['hide_qr_share'] ? 0 : 1);
+        if (!empty($story['hide_qr_share'])) {
+            $qrEnabled = 0;
+        }
+
         return [
             'template_id' => (!empty($data['template_id']) && (int)$data['template_id'] !== 3) ? (int) $data['template_id'] : 1,
             'cover_image' => $data['cover_image'] ?? null,
@@ -275,7 +298,7 @@ class InvitationPage
             'gallery' => $data['gallery'] ?? [],
             'videos' => $data['videos'] ?? [],
             'gift_registry' => $data['gift_registry'] ?? [],
-            'qr_enabled' => $data['qr_enabled'] ?? 1,
+            'qr_enabled' => $qrEnabled,
         ];
     }
 

@@ -3,6 +3,9 @@ import { getCoupleDisplayName } from '../../utils/invitationContent';
 import { normalizeWeddingProgram } from '../../utils/weddingTimeline';
 import { resolveMediaUrl } from '../../utils/mediaUrl';
 import RSVPForm from './RSVPForm';
+import QRShare from './QRShare';
+import InvitationFooter from './InvitationFooter';
+import ColorGuideSection from './ColorGuideSection';
 import { getCustomizedAttireColors } from '../../utils/invitationTheme';
 
 /* ─── Royal Gold Gradient Defs ──────────────────────── */
@@ -361,15 +364,8 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
             <h6 style={{ fontSize: '14px', color: '#f3e7c4', borderBottom: '1px solid rgba(190, 155, 99, 0.25)', paddingBottom: '6px', marginBottom: '12px', letterSpacing: '0.08em' }}>GENTLEMEN’S PANTS</h6>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {GENTLEMEN_PANTS_COLOR_GUIDE.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ fontSize: '13px', color: '#e8dfd1' }}>
-                    <strong style={{ color: '#ffffff' }}>{item.role}:</strong> {item.name}
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    {item.colors.map((c, cIdx) => (
-                      <span key={cIdx} style={{ width: '18px', height: '18px', borderRadius: '50%', background: c, border: '1px solid rgba(255,255,255,0.3)', display: 'inline-block' }} />
-                    ))}
-                  </div>
+                <div key={idx} style={{ fontSize: '13px', color: '#e8dfd1' }}>
+                  <strong style={{ color: '#ffffff' }}>{item.role}:</strong> {item.name}
                 </div>
               ))}
             </div>
@@ -379,15 +375,8 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
             <h6 style={{ fontSize: '14px', color: '#f3e7c4', borderBottom: '1px solid rgba(190, 155, 99, 0.25)', paddingBottom: '6px', marginBottom: '12px', letterSpacing: '0.08em' }}>LADIES’ GOWNS</h6>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {LADIES_GOWNS_COLOR_GUIDE.map((item, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ fontSize: '13px', color: '#e8dfd1' }}>
-                    <strong style={{ color: '#ffffff' }}>{item.role}:</strong> {item.name}
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    {item.colors.map((c, cIdx) => (
-                      <span key={cIdx} style={{ width: '18px', height: '18px', borderRadius: '50%', background: c, border: '1px solid rgba(255,255,255,0.3)', display: 'inline-block' }} />
-                    ))}
-                  </div>
+                <div key={idx} style={{ fontSize: '13px', color: '#e8dfd1' }}>
+                  <strong style={{ color: '#ffffff' }}>{item.role}:</strong> {item.name}
                 </div>
               ))}
             </div>
@@ -395,8 +384,13 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
         </div>
       </div>
 
+      {/* Color Guide */}
+      <div style={{ marginTop: 40, marginBottom: 40 }}>
+        <ColorGuideSection colorGuide={invitation.color_guide} image={invitation.color_guide_image} />
+      </div>
+
       {/* RSVP / Confirmation */}
-      {!saveTheDateEnabled && (
+      {!saveTheDateEnabled && !invitation.hide_rsvp && (
         <div className="rl-confirm-block">
           <h4 className="rl-rsvp-heading">RSVP CONFIRMATION</h4>
           {rsvpNote && <p className="rl-rsvp-body">{rsvpNote}</p>}
@@ -429,6 +423,13 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
         </div>
       )}
 
+      {/* Scan to view QR Share */}
+      {(!invitation.hide_qr_share && invitation.qr_enabled !== false && invitation.qr_enabled !== 0 && invitation.qr_enabled !== '0' && invitation.qr_enabled !== 'false') && (
+        <div style={{ marginTop: 40, marginBottom: 40, textAlign: 'center' }}>
+          <QRShare url={shareUrl} enabled={invitation.qr_enabled} />
+        </div>
+      )}
+
       {/* Closing words */}
       <p className="rl-closing-words">YOUR PRESENCE IS OUR GREATEST GIFT</p>
 
@@ -441,6 +442,17 @@ export default function RoyalLuxuryInvitation({ event, invitation, guestMessages
             </div>
           </div>
         </div>
+      )}
+
+      {/* Thank You Footer */}
+      {!invitation.hide_footer && (
+        <InvitationFooter
+          eventName={coupleName}
+          shareUrl={shareUrl}
+          hideShareButton={invitation.hide_share_button}
+          hideRsvpButton={invitation.hide_rsvp_button || invitation.hide_rsvp}
+          hideFooter={invitation.hide_footer}
+        />
       )}
     </div>
   );

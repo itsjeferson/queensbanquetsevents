@@ -1,7 +1,7 @@
 import MediaField from '../common/MediaField/MediaField';
 import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
 import { MAX_AUDIO_SIZE_MB, MAX_IMAGE_SIZE_MB, MAX_VIDEO_SIZE_MB } from '../../utils/mediaUpload';
-import { defaultAttire, defaultEntourage, normalizeWeddingProgram } from '../../utils/invitationContent';
+import { defaultAttire, defaultColorGuide, defaultEntourage, normalizeWeddingProgram } from '../../utils/invitationContent';
 import { ATTIRE_SWATCH_DEFAULT } from '../../utils/invitationTheme';
 import EntourageNameListEditor from './EntourageNameListEditor';
 import InvitationMotifPicker from './InvitationMotifPicker';
@@ -35,6 +35,74 @@ export default function WeddingContentFields({
         ? { ...(entourage[key] || {}), [subKey]: value }
         : value,
     });
+  };
+
+  const folderNames = [];
+  gallery.forEach((item) => {
+    const name = (item.folder || '').trim();
+    if (name && !folderNames.includes(name)) folderNames.push(name);
+  });
+
+  const groups = [];
+  const uncategorizedIndices = [];
+  gallery.forEach((item, index) => {
+    if (!(item.folder || '').trim()) uncategorizedIndices.push(index);
+  });
+  if (uncategorizedIndices.length) groups.push({ folder: '', indices: uncategorizedIndices });
+  folderNames.forEach((name) => {
+    const indices = [];
+    gallery.forEach((item, index) => {
+      if ((item.folder || '').trim() === name) indices.push(index);
+    });
+    groups.push({ folder: name, indices });
+  });
+
+  const setGallery = (next) => {
+    onInvitationChange({ gallery: next.length ? next : [{ caption: '', image: '' }] });
+  };
+
+  const addFolder = () => {
+    const base = 'New Folder';
+    let name = base;
+    let n = 2;
+    while (folderNames.includes(name)) {
+      name = `${base} ${n}`;
+      n += 1;
+    }
+    setGallery([...gallery, { folder: name, caption: '', image: '' }]);
+  };
+
+  const addPhotoSlot = (folder) => {
+    const next = [...gallery];
+    const slot = { folder: folder || '', caption: '', image: '' };
+    let insertAt = next.length;
+    for (let i = next.length - 1; i >= 0; i -= 1) {
+      if ((next[i].folder || '').trim() === folder) {
+        insertAt = i + 1;
+        break;
+      }
+    }
+    next.splice(insertAt, 0, slot);
+    setGallery(next);
+  };
+
+  const removePhotoSlot = (index) => {
+    const next = [...gallery];
+    next.splice(index, 1);
+    setGallery(next);
+  };
+
+  const removeFolder = (folder) => {
+    const next = gallery.filter((item) => (item.folder || '').trim() !== folder);
+    setGallery(next);
+  };
+
+  const renameFolder = (folder, newName) => {
+    const name = newName.trim();
+    const next = gallery.map((item) =>
+      (item.folder || '').trim() === folder ? { ...item, folder: name } : item
+    );
+    setGallery(next);
   };
 
   return (
@@ -332,38 +400,82 @@ export default function WeddingContentFields({
       </div>
 
       <div className="card-widget">
-        <h3>Happy Moments Gallery</h3>
+        <div className="card-widget-head">
+          <h3>Happy Moments Gallery</h3>
+          <button type="button" className="btn btn-outline btn-sm" onClick={addFolder}>
+            + Add Folder
+          </button>
+        </div>
         <div className="card-form-stack">
           <p className="form-help">
             Photos appear in the slideshow. Photo 3 is also used as the countdown background.
+            Create folders (e.g. Engagement, Pre-Nup Shoot) — each one shows as a filter tab on the
+            invitation, and every folder has its own photo slots.
           </p>
-          {gallery.map((item, index) => (
-            <div key={index} className="gallery-photo-item">
-              <div className="form-group">
-                <label>Photo {index + 1} Caption</label>
-                <input
-                  value={item.caption || ''}
-                  onChange={(e) => onGalleryChange(index, { caption: e.target.value })}
-                  placeholder="Caption"
-                />
+          {groups.map((group) => (
+            <div key={group.folder ? `folder-${group.indices[0]}` : 'uncategorized'} className="gallery-folder-group">
+              <div className="gallery-folder-head">
+                {group.folder ? (
+                  <input
+                    className="gallery-folder-name"
+                    value={group.folder}
+                    onChange={(e) => renameFolder(group.folder, e.target.value)}
+                    placeholder="Folder name"
+                  />
+                ) : (
+                  <span className="gallery-folder-name gallery-folder-static">Without Folder</span>
+                )}
+                <div className="gallery-folder-actions">
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => addPhotoSlot(group.folder)}
+                  >
+                    Add Photo Slot
+                  </button>
+                  {group.folder && (
+                    <button
+                      type="button"
+                      className="btn btn-sm gallery-folder-remove"
+                      onClick={() => removeFolder(group.folder)}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
               </div>
-              <MediaField
-                label={`Photo ${index + 1} Image`}
-                value={item.image || ''}
-                onChange={(value) => onGalleryChange(index, { image: value })}
-                accept="image/*"
-                maxSizeMb={MAX_IMAGE_SIZE_MB}
-                onError={onFileError}
-              />
+              {group.indices.map((index) => (
+                <div key={index} className="gallery-photo-item">
+                  <div className="gallery-photo-head">
+                    <span className="gallery-photo-index">Photo {index + 1}</span>
+                    <button
+                      type="button"
+                      className="btn btn-sm gallery-folder-remove"
+                      onClick={() => removePhotoSlot(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="form-group">
+                    <label>Caption</label>
+                    <input
+                      value={gallery[index].caption || ''}
+                      onChange={(e) => onGalleryChange(index, { caption: e.target.value })}
+                      placeholder="Caption"
+                    />
+                  </div>
+                  <MediaField
+                    label="Image"
+                    value={gallery[index].image || ''}
+                    onChange={(value) => onGalleryChange(index, { image: value })}
+                    accept="image/*"
+                    maxSizeMb={MAX_IMAGE_SIZE_MB}
+                    onError={onFileError}
+                  />
+                </div>
+              ))}
             </div>
           ))}
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={() => onInvitationChange({ gallery: [...gallery, { caption: '', image: '' }] })}
-          >
-            Add Photo Slot
-          </button>
         </div>
       </div>
 
@@ -519,66 +631,181 @@ export default function WeddingContentFields({
       <div className="card-widget">
         <h3>What To Wear</h3>
         <p className="form-help" style={{ marginTop: 12 }}>
-          Color swatches default to white. Only colors you change from white will appear on the invitation.
+          Specify attire details for your wedding party and guests.
         </p>
         <div className="form-group" style={{ marginTop: 20 }}>
           <label>Dress Code</label>
-          <input value={invitation.dress_code || ''} onChange={(e) => onInvitationChange({ dress_code: e.target.value })} />
+          <input
+            value={invitation.dress_code || attire.dress_code || ''}
+            onChange={(e) => {
+              onInvitationChange({ dress_code: e.target.value });
+              onAttireChange('dress_code', e.target.value);
+            }}
+            placeholder="FORMAL / BARONG"
+          />
         </div>
 
-        <div className="form-group">
-          <label>Female Primary Sponsors</label>
-          <textarea value={attire.female_primary_sponsors || ''} onChange={(e) => onAttireChange('female_primary_sponsors', e.target.value)} />
+        <p className="inv-settings-field-label" style={{ marginTop: 24, fontWeight: 700 }}>Gentlemen’s Pants</p>
+        <div className="form-group" style={{ marginTop: 8 }}>
+          <label>Groom</label>
+          <input
+            value={attire.gentlemen_pants?.groom || ''}
+            onChange={(e) => onAttireChange('gentlemen_pants', { ...(attire.gentlemen_pants || {}), groom: e.target.value })}
+            placeholder="Dark Brown"
+          />
         </div>
-        <ColorSwatchPicker
-          colors={attire.female_primary_sponsors_colors}
-          onChange={(colors) => onAttireChange('female_primary_sponsors_colors', colors)}
-          labelPrefix="Female Sponsor Color"
-          fallback={ATTIRE_SWATCH_DEFAULT}
-          count={4}
-        />
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>Ninongs</label>
+          <input
+            value={attire.gentlemen_pants?.ninongs || ''}
+            onChange={(e) => onAttireChange('gentlemen_pants', { ...(attire.gentlemen_pants || {}), ninongs: e.target.value })}
+            placeholder="Light Brown"
+          />
+        </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>Groomsmen &amp; Secondary Sponsors</label>
+          <input
+            value={attire.gentlemen_pants?.groomsmen || ''}
+            onChange={(e) => onAttireChange('gentlemen_pants', { ...(attire.gentlemen_pants || {}), groomsmen: e.target.value })}
+            placeholder="Black"
+          />
+        </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>All Other Gentlemen</label>
+          <input
+            value={attire.gentlemen_pants?.other_gentlemen || ''}
+            onChange={(e) => onAttireChange('gentlemen_pants', { ...(attire.gentlemen_pants || {}), other_gentlemen: e.target.value })}
+            placeholder="Black"
+          />
+        </div>
+
+        <p className="inv-settings-field-label" style={{ marginTop: 24, fontWeight: 700 }}>Ladies’ Gowns</p>
+        <div className="form-group" style={{ marginTop: 8 }}>
+          <label>Mothers of the Couple</label>
+          <input
+            value={attire.ladies_gowns?.mothers || ''}
+            onChange={(e) => onAttireChange('ladies_gowns', { ...(attire.ladies_gowns || {}), mothers: e.target.value })}
+            placeholder="Beacon Blue"
+          />
+        </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>Ninangs</label>
+          <input
+            value={attire.ladies_gowns?.ninangs || ''}
+            onChange={(e) => onAttireChange('ladies_gowns', { ...(attire.ladies_gowns || {}), ninangs: e.target.value })}
+            placeholder="Mid-Blue"
+          />
+        </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>Bridesmaids</label>
+          <input
+            value={attire.ladies_gowns?.bridesmaids || ''}
+            onChange={(e) => onAttireChange('ladies_gowns', { ...(attire.ladies_gowns || {}), bridesmaids: e.target.value })}
+            placeholder="Pale Blue or Lime Cream"
+          />
+        </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>Female Secondary Sponsors</label>
+          <input
+            value={attire.ladies_gowns?.secondary_sponsors || ''}
+            onChange={(e) => onAttireChange('ladies_gowns', { ...(attire.ladies_gowns || {}), secondary_sponsors: e.target.value })}
+            placeholder="Titanite Green"
+          />
+        </div>
+        <div className="form-group" style={{ marginTop: 12 }}>
+          <label>All Other Ladies</label>
+          <input
+            value={attire.ladies_gowns?.other_ladies || ''}
+            onChange={(e) => onAttireChange('ladies_gowns', { ...(attire.ladies_gowns || {}), other_ladies: e.target.value })}
+            placeholder="Light Beige, Warm Taupe, Sage Green, or Espresso"
+          />
+        </div>
 
         <div className="form-group" style={{ marginTop: 20 }}>
-          <label>Male Primary Sponsors</label>
-          <textarea value={attire.male_primary_sponsors || ''} onChange={(e) => onAttireChange('male_primary_sponsors', e.target.value)} />
-        </div>
-        <ColorSwatchPicker
-          colors={attire.male_primary_sponsors_colors}
-          onChange={(colors) => onAttireChange('male_primary_sponsors_colors', colors)}
-          labelPrefix="Male Sponsor Color"
-          fallback={ATTIRE_SWATCH_DEFAULT}
-          count={4}
-        />
-
-        <p className="inv-settings-field-label" style={{ marginTop: 28 }}>Guest</p>
-
-        <div className="form-group">
-          <label>Ladies</label>
-          <textarea value={attire.ladies || ''} onChange={(e) => onAttireChange('ladies', e.target.value)} />
-        </div>
-        <ColorSwatchPicker
-          colors={attire.ladies_colors}
-          onChange={(colors) => onAttireChange('ladies_colors', colors)}
-          labelPrefix="Ladies Color"
-          fallback={ATTIRE_SWATCH_DEFAULT}
-          count={4}
-        />
-
-        <div className="form-group" style={{ marginTop: 20 }}>
-          <label>Gentlemen</label>
-          <textarea value={attire.gentlemen || ''} onChange={(e) => onAttireChange('gentlemen', e.target.value)} />
-        </div>
-        <ColorSwatchPicker
-          colors={attire.gentlemen_colors}
-          onChange={(colors) => onAttireChange('gentlemen_colors', colors)}
-          labelPrefix="Gentlemen Color"
-          fallback={ATTIRE_SWATCH_DEFAULT}
-          count={4}
-        />
-
-        <div className="form-group" style={{ marginTop: 20 }}>
-          <label>Reminders</label>
+          <label>Reminders / Note</label>
           <textarea value={attire.reminders || ''} onChange={(e) => onAttireChange('reminders', e.target.value)} />
+        </div>
+      </div>
+
+      <div className="card-widget">
+        <h3>Color Guide</h3>
+        <p className="form-help" style={{ marginTop: 12 }}>
+          Customize color swatches or upload your own custom Color Guide design image.
+        </p>
+
+        <div style={{ marginBottom: 20 }}>
+          <MediaField
+            label="Custom Color Guide Design Image (Optional)"
+            urlLabel="Image URL"
+            placeholder="https://example.com/color-guide-design.png"
+            uploadHint="Upload a custom design image for your Color Guide if you prefer an image over circular swatches."
+            value={invitation.color_guide_image || ''}
+            onChange={(value) => onInvitationChange({ color_guide_image: value })}
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={onFileError}
+          />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+          {(invitation.color_guide || defaultColorGuide()).map((item, index) => (
+            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg-card, #fafafa)', padding: '10px 14px', borderRadius: 8, border: '1px solid #eee' }}>
+              <input
+                type="color"
+                value={item.color || '#091333'}
+                onChange={(e) => {
+                  const updated = [...(invitation.color_guide || defaultColorGuide())];
+                  updated[index] = { ...updated[index], color: e.target.value };
+                  onInvitationChange({ color_guide: updated });
+                }}
+                style={{ width: 44, height: 38, border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                title="Pick color"
+              />
+              <input
+                type="text"
+                value={item.name || ''}
+                onChange={(e) => {
+                  const updated = [...(invitation.color_guide || defaultColorGuide())];
+                  updated[index] = { ...updated[index], name: e.target.value };
+                  onInvitationChange({ color_guide: updated });
+                }}
+                placeholder="Color Name (e.g. MID-BLUE)"
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className="action-btn danger"
+                onClick={() => {
+                  const updated = (invitation.color_guide || defaultColorGuide()).filter((_, i) => i !== index);
+                  onInvitationChange({ color_guide: updated });
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="action-btn"
+            onClick={() => {
+              const updated = [...(invitation.color_guide || defaultColorGuide()), { name: 'NEW COLOR', color: '#6184a8' }];
+              onInvitationChange({ color_guide: updated });
+            }}
+          >
+            + Add Swatch Color
+          </button>
+          <button
+            type="button"
+            className="action-btn outline"
+            onClick={() => {
+              onInvitationChange({ color_guide: defaultColorGuide() });
+            }}
+          >
+            Reset Default Palette
+          </button>
         </div>
       </div>
 

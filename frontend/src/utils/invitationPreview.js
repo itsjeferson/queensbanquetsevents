@@ -93,7 +93,27 @@ function hasAttireDetails(attire, dressCode) {
 
 function mergeThemeFields(apiInvitation = {}, draftInvitation = {}) {
   const merged = { ...apiInvitation };
-  const fields = ['color_motif', 'primary_color', 'secondary_color', 'background_color', 'palette_colors', 'content_reveal_mode', 'content_reveal_order', 'std_photo', 'floral_design_enabled', 'password_protected', 'password', 'hide_music_player'];
+  const fields = [
+    'color_motif',
+    'primary_color',
+    'secondary_color',
+    'background_color',
+    'palette_colors',
+    'content_reveal_mode',
+    'content_reveal_order',
+    'std_photo',
+    'floral_design_enabled',
+    'password_protected',
+    'password',
+    'hide_music_player',
+    'hide_qr_share',
+    'hide_share_button',
+    'hide_rsvp_button',
+    'hide_rsvp',
+    'hide_footer',
+    'qr_enabled',
+    'color_guide',
+  ];
 
   fields.forEach((field) => {
     if (draftInvitation[field] !== undefined && draftInvitation[field] !== null) {
@@ -118,6 +138,7 @@ function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
     'countdown_bg_media',
     'couple_logo',
     'std_music_url',
+    'color_guide_image',
   ];
 
   mediaFields.forEach((field) => {
@@ -128,11 +149,23 @@ function mergeGuestExperienceFields(apiInvitation = {}, draftInvitation = {}) {
     }
   });
 
-  if (typeof draftInvitation.save_the_date_enabled === 'boolean') {
-    merged.save_the_date_enabled = draftInvitation.save_the_date_enabled;
-  }
-  if (typeof draftInvitation.hide_music_player === 'boolean') {
-    merged.hide_music_player = draftInvitation.hide_music_player;
+  const boolFields = [
+    'save_the_date_enabled',
+    'hide_music_player',
+    'hide_qr_share',
+    'hide_share_button',
+    'hide_rsvp_button',
+    'hide_rsvp',
+    'hide_footer',
+  ];
+  boolFields.forEach((field) => {
+    if (typeof draftInvitation[field] === 'boolean') {
+      merged[field] = draftInvitation[field];
+    }
+  });
+
+  if (draftInvitation.qr_enabled !== undefined) {
+    merged.qr_enabled = draftInvitation.qr_enabled;
   }
   if (draftInvitation.content_reveal_mode) {
     merged.content_reveal_mode = draftInvitation.content_reveal_mode;
@@ -296,6 +329,11 @@ export function buildInvitationPreviewData({ event = {}, invitation = {}, guest_
       std_location: pickText(invitation.std_location) || normalized.std_location,
       content_reveal_mode: normalized.content_reveal_mode,
       content_reveal_order: normalized.content_reveal_order,
+      hide_qr_share: normalized.hide_qr_share,
+      hide_share_button: normalized.hide_share_button,
+      hide_rsvp_button: normalized.hide_rsvp_button,
+      hide_rsvp: normalized.hide_rsvp,
+      hide_footer: normalized.hide_footer,
       ...themeFields,
     },
     guest_messages: guest_messages || [],

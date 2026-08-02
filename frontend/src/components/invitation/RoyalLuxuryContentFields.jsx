@@ -1,5 +1,6 @@
 import MediaField from '../common/MediaField/MediaField';
 import { normalizeWeddingProgram } from '../../utils/weddingTimeline';
+import { defaultColorGuide } from '../../utils/invitationContent';
 import ColorSwatchPicker from '../common/ColorInput/ColorSwatchPicker';
 import { ATTIRE_SWATCH_DEFAULT } from '../../utils/invitationTheme';
 import { MAX_IMAGE_SIZE_MB } from '../../utils/mediaUpload';
@@ -409,6 +410,92 @@ export default function RoyalLuxuryContentFields({
             onChange={(e) => updateAttireReminders(e.target.value)}
             placeholder="Adoramos a sus hijos, pero creemos que necesitan una noche libre. ¡SOLO ADULTOS, POR FAVOR!"
           />
+        </div>
+      </div>
+
+      {/* ── Color Guide ─────────────────────────────── */}
+      <div className="card-widget">
+        <div className="inv-builder-section-header">
+          <h3>Color Guide</h3>
+          <span className="inv-builder-gold-line" style={{ background: '#3E5C44' }} />
+        </div>
+        <p className="form-help" style={{ marginTop: 12 }}>
+          Customize color swatches or upload your own custom Color Guide design image.
+        </p>
+
+        <div style={{ marginTop: 16, marginBottom: 20 }}>
+          <MediaField
+            label="Custom Color Guide Design Image (Optional)"
+            urlLabel="Image URL"
+            placeholder="https://example.com/color-guide-design.png"
+            uploadHint="Upload a custom design image for your Color Guide if you prefer an image over circular swatches."
+            value={invitation.color_guide_image || ''}
+            onChange={(value) => onInvitationChange({ color_guide_image: value })}
+            accept="image/*"
+            maxSizeMb={MAX_IMAGE_SIZE_MB}
+            onError={onFileError}
+          />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 16 }}>
+          {(invitation.color_guide || defaultColorGuide()).map((item, index) => (
+            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg-card, #fafafa)', padding: '10px 14px', borderRadius: 8, border: '1px solid #eee' }}>
+              <input
+                type="color"
+                value={item.color || '#091333'}
+                onChange={(e) => {
+                  const updated = [...(invitation.color_guide || defaultColorGuide())];
+                  updated[index] = { ...updated[index], color: e.target.value };
+                  onInvitationChange({ color_guide: updated });
+                }}
+                style={{ width: 44, height: 38, border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                title="Pick color"
+              />
+              <input
+                type="text"
+                value={item.name || ''}
+                onChange={(e) => {
+                  const updated = [...(invitation.color_guide || defaultColorGuide())];
+                  updated[index] = { ...updated[index], name: e.target.value };
+                  onInvitationChange({ color_guide: updated });
+                }}
+                placeholder="Color Name (e.g. MID-BLUE)"
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className="action-btn danger"
+                onClick={() => {
+                  const updated = (invitation.color_guide || defaultColorGuide()).filter((_, i) => i !== index);
+                  onInvitationChange({ color_guide: updated });
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, marginTop: 20, flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="action-btn"
+            onClick={() => {
+              const updated = [...(invitation.color_guide || defaultColorGuide()), { name: 'NEW COLOR', color: '#6184a8' }];
+              onInvitationChange({ color_guide: updated });
+            }}
+          >
+            + Add Swatch Color
+          </button>
+          <button
+            type="button"
+            className="action-btn outline"
+            onClick={() => {
+              onInvitationChange({ color_guide: defaultColorGuide() });
+            }}
+          >
+            Reset Default Palette
+          </button>
         </div>
       </div>
 
