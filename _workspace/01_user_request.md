@@ -1,1 +1,1 @@
-remove this "gifts" since we already have the "Wedding Gifts"
+theres a design overlapping here. can you move the play music button to the top right corner?

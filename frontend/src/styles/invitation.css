@@ -7466,7 +7466,7 @@ html.invitation-scroll::-webkit-scrollbar {
 /* ── Floating Fixed Music Toggle Button ────────────────── */
 .inv-floating-music-btn {
   position: fixed;
-  bottom: 24px;
+  top: 24px;
   right: 24px;
   z-index: 99999;
   width: 48px;
