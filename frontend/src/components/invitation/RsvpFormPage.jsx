@@ -24,7 +24,7 @@ export default function RsvpFormPage({ event, invitation, onRsvpSuccess }) {
     setLoading(true);
     setForm(prev => ({ ...prev, attendance: attendanceValue }));
 
-    let hasDuplicateError = false;
+    let isConfirmedOrDuplicate = false;
     try {
       await rsvpService.submit({
         event_id: event.id,
@@ -35,19 +35,19 @@ export default function RsvpFormPage({ event, invitation, onRsvpSuccess }) {
         message: form.facebookLink ? `Facebook: ${form.facebookLink}` : '',
         guest_count: attendanceValue === 'yes' ? 1 : 0,
       });
+      isConfirmedOrDuplicate = true;
     } catch (err) {
       if (err.response?.status === 409 || err.response?.data?.error === 'duplicate') {
-        setFormError(err.response.data.message || 'You have already submitted an RSVP for this invitation.');
-        hasDuplicateError = true;
+        isConfirmedOrDuplicate = true;
+      } else {
+        setFormError(err.response?.data?.message || 'Failed to submit RSVP. Please try again.');
       }
     } finally {
       setLoading(false);
-      if (!hasDuplicateError) {
+      if (isConfirmedOrDuplicate) {
         setSubmitted(true);
         if (attendanceValue === 'yes') {
-          setTimeout(() => {
-            onRsvpSuccess?.({ name: form.name, attendance: 'yes' });
-          }, 2500);
+          onRsvpSuccess?.({ name: form.name, attendance: 'yes' });
         }
       }
     }

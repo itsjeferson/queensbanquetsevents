@@ -189,7 +189,9 @@ export default function InvitationRenderer({
     }
 
     setRsvpUnlocked(unlockContext, { name, attendance });
-    onGuestUnlock?.();
+    setTimeout(() => {
+      onGuestUnlock?.();
+    }, 2000);
   };
 
   const handlePasswordUnlock = () => {
