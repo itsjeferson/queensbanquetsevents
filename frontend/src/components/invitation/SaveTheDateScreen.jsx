@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getCoupleDisplayName } from '../../utils/invitationContent';
-import { formatSaveTheDateCompact, getSaveTheDatePhoto } from '../../utils/saveTheDateFormat';
+import { formatSaveTheDateCompact, getSaveTheDateLocation, getSaveTheDatePhoto } from '../../utils/saveTheDateFormat';
 import CoupleNameHeading from './CoupleNameHeading';
 import { rsvpService } from '../../services/invitationService';
 import { Spinner } from '../common/Loader/Loader';
@@ -20,6 +20,8 @@ export default function SaveTheDateScreen({ event, invitation, rsvpForceForm, on
 
   const coupleDisplay = getCoupleDisplayName(event, invitation);
   const dateLine = formatSaveTheDateCompact(event.event_date);
+  const locationLine = getSaveTheDateLocation(invitation);
+  const deadlineLine = (invitation.std_deadline?.trim() || '').toUpperCase();
   const photoUrl = getSaveTheDatePhoto(invitation);
 
   const handleRsvpSubmit = async (attendanceValue) => {
@@ -82,7 +84,10 @@ export default function SaveTheDateScreen({ event, invitation, rsvpForceForm, on
     <section className="inv-std inv-std-classic" id="save-the-date">
       <div className="inv-std-classic-bg" aria-hidden="true">
         {photoUrl ? (
-          <img className="inv-std-classic-photo" src={photoUrl} alt="" />
+          <>
+            <img className="inv-std-classic-blur" src={photoUrl} alt="" />
+            <img className="inv-std-classic-photo" src={photoUrl} alt="" />
+          </>
         ) : (
           <div className="inv-std-classic-photo inv-std-classic-photo-fallback" />
         )}
@@ -106,6 +111,10 @@ export default function SaveTheDateScreen({ event, invitation, rsvpForceForm, on
               <CoupleNameHeading name={coupleDisplay} className="inv-std-classic-couple" />
             </div>
           )}
+
+          {locationLine && (
+            <p className="inv-std-classic-location">{locationLine}</p>
+          )}
         </header>
 
         <div className="inv-std-classic-rsvp">
@@ -118,6 +127,11 @@ export default function SaveTheDateScreen({ event, invitation, rsvpForceForm, on
               >
                 RSVP
               </button>
+              {deadlineLine && (
+                <p className="inv-std-classic-deadline">
+                  DEADLINE: <span>{deadlineLine}</span>
+                </p>
+              )}
             </div>
           )}
 

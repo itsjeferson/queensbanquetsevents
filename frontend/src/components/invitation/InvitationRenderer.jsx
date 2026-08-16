@@ -304,7 +304,6 @@ export default function InvitationRenderer({
                   guestMessages={guestMessages}
                   saveTheDateEnabled={saveTheDateActive}
                   sectionOrder={sectionOrder}
-                  gradualReveal={gradualReveal}
                   musicOn={musicOn}
                   toggleMusic={toggleMusic}
                 />

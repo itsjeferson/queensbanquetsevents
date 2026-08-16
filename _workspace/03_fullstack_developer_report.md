@@ -1,14 +1,24 @@
-# Fullstack Developer Report
+# Fullstack Developer Report: Non-Collapsing Full-Content Multi-Device Wedding Invitation
 
-## Problem Analysis
-- When submitting RSVP on the Save the Date screen or page, `onRsvpSuccess` was delayed inside a 2.5 second `setTimeout`.
-- If a guest refreshed the browser before the 2.5s timer completed, the local storage unlock record was never written.
-- When the guest attempted to re-submit RSVP, the backend returned HTTP 409 (`duplicate`). Previously, 409 responses were treated as errors and blocked `onRsvpSuccess`, leaving the guest permanently trapped on the Save the Date page.
-
-## Changes Made
-1. **[SaveTheDateScreen.jsx](file:///c:/queens-banquet-events/frontend/src/components/invitation/SaveTheDateScreen.jsx#L25-L60)** & **[RsvpFormPage.jsx](file:///c:/queens-banquet-events/frontend/src/components/invitation/RsvpFormPage.jsx#L18-L54)**:
-   - Synchronously invoke `onRsvpSuccess` immediately upon submission (or upon receiving HTTP 409 duplicate) so the unlock state is persisted to `localStorage` at frame 0.
-   - Treat HTTP 409 (`duplicate`) as a successful confirmation for the guest instead of trapping them with an error message.
-2. **[InvitationRenderer.jsx](file:///c:/queens-banquet-events/frontend/src/components/invitation/InvitationRenderer.jsx#L182-L194)**:
-   - Instantly write the unlock state to local storage via `setRsvpUnlocked` when `handleSaveTheDateRsvp` runs.
-   - Added a 2-second transition delay before invoking `onGuestUnlock` so the guest can read the confirmation text ("RSVP Confirmed! Opening your invitation...") while ensuring page refreshes immediately open the main invitation page (`/invite/:slug`).
+## Summary of Changes
+1. **Botanical Watercolor Accent (`BotanicalLeafBranch.jsx`)**:
+   - Implemented high-resolution SVG botanical eucalyptus greenery corner accent matching the reference screenshots.
+2. **Entourage Section (`EntourageFullSection.jsx`)**:
+   - Added large gold cursive header "Entourage" with botanical leaf corner.
+   - Built full hierarchy: Parents of the Groom & Bride, Principal Sponsors (2 balanced columns: Male & Female), Best Men & Matron/Maid of Honor, Secondary Sponsors (Veil, Candle, Cord), Bearers (Bible, Ring, Coin), Flower Girls, and Ceremony Contributors / Officiants.
+   - Preserves 2-column side-by-side layout on all screens (mobile, tablet, desktop) using fluid clamp typography.
+3. **Details Section (`AttireGuideSection.jsx`)**:
+   - Added large gold cursive header "Details" with top-right eucalyptus branch.
+   - Attire: Strictly formal badge, ladies & gentlemen description.
+   - Principal Sponsors Color Motif (Matte Gold) + Guests Color Palette (Pastel Earth swatches + cautionary notice).
+   - Couple formalwear vector illustration (`AttireCoupleIllustration.jsx`) beside the swatches.
+   - Unplugged Ceremony message card.
+   - Children and Companions policy message card.
+   - Venue Information: "Where we say 'I do'" & "Where we celebrate" side-by-side with church/pavilion vintage architectural sketches and scan-to-navigate QR codes (`VenueSketchIllustration.jsx`).
+4. **Venue Details Section (`WeddingDetailsSection.jsx`)**:
+   - Updated with church & pavilion sketches, Google Maps QR codes, and non-collapsing 2-column layout.
+5. **CSS Styles & Media Queries (`invitation.css`)**:
+   - Added `.inv-entourage-luxurious`, `.inv-details-full-section`, `.inv-entourage-two-col`, `.inv-venue-two-col`, `.inv-attire-visual-grid`, `.inv-attire-circle-swatch`, etc.
+   - Guaranteed that mobile devices maintain the elegant 2-column layout without collapsing.
+6. **Data & Normalization (`demoInvitation.js` & `invitationContent.js`)**:
+   - Fully populated all entourage roles, attire swatches, messages, and sketches in default content.

@@ -60,6 +60,14 @@ export default function InvitationExperienceSettings({
               placeholder="San Antonio, Texas"
             />
           </div>
+          <div className="form-group">
+            <label>RSVP Deadline</label>
+            <input
+              value={invitation.std_deadline || ''}
+              onChange={(e) => onChange({ std_deadline: e.target.value })}
+              placeholder="October 15, 2026"
+            />
+          </div>
           <MediaField
             label="Couple photo"
             urlLabel="Online photo URL"

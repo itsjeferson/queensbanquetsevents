@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getCoupleDisplayName } from '../../utils/invitationContent';
+import { formatSaveTheDateCompact, getSaveTheDateLocation } from '../../utils/saveTheDateFormat';
 import { rsvpService } from '../../services/invitationService';
 import { Spinner } from '../common/Loader/Loader';
 import CoupleNameHeading from './CoupleNameHeading';
@@ -14,6 +15,10 @@ export default function RsvpFormPage({ event, invitation, onRsvpSuccess }) {
   const [submitted, setSubmitted] = useState(false);
 
   const coupleDisplay = getCoupleDisplayName(event, invitation);
+  const dateLine = formatSaveTheDateCompact(event.event_date);
+  const locationLine = getSaveTheDateLocation(invitation);
+  const deadlineLine = (invitation.std_deadline?.trim() || '').toUpperCase();
+  const detailsLine = [dateLine, locationLine].filter(Boolean).join(' | ');
 
   const handleRsvpSubmit = async (attendanceValue) => {
     if (!form.name || !form.phone || !form.email) {
@@ -71,6 +76,14 @@ export default function RsvpFormPage({ event, invitation, onRsvpSuccess }) {
               )}
               <h1 className="rsvp-page-title">RSVP</h1>
               <div className="rsvp-page-header-line"></div>
+              {detailsLine && (
+                <div className="rsvp-page-details">
+                  <p className="rsvp-page-details-line">{detailsLine}</p>
+                  {deadlineLine && (
+                    <p className="rsvp-page-details-deadline">DEADLINE: {deadlineLine}</p>
+                  )}
+                </div>
+              )}
             </header>
 
             <div className="inv-rsvp-page-field">

@@ -4,12 +4,13 @@ export default function CoupleShowcaseSection({ groom, bride }) {
   if (!groomName && !brideName && !groom?.photo && !bride?.photo) return null;
 
   const cards = [
-    { role: 'The Groom', profile: groom },
     { role: 'The Bride', profile: bride },
+    { role: 'The Groom', profile: groom },
   ].filter((item) => item.profile?.name?.trim() || item.profile?.photo);
 
   return (
     <section className="inv-section inv-couple-showcase">
+      <p className="inv-script-title inv-script-title-small">The Bride &amp; Groom</p>
       <div className="inv-couple-showcase-grid">
         {cards.map(({ role, profile }) => (
           <article key={role} className="inv-couple-card">

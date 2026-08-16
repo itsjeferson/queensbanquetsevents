@@ -3,8 +3,8 @@ function NameList({ items }) {
   if (!list.length) return null;
   return (
     <ul className="inv-entourage-names">
-      {list.map((name) => (
-        <li key={name}>{name}</li>
+      {list.map((name, index) => (
+        <li key={`${name}-${index}`}>{name}</li>
       ))}
     </ul>
   );

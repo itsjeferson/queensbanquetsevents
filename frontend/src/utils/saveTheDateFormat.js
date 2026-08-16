@@ -25,11 +25,11 @@ export function formatSaveTheDateCompact(eventDate) {
   const parsed = parseEventDate(eventDate);
   if (!parsed) return '';
 
-  const day = String(parsed.getDate()).padStart(2, '0');
-  const month = String(parsed.getMonth() + 1).padStart(2, '0');
+  const day = parsed.getDate();
+  const month = parsed.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
   const year = parsed.getFullYear();
 
-  return `${day}.${month}.${year}`;
+  return `${month} ${day}, ${year}`;
 }
 
 export function formatStdCoupleName(displayName = '') {

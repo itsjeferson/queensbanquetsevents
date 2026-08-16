@@ -638,13 +638,13 @@
 }
 
 .inv-attire-stack {
-  max-width: 680px;
+  max-width: 880px;
   margin: 0 auto;
   text-align: center;
 }
 
 .inv-attire-header-block {
-  max-width: 680px;
+  max-width: 880px;
   margin: 0 auto 28px;
   text-align: center;
 }
@@ -655,6 +655,41 @@
   line-height: 1.6;
   color: var(--inv-muted, #555);
   margin-top: 12px;
+}
+
+.inv-attire-reference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 880px;
+  margin: 0 auto 28px;
+}
+
+.inv-attire-reference {
+  margin: 0;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--inv-line, #e2d7c7);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.inv-attire-reference img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.inv-attire-reference figcaption {
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--inv-primary, #6b8f71);
+  margin-top: 10px;
 }
 
 .inv-attire-guide-card {
@@ -953,9 +988,9 @@
   font-style: italic;
   font-size: clamp(15px, 2vw, 19px);
   line-height: 1.35;
-  color: #B0DB8A !important;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  color: #2F5233 !important;
+  font-weight: 700;
+  text-shadow: none;
   min-height: 2.7em;
   display: flex;
   align-items: flex-end;
@@ -998,7 +1033,7 @@
   font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
   font-size: clamp(28px, 4.5vw, 42px);
-  color: rgba(109, 98, 91, 0.75);
+  color: var(--inv-muted);
   text-align: center;
   margin: 8px 0 0;
 }
@@ -1460,7 +1495,7 @@
   font-family: 'Playfair Display', serif;
   font-size: clamp(16px, 2.2vw, 20px);
   line-height: 1.85;
-  color: var(--inv-muted);
+  color: #000;
 }
 
 .inv-story-message-soft {
@@ -1528,7 +1563,7 @@
 }
 
 .inv-couple-card p {
-  color: var(--inv-muted);
+  color: #000;
   font-size: 14px;
   line-height: 1.6;
 }
@@ -1629,9 +1664,10 @@
 }
 
 .inv-entourage-header-accent {
-  color: #B0DB8A !important;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  color: #2F5233 !important;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: none;
 }
 
 .inv-entourage-couple-row > div > span {
@@ -2633,18 +2669,16 @@ html.invitation-scroll {
   scroll-behavior: auto;
 }
 
+/* Non-collapsing full-content: sections are always fully visible on every
+   device. The reveal-visible rule is kept only as an inert fallback. */
 .inv-scroll-reveal {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-  will-change: transform, opacity;
-  transition:
-    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
+  transform: none;
 }
 
 .inv-scroll-reveal.inv-scroll-reveal-visible {
   opacity: 1;
-  transform: translate3d(0, 0, 0);
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3343,10 +3377,19 @@ html.invitation-scroll::-webkit-scrollbar {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 28%;
+  object-fit: contain;
+  object-position: center;
   filter: grayscale(1) contrast(1.08);
-  transform: scale(1.03);
+}
+
+.inv-std-classic-blur {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(28px) grayscale(1) brightness(0.55) contrast(1.05);
+  transform: scale(1.15);
 }
 
 .inv-std-classic-photo-fallback {
@@ -6968,6 +7011,29 @@ html.invitation-scroll::-webkit-scrollbar {
   margin: 20px auto 0 auto;
 }
 
+.rsvp-page-details {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.rsvp-page-details-line {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1a202c;
+}
+
+.rsvp-page-details-deadline {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #718096;
+}
+
 .inv-rsvp-page-field {
   display: flex;
   flex-direction: column;
@@ -7528,8 +7594,21 @@ html.invitation-scroll::-webkit-scrollbar {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   z-index: 1;
+  filter: none;
+}
+
+.inv-std-classic-blur {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: blur(28px) brightness(0.5) saturate(1.1);
+  transform: scale(1.15);
 }
 
 .inv-std-classic-photo-fallback {
@@ -7541,7 +7620,7 @@ html.invitation-scroll::-webkit-scrollbar {
   inset: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.75) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0%, rgba(0, 0, 0, 0.34) 55%, rgba(0, 0, 0, 0.52) 100%);
   z-index: 2;
 }
 
@@ -7605,6 +7684,7 @@ html.invitation-scroll::-webkit-scrollbar {
 
 .inv-std-classic-couple-block {
   margin-top: 14px;
+  margin-bottom: clamp(18px, 4vw, 26px);
 }
 
 .inv-std-classic-for {
@@ -7620,6 +7700,28 @@ html.invitation-scroll::-webkit-scrollbar {
   color: #ffffff;
   font-weight: 600;
   letter-spacing: 0.03em;
+}
+
+.inv-std-classic-location {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(13px, 3vw, 16px);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+.inv-std-classic-deadline {
+  margin: 20px 0 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(11px, 2.6vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
 }
 
 .inv-std-rsvp-trigger-btn {
@@ -8114,6 +8216,15 @@ html.invitation-scroll::-webkit-scrollbar {
   .inv-std-classic-couple-block {
     margin-top: 10px;
   }
+  .inv-std-classic-location {
+    font-size: clamp(11px, 3.4vw, 14px);
+    letter-spacing: 0.16em;
+  }
+  .inv-std-classic-deadline {
+    font-size: clamp(9px, 2.8vw, 12px);
+    margin-top: 14px;
+    letter-spacing: 0.14em;
+  }
   .inv-std-rsvp-trigger-btn {
     padding: 12px 32px;
     font-size: 13px;
@@ -8227,6 +8338,13 @@ html.invitation-scroll::-webkit-scrollbar {
 @media (max-width: 768px) {
   .inv-std-classic-bg {
     position: absolute;
+  }
+  .inv-std-classic-blur {
+    display: none;
+  }
+  .inv-std-classic-photo {
+    object-fit: cover;
+    object-position: center;
   }
 }
 
@@ -8351,6 +8469,9 @@ html.invitation-scroll::-webkit-scrollbar {
   /* Attire Section */
   .inv-attire-stack {
     padding: 0 2px;
+  }
+  .inv-attire-reference-grid {
+    grid-template-columns: 1fr;
   }
   .inv-attire-guide-card {
     padding: 18px 12px;

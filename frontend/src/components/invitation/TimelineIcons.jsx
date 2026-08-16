@@ -15,18 +15,17 @@ export function TimelineIcon({ id }) {
     case 'ceremony':
       return (
         <svg {...iconProps}>
-          <path d="M21 8v26M14 14h14M17 14V11a4 4 0 0 1 8 0v3" />
-          <path d="M12 34h18" />
-          <path d="M21 8l-3 4h6l-3-4z" />
+          <path d="M9 34V21l12-7 12 7v13" />
+          <path d="M15 34v-6h12v6" />
+          <path d="M21 14V7M17 10h8" />
         </svg>
       );
     case 'pictorial':
       return (
         <svg {...iconProps}>
-          <rect x="8" y="12" width="16" height="18" rx="1.5" />
-          <rect x="18" y="8" width="16" height="18" rx="1.5" />
-          <circle cx="16" cy="20" r="2.5" />
-          <path d="M11 27l4-4 3 3 5-6 4 5" />
+          <rect x="9" y="13" width="24" height="16" rx="2.5" />
+          <path d="M15 13l2-4h8l2 4" />
+          <circle cx="21" cy="21" r="5" />
         </svg>
       );
     case 'cocktail':
@@ -41,27 +40,29 @@ export function TimelineIcon({ id }) {
     case 'program':
       return (
         <svg {...iconProps}>
-          <path d="M12 28c2-8 6-12 9-12s7 4 9 12" />
-          <circle cx="15" cy="30" r="2.5" />
-          <circle cx="27" cy="30" r="2.5" />
-          <path d="M17.5 30h7" />
+          <rect x="16.5" y="6" width="9" height="15" rx="4.5" />
+          <path d="M12 20a9 9 0 0 0 18 0" />
+          <path d="M21 29v5M16 34h10" />
         </svg>
       );
     case 'dinner':
       return (
         <svg {...iconProps}>
-          <circle cx="21" cy="21" r="10" />
-          <path d="M21 11v20M11 21h20" />
-          <path d="M14 14l14 14M28 14L14 28" />
+          <path d="M12 5v15M16 5v15" />
+          <path d="M10 6a4 4 0 0 1 8 0" />
+          <path d="M12 20v10M16 20v10" />
+          <path d="M10 30h8" />
+          <path d="M30 5v14a5 5 0 0 1-9 1V5" />
+          <path d="M25.5 20v10M21 30h9" />
         </svg>
       );
     case 'sde':
       return (
         <svg {...iconProps}>
-          <rect x="10" y="13" width="22" height="16" rx="2" />
-          <path d="M16 13l2-4h8l2 4" />
-          <circle cx="21" cy="21" r="4" />
-          <path d="M10 19h3M29 19h3" />
+          <circle cx="21" cy="21" r="9" />
+          <path d="M21 12v18M12 21h18" />
+          <path d="M15 15l12 12M27 15L15 27" />
+          <path d="M33 9l1.2 2.3 2.3 1.2-2.3 1.2L33 16l-1.2-2.3-2.3-1.2 2.3-1.2L33 9z" />
         </svg>
       );
     default:

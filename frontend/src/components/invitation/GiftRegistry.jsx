@@ -10,7 +10,7 @@ export default function GiftRegistry({ registry }) {
     <section className="inv-section-full" id="gifts">
       <FloralCornerFrame className="inv-floral-frame-section">
         <div className="inv-section">
-        <h2>Wedding Gift</h2>
+        <h2>{registry.title || 'Wedding Gift'}</h2>
         <div className="inv-divider" />
         <div className="inv-gift-info">
           {registry.preferences && <p>{registry.preferences}</p>}

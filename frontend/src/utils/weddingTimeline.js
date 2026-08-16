@@ -1,10 +1,10 @@
 export const WEDDING_TIMELINE_ITEMS = [
-  { id: 'ceremony', title: 'Wedding Ceremony', time: '3:00 PM' },
+  { id: 'ceremony', title: 'Wedding Ceremony', time: '2:00 PM' },
   { id: 'pictorial', title: 'Pictorial', time: '4:00 PM' },
-  { id: 'cocktail', title: 'Cocktail Hour', time: '4:30 PM' },
+  { id: 'cocktail', title: 'Cocktail Hour @ Serenscapes Open-Air Lawn', time: '5:00 PM' },
   { id: 'program', title: 'Program Proper', time: '6:00 PM' },
   { id: 'dinner', title: 'Dinner', time: '7:00 PM' },
-  { id: 'sde', title: 'Same Day Edit Photo and Video', time: '8:30 PM' },
+  { id: 'sde', title: 'After Party', time: '9:00 PM ONWARDS' },
 ];
 
 export const defaultWeddingProgram = () => WEDDING_TIMELINE_ITEMS.map(({ title, time }) => ({

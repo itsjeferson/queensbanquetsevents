@@ -22,49 +22,19 @@ import WeddingMonthCalendar from './WeddingMonthCalendar';
 import ScrollToTopButton from '../common/ScrollToTop/ScrollToTopButton';
 import { parseEventDate } from '../../utils/eventDate';
 import { isDirectVideoUrl, resolveMediaUrl } from '../../utils/mediaUrl';
-import { useEffect, useRef } from 'react';
 
 function SectionShell({
   sectionId,
   floral,
-  scrollAnimation,
   children,
 }) {
-  const shellRef = useRef(null);
   const content = floral ? (
     <FloralCornerFrame className="inv-floral-frame-section">{children}</FloralCornerFrame>
   ) : children;
 
-  useEffect(() => {
-    if (!scrollAnimation) return undefined;
-
-    const node = shellRef.current;
-    if (!node) return undefined;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        node.classList.add('inv-scroll-reveal-visible');
-        document.dispatchEvent(new CustomEvent('aos:in', { detail: node }));
-        observer.disconnect();
-      },
-      { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [scrollAnimation, sectionId]);
-
-  const classes = [
-    'inv-section-shell',
-    `inv-section-${sectionId}`,
-    scrollAnimation ? 'inv-scroll-reveal' : '',
-  ].filter(Boolean).join(' ');
-
   return (
     <div
-      ref={scrollAnimation ? shellRef : undefined}
-      className={classes}
+      className={`inv-section-shell inv-section-${sectionId}`}
       data-section-id={sectionId}
     >
       {content}
@@ -80,10 +50,6 @@ export function renderInvitationSection(sectionId, ctx) {
     shareUrl,
     guestMessages,
     saveTheDateEnabled,
-    gradualReveal,
-    animateHero,
-    scrollAnimation,
-    showFollowMessage,
     musicOn,
     toggleMusic,
   } = ctx;
@@ -91,13 +57,13 @@ export function renderInvitationSection(sectionId, ctx) {
   switch (sectionId) {
     case 'hero':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
-          <OpenedHeroSection event={event} invitation={invitation} animateHero={animateHero} />
+        <SectionShell sectionId={sectionId} floral={false}>
+          <OpenedHeroSection event={event} invitation={invitation} animateHero />
         </SectionShell>
       );
     case 'quote_primary':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <QuoteBlock quote={invitation.quote} source={invitation.quote_source} compact />
           {!invitation.hide_music_player && (
             <MusicPlayerCard musicOn={musicOn} toggleMusic={toggleMusic} />
@@ -106,25 +72,25 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'story_intro':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <StoryIntroSection story={invitation.story} showMessages={false} />
         </SectionShell>
       );
     case 'quote_secondary':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <QuoteBlock quote={invitation.secondary_quote} compact />
         </SectionShell>
       );
     case 'couple_initials':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <CoupleInitialsSection event={event} invitation={invitation} />
         </SectionShell>
       );
     case 'invitation_message':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <StoryIntroSection
             showTitleImage={false}
             invitationMessage={invitation.story.invitation_message || invitation.invitation_message}
@@ -134,13 +100,13 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'couple_showcase':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <CoupleShowcaseSection groom={invitation.groom_profile} bride={invitation.bride_profile} />
         </SectionShell>
       );
     case 'wedding_details':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <WeddingDetailsSection event={event} venue={invitation.venue} />
         </SectionShell>
       );
@@ -156,7 +122,7 @@ export function renderInvitationSection(sectionId, ctx) {
       const countdownTitle = invitation.countdown_title?.trim() || "Countdown to forever:";
 
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <section className="inv-countdown-band-media" id="countdown">
             {isVideoMedia ? (
               <video src={countdownMedia} autoPlay muted loop playsInline className="inv-countdown-media-bg" />
@@ -174,19 +140,19 @@ export function renderInvitationSection(sectionId, ctx) {
     case 'rsvp':
       if (saveTheDateEnabled || invitation.save_the_date_enabled || invitation.hide_rsvp) return null;
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <RSVPForm eventId={event.id} note={invitation.rsvp_note} />
         </SectionShell>
       );
     case 'entourage':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <EntourageFullSection entourage={invitation.entourage} />
         </SectionShell>
       );
     case 'attire':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <AttireGuideSection
             attire={invitation.attire}
             dressCode={invitation.dress_code}
@@ -196,37 +162,37 @@ export function renderInvitationSection(sectionId, ctx) {
       );
     case 'color_guide':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <ColorGuideSection colorGuide={invitation.color_guide} image={invitation.color_guide_image} />
         </SectionShell>
       );
     case 'program':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <TimelineSection program={invitation.program} coupleName={coupleName} />
         </SectionShell>
       );
     case 'gift_registry':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <GiftRegistry registry={invitation.gift_registry} />
         </SectionShell>
       );
     case 'faqs':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <FaqSection faqs={invitation.faqs} />
         </SectionShell>
       );
     case 'gallery':
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <HappyMomentsSlideshow gallery={invitation.gallery} />
         </SectionShell>
       );
     case 'guest_book':
       return (
-        <SectionShell sectionId={sectionId} floral scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral>
           <GuestBook eventId={event.id} messages={guestMessages} />
         </SectionShell>
       );
@@ -235,7 +201,7 @@ export function renderInvitationSection(sectionId, ctx) {
         return null;
       }
       return (
-        <SectionShell sectionId={sectionId} floral={false} scrollAnimation={scrollAnimation}>
+        <SectionShell sectionId={sectionId} floral={false}>
           <QRShare url={shareUrl} enabled={invitation.qr_enabled} />
         </SectionShell>
       );
@@ -263,7 +229,6 @@ export default function InvitationMainContent({
   guestMessages,
   saveTheDateEnabled,
   sectionOrder,
-  gradualReveal = false,
   musicOn,
   toggleMusic,
 }) {
@@ -274,25 +239,14 @@ export default function InvitationMainContent({
     shareUrl,
     guestMessages,
     saveTheDateEnabled,
-    gradualReveal,
-    animateHero: true,
     musicOn,
     toggleMusic,
   };
 
-  const showFollowMessage = gradualReveal;
-
   return (
     <main id="inv-main" className="inv-main">
-      {sectionOrder.map((sectionId, index) => {
-        const skipScrollAnimation = gradualReveal && index === 0;
-        const section = renderInvitationSection(sectionId, {
-          ...sectionCtx,
-          gradualReveal,
-          animateHero: gradualReveal && index === 0,
-          scrollAnimation: !skipScrollAnimation,
-          showFollowMessage: sectionId === 'countdown' && showFollowMessage,
-        });
+      {sectionOrder.map((sectionId) => {
+        const section = renderInvitationSection(sectionId, sectionCtx);
         if (!section) return null;
         return <div key={sectionId}>{section}</div>;
       })}

@@ -147,6 +147,7 @@ class InvitationPage
             'std_cover_image' => $story['std_cover_image'] ?? '',
             'std_photo' => $story['std_photo'] ?? ($story['std_cover_image'] ?? ''),
             'std_location' => $story['std_location'] ?? '',
+            'std_deadline' => $story['std_deadline'] ?? '',
             'content_reveal_mode' => ($story['content_reveal_mode'] ?? 'full') === 'gradual' ? 'gradual' : 'full',
             'content_reveal_order' => is_array($story['content_reveal_order'] ?? null) ? $story['content_reveal_order'] : [],
             'floral_design_enabled' => ($story['floral_design_enabled'] ?? true) !== false,
@@ -237,6 +238,7 @@ class InvitationPage
         $story['std_cover_image'] = $data['std_cover_image'] ?? ($story['std_cover_image'] ?? '');
         $story['std_photo'] = $data['std_photo'] ?? ($data['std_cover_image'] ?? ($story['std_photo'] ?? ($story['std_cover_image'] ?? '')));
         $story['std_location'] = $data['std_location'] ?? ($story['std_location'] ?? '');
+        $story['std_deadline'] = $data['std_deadline'] ?? ($story['std_deadline'] ?? '');
         $story['std_music_url'] = $data['std_music_url'] ?? ($story['std_music_url'] ?? '');
         $story['hide_music_player'] = (bool) ($data['hide_music_player'] ?? ($story['hide_music_player'] ?? false));
         $story['content_reveal_mode'] = ($data['content_reveal_mode'] ?? ($story['content_reveal_mode'] ?? 'full')) === 'gradual'
@@ -364,6 +366,11 @@ class InvitationPage
 
         if (empty($story['std_location']) && !empty($existing['std_location'])) {
             $story['std_location'] = $existing['std_location'];
+            $normalized['story'] = $story;
+        }
+
+        if (empty($story['std_deadline']) && !empty($existing['std_deadline'])) {
+            $story['std_deadline'] = $existing['std_deadline'];
             $normalized['story'] = $story;
         }
 

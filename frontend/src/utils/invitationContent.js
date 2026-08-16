@@ -59,8 +59,8 @@ export const defaultAttire = () => ({
     secondary_sponsors: 'Titanite Green',
     other_ladies: 'Light Beige, Warm Taupe, Sage Green, or Espresso',
   },
-  reminders: 'To honor our wedding party and family, we have assigned specific colors for each group.',
-  color_guide_note: 'To honor our wedding party and family, we have assigned specific colors for each group.',
+  reminders: 'Kindly join this once in a lifetime celebration by wearing the following',
+  color_guide_note: 'Kindly join this once in a lifetime celebration by wearing the following',
 });
 
 export const defaultColorGuide = () => [
@@ -141,6 +141,7 @@ export const defaultWeddingInvitationContent = {
   std_cover_image: '',
   std_photo: '',
   std_location: '',
+  std_deadline: '',
   content_reveal_mode: 'full',
   content_reveal_order: [],
   floral_design_enabled: true,
@@ -438,6 +439,7 @@ export function normalizeInvitationContent(invitation = {}) {
     std_cover_image: resolveMedia(invitation.std_cover_image),
     std_photo: resolveMedia(invitation.std_photo || invitation.std_cover_image),
     std_location: invitation.std_location || '',
+    std_deadline: invitation.std_deadline || '',
     content_reveal_mode: (invitation.content_reveal_mode ?? invitation.story?.content_reveal_mode) === 'gradual'
       ? 'gradual'
       : 'full',
